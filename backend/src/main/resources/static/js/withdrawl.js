@@ -1,8 +1,8 @@
 
 const params_with = new URLSearchParams(window.location.search);
-const useracc_with = params_with.get("accno");
+const token_with = params_with.get("token");
 
-function withdrawl(redirect_page,passed_amount) {
+function withdrawl(redirect_page,passed_token,passed_amount) {
 
     if(redirect_page){
         //hoo the call came from the frontend - so first validate the pin then withdrawl
@@ -15,7 +15,7 @@ function withdrawl(redirect_page,passed_amount) {
         else {
             //now we had valid amount - redirect to pin page - validate - if correct - come here with values
             let action = "withdrawl"
-            window.location.href = "pin.html?accno=" + useracc_with + "&action=" + action + "&amount=" + amt;
+            window.location.href = "pin.html?token=" + token_with + "&action=" + action + "&amount=" + amt;
         }
     }
     else{
@@ -26,7 +26,7 @@ function withdrawl(redirect_page,passed_amount) {
 
         //as we are updating a attribute - this is patch - pass input in body
         let userdata = {
-            accno: useracc_with,
+            token : passed_token,
             amount: passed_amount
         };
 
@@ -37,12 +37,21 @@ function withdrawl(redirect_page,passed_amount) {
             },
             body: JSON.stringify(userdata)
         })
-        .then(response => response.text())
+        .then(response => {
+            if(response.status!=200){
+                //invalid token
+                showToast("Invalid token !!")
+            }
+            else{
+                //valid token
+                return response.text();
+            }
+        })
         .then(data => {
             showToast(data,2000);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html?accno=" + useracc_with;
+                window.location.href = "dashboard.html?token=" + token_with;
             }, 2000);
 
         })

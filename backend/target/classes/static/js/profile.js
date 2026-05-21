@@ -1,21 +1,30 @@
 const params = new URLSearchParams(window.location.search);
-const useracc = params.get("accno");
+const token = params.get("token");
 
 
-    url = "http://localhost:8080/user_details?accno=" + useracc;
+    url = "http://localhost:8080/user_details?token=" + token;
 
     fetch(url, {
         method: 'GET'
     })
-    .then(response => response.text())
+    .then(response => {
+        if(response.status == 200) {
+            return response.text();
+        } else {
+            showToast("Invalid token !!");
+        }
+    })
     .then(data => {
+
         let userdata = data.split(",");
-        let uname = userdata[0];
-        let age = userdata[1];
-        let city = userdata[2];
-        let phone = userdata[3];
         
-        document.getElementById("accno").innerHTML = useracc;
+        let uaccno = userdata[0];
+        let uname = userdata[1];
+        let age = userdata[2];
+        let city = userdata[3];
+        let phone = userdata[4];
+        
+        document.getElementById("accno").innerHTML = uaccno;
         document.getElementById("uname").innerHTML = uname;
         document.getElementById("age").innerHTML = age;
         document.getElementById("city").innerHTML = city;

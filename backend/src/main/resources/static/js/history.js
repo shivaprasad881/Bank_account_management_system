@@ -1,37 +1,45 @@
 const params = new URLSearchParams(window.location.search);
-const useracc = params.get("accno");
+const token = params.get("token");
 
-let data;
 
-function goBack() {
-    window.location.href = "dashboard.html?accno=" + useracc;
-}
-
-let url = "http://localhost:8080/user_transactions?accno=" + useracc;
+let url = "http://localhost:8080/user_transactions?token=" + token ;
 
 fetch(url, {
     method: 'GET'
 })
-.then(response => response.json())
-.then(jsondata => {
-    data = jsondata;
-    for(let i = 0; i < jsondata.length; i++) {
-        let tar_acc_value = jsondata[i].tarAcc;
-        let amount_value = jsondata[i].amount;
-        let transaction_type_value = jsondata[i].transactionType;
-        let transaction_date_value = jsondata[i].transactionDate;
-
-        let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,16);
-
-        document.getElementById("tableBody").innerHTML += `
-        <tr>
-            <td>${tar_acc_value}</td>
-            <td>${amount_value}</td>
-            <td>${transaction_type_value}</td>
-            <td>${updated}</td>
-        </table>
-        `;
+.then(response => {
+    if(response.status == 200) {
+        return response.json();
+    } else {
+        showToast("Invalid token !!");
     }
+})
+
+.then(jsondata => {
+    
+    
+
+        for(let i = 0; i < jsondata.length; i++) {
+            let tar_acc_value = jsondata[i].tarAcc;
+            let amount_value = jsondata[i].amount;
+            let transaction_type_value = jsondata[i].transactionType;
+            let transaction_date_value = jsondata[i].transactionDate;
+
+            let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,16);
+
+            document.getElementById("tableBody").innerHTML += `
+            <tr>
+                <td>${tar_acc_value}</td>
+                <td>${amount_value}</td>
+                <td>${transaction_type_value}</td>
+                <td>${updated}</td>
+            </tr>
+            `;
+        
+
+        }
+
+    
 })
 .catch(error => {
     showToast("error in fetching the history !!");

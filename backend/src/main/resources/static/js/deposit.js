@@ -1,8 +1,8 @@
 //acc number passed from dashboard
 const params_depo = new URLSearchParams(window.location.search);
-const useracc_depo = params_depo.get("accno");
+const token_depo = params_depo.get("token");
 
-function deposit(redirect_page,passed_amount) {
+function deposit(redirect_page,passed_token,passed_amount) {
 
     if(redirect_page){
         //hoo the call came from the frontend - so first validate the pin then deposit
@@ -15,18 +15,18 @@ function deposit(redirect_page,passed_amount) {
         else {
             //now we had valid amount - redirect to pin page - validate - if correct - come here with values
             let action = "deposit"
-            window.location.href = "pin.html?accno=" + useracc_depo + "&action=" + action + "&amount=" + amt;
+            window.location.href = "pin.html?token=" + token_depo + "&action=" + action + "&amount=" + amt;
         }
     }
     else{
 
         
         //hoo the call came from pin page  after validating the pin to deposti money
-        url = "http://localhost:8080/deposit";
+        url = "http://localhost:8080/deposit" ;
 
         //as we are updating a attribute - this is patch - pass input in body
         let userdata = {
-            accno: useracc_depo,
+            token: passed_token,
             amount: passed_amount
         };
 
@@ -37,12 +37,21 @@ function deposit(redirect_page,passed_amount) {
             },
             body: JSON.stringify(userdata)
         })
-        .then(response => response.text())
+        .then(response => {
+            if(response.status!=200){
+                //hoo i got the status other than 200 p - so may be invalid tone
+                showToast("Invalid token !!")
+            }
+            else{
+                //hoo i got the stauts as 200 so it is valid toke and i got a valid response i shoudl render thantg in tnext ithem
+                return response.text();
+            }
+        })
         .then(data => {
             showToast(data,2000);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html?accno=" + useracc_depo;
+                window.location.href = "dashboard.html?token=" + token_depo;
             }, 2000);
 
         })

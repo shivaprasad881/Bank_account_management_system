@@ -4,7 +4,8 @@ function user_signin() {
     
     if(useracc == "" || userpass == "" ) {
         showToast("please fill the details");
-    } else {
+    }
+    else {
         let url = "http://localhost:8080/validate_user?accno=" + useracc + "&password=" + userpass;
 
         fetch(url, {
@@ -12,15 +13,25 @@ function user_signin() {
         })
         .then(response => response.text())
         .then(data => {
-            if(data == "true") {
-                //user present
-                showToast("successful login!!",2000);
+            if(data == "false") {
+
+                showToast("Invalid credentials !!");
+                
+            } else {
+                
+               
+                showToast("successful login!!",1500);
+
+
+                // logged in sucessfully - hoo we got a jwt token for our successfull login
+
+                //now where should i store this jwt token - so that i would send for every request
+                
                 
                 setTimeout(() => {
-                    window.location.href = "dashboard.html?accno=" + useracc;
-                }, 2000);
-            } else {
-                showToast("Invalid credentials !!");
+                    window.location.href = "dashboard.html?token=" + data;
+                }, 1500);
+
             }
         })
         .catch(error => {

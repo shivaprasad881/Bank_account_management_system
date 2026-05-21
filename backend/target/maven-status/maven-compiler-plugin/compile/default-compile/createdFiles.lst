@@ -1,5 +1,6 @@
 controller\UserController.class
 repository\UserRepository.class
+com\example\demo\JwtUtil.class
 model\Transaction.class
 model\User.class
 repository\TransactionRepository.class

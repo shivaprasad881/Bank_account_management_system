@@ -1,7 +1,15 @@
 function showToast(message, duration = 3000) {
     // Create toast element
     const toast = document.createElement('div');
-    toast.textContent = message;
+    
+    // Check if message contains newline or <br> - use innerHTML, otherwise textContent
+    if(message.includes('\n') || message.includes('<br')) {
+        toast.innerHTML = message;
+        toast.style.whiteSpace = 'pre-line';
+    } else {
+        toast.textContent = message;
+        toast.style.whiteSpace = 'nowrap';
+    }
     
     // Style the toast
     toast.style.position = 'fixed';
@@ -17,7 +25,6 @@ function showToast(message, duration = 3000) {
     toast.style.zIndex = '9999';
     toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
     toast.style.textAlign = 'center';
-    toast.style.whiteSpace = 'nowrap';
     
     // Add to body
     document.body.appendChild(toast);

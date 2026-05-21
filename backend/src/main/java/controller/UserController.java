@@ -1,7 +1,14 @@
 package controller;
 
 import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
 import model.User;
 import repository.TransactionRepository;
 import repository.UserRepository;
@@ -69,21 +76,10 @@ public class UserController {
     } 
 
 
+    @PostMapping("/check_accno")
+    public String checkAccno(@RequestBody Map<String, Object> jsonBody) {
+        String accno = (String) jsonBody.get("accno");
 
-    @GetMapping("/validate_user")
-    public String validateuser(@RequestParam String accno, @RequestParam String password) {
-        User user = userRepository.findByAccnoAndPassword(accno,password);
-
-        if(user == null){
-            return "false";
-        }
-        else{
-            return "true";
-        }
-    }
-
-    @GetMapping("/check_accno")
-    public String checkAccno(@RequestParam String accno) {
         User user = userRepository.findByAccno(accno);
 
         if(user==null){
@@ -96,100 +92,299 @@ public class UserController {
         
     }
 
-    @GetMapping("/check_balance")
-    public String checkBalance(@RequestParam String accno) {
-        User user = userRepository.findByAccno(accno); //we are finding the user record based on the user accno - once we got the user record we can fetechand update any of the fields of that user
 
-        return ""+user.getBalance();
+    @GetMapping("/validate_user")
+    public String validateuser(@RequestParam String accno, @RequestParam String password) {
+        User user = userRepository.findByAccnoAndPassword(accno,password);
+
+        if(user == null){
+            return "false";
+        }
+        else{
+            return JwtUtil.generateToken(accno);
+
+        }
+    }
+
+    
+
+    @GetMapping("/check_balance")
+    public ResponseEntity<?> checkBalance(@RequestParam String token) {
+        //validate token - send bal
+
+        try{
+            String accno_jwt = JwtUtil.validateToken(token);
+
+            User user = userRepository.findByAccno(accno_jwt);
+
+
+            return ResponseEntity.ok(user.getBalance());
+
+
+        }
+        catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
+
+            return ResponseEntity.status(401).body("Invalid token !!");
+
+        }
+
     }
 
     @GetMapping("/user_details")
-    public String userdetails(@RequestParam String accno) {
-        User user = userRepository.findByAccno(accno);
+    public ResponseEntity<?>  userdetails(@RequestParam String token) {
+
+        // first validate the token then send the response
+
+        // in case of valid token - it would return the accno
+        // in case of invalid token - it would return the exception - so we need to hangle the exp in the cathc block
+
+        // as there is a chance for exp - keep the that error code in the try bloack - when ecp occurs then catch block will execute
+
+        // to return dynamic datatypes we would use repository - in frontend based on the status code woudl would take the responsein according datatypes
+
+
+        try{// make sure that take the accno from teh token but nto from the url , because if u take the accno from the url thne by cahnging the accno inthe url the data would be fetcehed , so if u take teh accno from the token as the attacker cant change the accno in the otken it would remain safe and give the according reseultr
+            // as we had thatjava function somewhere - we need to atleast specify the file in which it is parent so that we would search fo rthat file an dcheck for tha tethod in tit
+            String accno_jwt = JwtUtil.validateToken(token);
+
+            User user = userRepository.findByAccno(accno_jwt);
+
+            String data =  user.getAccno() +  ","   +  user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber() ;
+
+            return ResponseEntity.ok(data);
+
+
+        }
+        catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
+
+            return ResponseEntity.status(401).body("Invalid token !!");
+
+        }
 
         
-         return user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber() ;
+
+        
     }
 
     @GetMapping("/user_transactions")
-    public List<Transaction> user_transactions(@RequestParam String accno) {
-        List<Transaction> transactions = transactionRepository.findByAccno(accno);
+    public ResponseEntity<?> user_transactions(@RequestParam String token) {
+        
 
-         return transactions;
+        //first verify token - if valid - send response
+
+        // there is a chance for exception from this token validation method -so use try catch
+        try{
+            
+            String accno_jwt = JwtUtil.validateToken(token);
+
+            List<Transaction> transactions = transactionRepository.findByAccno(accno_jwt);
+
+            return ResponseEntity.ok(transactions);
+        }
+        catch(Exception e){//exception is the parent of all the exseptions - so it can handle all the exceptions
+
+            //hoo we got a exception - so one of the stage got rejected by the backend while validation
+            // the stages are token absence - invalid token - signature mismathc - token expiry
+
+            //either one would cause token rejecttion 
+            //so we need to simply indicate the user that ur toke in invalid
+            return ResponseEntity.status(401).body("Invalid token !!");
+
+        }
+        
     }
 
     @GetMapping("/validate_pin")
-    public String validatepin(@RequestParam String accno,@RequestParam String userpin) {
-        User user = userRepository.findByAccno(accno);
+    public ResponseEntity<?> validatepin(@RequestParam String token,@RequestParam String userpin) {
 
-        String orig_pin = user.getPin();
+        // first validate the token - if valid - send the response - it case of invalid it would send the exp so keep it in try block
 
-        if( orig_pin.equals(userpin) ){
-            //the original pin and user entered old pin are same
-            return "true";
+        try{
+            String accno_jwt  = JwtUtil.validateToken(token);
+
+            User user = userRepository.findByAccno(accno_jwt);
+
+            String orig_pin = user.getPin();
+
+            if( orig_pin.equals(userpin) ){
+                //the original pin and user entered old pin are same
+                return ResponseEntity.ok("true");
+            }
+            else{
+                return ResponseEntity.ok("false"); //invalid pin
+            }
+
+
         }
-        else{
-            return "false"; //invalid pin
+        catch(Exception e){
+            // invalid token
+            return ResponseEntity.status(401).body("Invalid token !!");
         }
+        
+
+
+        
          
     }
 
 
-    @PatchMapping("/updatepin") 
-        public String updatePin(@RequestBody Map<String, Object> jsonBody) {
-            String accno = (String) jsonBody.get("accno");
+    @PatchMapping("/transfer")
+        public ResponseEntity<?> transfer(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
+            String tar_acc = (String) jsonBody.get("tar_acc");
+            Double amt = Double.parseDouble(jsonBody.get("amount").toString());
+
+            try{
+                String accno_jwt = JwtUtil.validateToken(token);
+
+                
+
+                User acc_user = userRepository.findByAccno(accno_jwt);
+
+                //check whether use had enough balance or not to debit
+
+                if(amt<=0){
+                    return ResponseEntity.ok("Please enter valid amount !!");
+                }
+                else if( acc_user.getBalance() >= amt ){
+                    //enough balance
+
+                    // now check whether tar acc exists to transfer money
+                    User tar_user = userRepository.findByAccno(tar_acc);
+
+                    if(tar_user!=null){
+                        //exists
+
+                        acc_user.setBalance( acc_user.getBalance() - amt );
+
+                        userRepository.save(acc_user);
+
+                        tar_user.setBalance(tar_user.getBalance() + amt );
+
+                        userRepository.save(tar_user);
+
+                        return ResponseEntity.ok("Transaction successfull !!");
+
+                    }
+                    else{
+                        //not exists
+                        return ResponseEntity.ok("Destination account not existing !!");
+                    }
+
+                    
+                }
+                else{
+                    return ResponseEntity.ok("Insufficient balance !!");
+                }
+
+            }
+            catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
+
+                return ResponseEntity.status(401).body("Invalid token !!");
+
+            }
+
+
+        }
+
+
+    @PatchMapping("/updatepin")
+        public  ResponseEntity<?> updatePin(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
             String newpin = (String) jsonBody.get("newpin");
-            // fill your code here
-            User user = userRepository.findByAccno(accno);
 
-            //now we got the record - just update the pin by using setter
-            user.setPin(newpin);
-            userRepository.save(user);
 
-            return "pin updated successfully!!";
+            try{
+                String accno_jwt = JwtUtil.validateToken(token);
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+                
+                user.setPin(newpin);
+                userRepository.save(user);
+
+                return ResponseEntity.ok("Pin updated succesfully!!");
+                
+            }
+            catch(Exception e){
+                return ResponseEntity.status(401).body("Invalid token !!");
+            }
+
+            
+          
             
         }
 
 
     @PatchMapping("/deposit")
-        public String deposit(@RequestBody Map<String, Object> jsonBody) {
-            String accno = (String) jsonBody.get("accno");
+        public ResponseEntity<?> deposit(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
             Double amt = Double.parseDouble((String) jsonBody.get("amount"));
 
-            
-            User user = userRepository.findByAccno(accno);
+            // first validate the token - if valid - deposit the money - send response
+
+
+            try{
+                String accno_jwt = JwtUtil.validateToken(token);
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+                
+                user.setBalance( user.getBalance() + amt );
+
+                userRepository.save(user);
+
+                return ResponseEntity.ok("Amount deposited succesfully!!");
+                
+            }
+            catch(Exception e){
+                return ResponseEntity.status(401).body("Invalid token !!");
+            }
 
             
-            user.setBalance( user.getBalance() + amt );
-
-            userRepository.save(user);
-
-            return "Amount deposited succesfully!!";
             
         }
 
 
 
     @PatchMapping("/withdrawl")
-        public String withdrawl(@RequestBody Map<String, Object> jsonBody) {
-            String accno = (String) jsonBody.get("accno");
+        public ResponseEntity<?> withdrawl(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
             Double amt = Double.parseDouble((String) jsonBody.get("amount"));
 
-            
-            User user = userRepository.findByAccno(accno);
-            
-            if(user.getBalance()<amt){
-                return "Insuffient balance!!";
-            }
-            else{
-                user.setBalance( user.getBalance() - amt );
+            // first validate the token - if valid - deposit the money - send response
 
-                userRepository.save(user);
 
-                return "Amount Withdrawl succesfully!!";
+            try{
+                String accno_jwt = JwtUtil.validateToken(token);
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+                Double bal = user.getBalance();
+
+                //now i had the actual balance and the user requested balance - check whether i had enough bal to withdraw
+
+                if(bal>=amt){
+                    //i had enough bal - with  draw and send response
+                    user.setBalance( user.getBalance() - amt );
+
+                    userRepository.save(user);
+
+                    return ResponseEntity.ok("Amount withdrawl successfull !!");
+                }
+                else{
+                    //i dont had enought balance - as the token is valid we need to send ok response even in case of insufficient balance
+                    return ResponseEntity.ok("Insufficient balance !!");
+                }
+  
+                
             }
+            catch(Exception e){
+                return ResponseEntity.status(401).body("Invalid token !!");
+            }
+
             
             
-        }
+        }//withdrawl
 
 }

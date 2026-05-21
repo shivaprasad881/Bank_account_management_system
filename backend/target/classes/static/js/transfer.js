@@ -1,7 +1,7 @@
 const params_trans = new URLSearchParams(window.location.search);
-const useracc_trans = params_trans.get("accno");
+const token_trans = params_trans.get("token");
 
-function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
+function transfer(redirect_page,tar_acc_pin,tar_amt_pin,token_passed) {
 
 
     if(redirect_page){
@@ -17,33 +17,54 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
             showToast("please enter valid details!!");
 
         }
-        else if(useracc_trans == tar_acc) {
+        // else if(useracc_trans == tar_acc) {
 
-            showToast("Cannot transfer to your own account!!");
+        //     showToast("Cannot transfer to your own account!!");
 
-        }
+        // }
         else {
             // valid data
 
-            // now get the user balance
-            let url = "http://localhost:8080/check_balance?accno=" + useracc_trans;
+            // // now get the user balance
+            // let url = "http://localhost:8080/check_balance?token="+ token_trans;
         
-            fetch(url, {
-                method: 'get'
-            })
-            .then(response => response.text())
-            .then(data => {
-                //succesfully fetched user balance
-                let bal = parseFloat(data);
-                if(bal >= tar_amt) {
-                    //user had enough bal to transfer
+            // fetch(url, {
+            //     method: 'get'
+            // })
+            // .then(response => {
+            //     if(response.status!=200){
+            //         showToast("Invalid token !!")
+            //     }
+            //     else{
+            //         // valid token - proceed
+            //         return response.text()
+            //     }
+            // })
+            // .then(data => {
+            //     //succesfully fetched user balance
+            //     let bal = parseFloat(data);
+            //     if(bal >= tar_amt) {
+            //         //user had enough bal to transfer
 
-                    //now check whether dest user exists or not
-                    url = "http://localhost:8080/check_accno?accno=" + tar_acc;
+            //         //now check whether dest user exists or not - ****change it to post request for security concern
+
+
+
+                    //no token required
+                    url = "http://localhost:8080/check_accno"
+
+                    let userdata1 = {
+                        accno: tar_acc
+                    };
 
                     //get method - pass acc within url
                     fetch(url, {
-                        method: 'get'
+                        method: 'POST',
+                         headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(userdata1)
+
                     })
                     .then(response => response.text())
                     .then(data => {
@@ -51,7 +72,7 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
                             //dest acc is present - now we can start the transaction
                             
                             let action = "transfer"
-                            window.location.href = "pin.html?accno=" + useracc_trans + "&action=" + action   + "&tar_acc=" + tar_acc + "&amount=" + tar_amt;
+                            window.location.href = "pin.html?token=" + token_trans + "&action=" + action   + "&tar_acc=" + tar_acc + "&amount=" + tar_amt;
 
                         }
                         else {
@@ -67,16 +88,16 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
 
 
 
-                }
-                else{
-                    showToast("Insufficient balance !!");
-                }
+            //     }
+            //     else{
+            //         showToast("Insufficient balance !!");
+            //     }
 
-            })
+            // })
 
-            .catch(error => {
-                showToast("error in fetching the user balance !!");
-            });
+            // .catch(error => {
+            //     showToast("error in fetching the user balance !!");
+            // });
 
         }
     }
@@ -84,13 +105,17 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
         //hoo the call came from the pin page after succesffull validateion - now no reidrection needed - only thins is to trranfer
         //all the detatils for transfer is passed by pin page which are passed by ours
 
+        //*** now do the transaction without any token validation - as we done it in the pin security gate 
+        //*** */ by not using the token here , it would restrict the transaction rejection in the middel due to token expiry
+        // ** here we are doing the transfer in request but not in two differnt requests (debit and credit ) - this make sure the atomicity
 
-        // 1.debit from cur user 
-        let url = "http://localhost:8080/withdrawl";
+        let url = "http://localhost:8080/transfer";
 
-        //as we are updating an attribute it is patch - pass input accno and withdrawal amt as body
-        let userdata = {
-            accno: useracc_trans,
+
+
+        let userdata2 = {
+            token: token_passed,
+            tar_acc: tar_acc_pin,
             amount: tar_amt_pin
         };
 
@@ -99,123 +124,26 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(userdata)
+            body: JSON.stringify(userdata2)
         })
-        .then(response => response.text())
+        
+        .then(response =>{
+            if(response.status!=200){
+                showToast("Invalid token !!")
+            }
+            else{
+                // valid token - pass the response
+                return response.text()
+            }
+        })
         .then(data => {
-            // withdrawal is successful
-
-            //---- now deposit the amount in the tar acc----
-            url = "http://localhost:8080/deposit";
-
-            //as we are updating a attribute - this is patch - pass input in body
-            userdata = {// deposit into tar account
-                accno: tar_acc_pin,
-                amount: tar_amt_pin
-            };
-
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(userdata)
-            })
-            .then(response => response.text())
-            .then(data => {
-                // successfully credited the amt in tar acc
-
-                // we are done with the transaction - debited from user and credited into tar acc
-                showToast("Transaction successful !!",1000);
-
-
-
-                let url = "http://localhost:8080/transaction_registration";
-
-                //record 1
-                let transdata = {
-                    accno: useracc_trans,
-                    tar_acc: tar_acc_pin,
-                    amount: tar_amt_pin,
-                    transaction_type: "debit"
-                };
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(transdata)
-                })
-                .then(response => response.text())
-                .then(data => {
-                    setTimeout(() => {
-                        showToast(data.substring(0,18)+" 1 "+data.substring(18),1000)
-                    }, 1000);
-
-                    //we are done creating record 1 ,now create record 2
-
-
-                    transdata = {
-                        accno: tar_acc_pin,
-                        tar_acc: useracc_trans,
-                        amount: tar_amt_pin,
-                        transaction_type: "credit"
-                    };
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(transdata)
-                    })
-                    .then(response => response.text())
-                    .then(data => {
-
-                        setTimeout(() => {
-                            showToast(data.substring(0,18)+" 2 "+data.substring(18),1000)
-                        }, 2000);
-
-                        //we are done..
-                        setTimeout(() => {
-                            window.location.href = "dashboard.html?accno=" + useracc_trans;
-                        }, 3000);
-
-                    })
-
-
-                    .catch(error => {
-                        showToast("error in creating the 2nd transaction record !!");
-                    });
-
-
-
-                })
-
-                .catch(error => {
-                    showToast("error in creating the 1st transaction record !!");
-                });
-
-
-
-
-
-
-                // setTimeout(() => {
-                //     window.location.href = "dashboard.html?accno=" + useracc_trans;
-                // }, 2000);
-
-            })
-
-            .catch(error => {
-                showToast("error in crediting amount from user !!");
-            });
+            
+            showToast(data)
 
         })
 
         .catch(error => {
-            showToast("error in withdrawing amount from user !!");
+            showToast("Error in money transfer  !!");
         });           
 
 

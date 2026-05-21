@@ -9,7 +9,16 @@ function user_signup() {
 
     if(uname == "" || age == "" || parseInt(age) <= 0 || city == "" || phonenumber == "" || phonenumber.length != 10 || password == "") {
         showToast("please enter valid details !!");
-    } else {
+    }
+    else if( password_strength(password)==false ){
+        showToast("please enter Strong Password !!",1500);
+
+        setTimeout(() => {
+            // code to execute after delay
+            showToast("Strong password -:-\n\n * Atleast one small alphabet \n * Atleast one big alphabet \n * Atleast one digit \n * Atleast one special character \n * Atleast 8 length  ",8000)
+        }, 1500);
+    }
+    else {
         let url = "http://localhost:8080/register";
 
         let userData = {
