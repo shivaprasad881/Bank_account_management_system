@@ -36,74 +36,71 @@ public class UserController {
         String phonenumber = (String) jsonBody.get("phonenumber");
         String password = (String) jsonBody.get("password");
 
-           // DEBUG: Check password value
-        System.out.println("Password received: '" + password + "'");
-        System.out.println("Password is null: " + (password == null));
-        System.out.println("Password is empty: " + (password != null && password.isEmpty()));
+        if(uname == null || uname.isEmpty() || city == null || city.isEmpty() || phonenumber == null || phonenumber.isEmpty()  || phonenumber.length()!=10 || password == null || password.isEmpty() || age <= 0){
+            return "Please enter valid details !!";
+        }
+        else{
+            User newUser = new User(uname, age, city, phonenumber,password);
+            User savedUser = userRepository.save(newUser);
 
-        User newUser = new User(uname, age, city, phonenumber,password);
-        User savedUser = userRepository.save(newUser);
+            String accno = "ACC" + String.format("%08d", savedUser.getUserid());
+            String pin = String.format("%04d", savedUser.getUserid() % 10000);
+            
+            savedUser.setAccno(accno);
+            savedUser.setPin(pin);
+            userRepository.save(savedUser);
 
-        String accno = "ACC" + String.format("%08d", savedUser.getUserid());
-        String pin = String.format("%04d", savedUser.getUserid() % 10000);
+            return "Account Number: " + accno + " | PIN: " + pin;
+        }
+
         
-        savedUser.setAccno(accno);
-        savedUser.setPin(pin);
-        userRepository.save(savedUser);
-
-        return "Account Number: " + accno + " | PIN: " + pin;
     } 
-
-
-
-    @PostMapping("/transaction_registration")
-    public String transaction_registration(@RequestBody Map<String, Object> jsonBody) {
-
-        String accno = (String) jsonBody.get("accno");
-        String tar_acc = (String) jsonBody.get("tar_acc");
-
-        Double amount = Double.parseDouble(jsonBody.get("amount").toString());
-        String transaction_type = (String) jsonBody.get("transaction_type");
-
-        Transaction newtransaction = new Transaction(accno,tar_acc,amount,transaction_type);
-
-        
-
-        
-        transactionRepository.save(newtransaction);
-
-        return "Transaction record created successfully !!";
-    } 
-
 
     @PostMapping("/check_accno")
     public String checkAccno(@RequestBody Map<String, Object> jsonBody) {
         String accno = (String) jsonBody.get("accno");
 
-        User user = userRepository.findByAccno(accno);
-
-        if(user==null){
-            //the user is not present
-            return "false";
+        if(accno.length()==0){
+            return "Please enter valid account number !!";
         }
         else{
-            return "true";
+            
+            User user = userRepository.findByAccno(accno);
+
+            if(user==null){
+                //the user is not present
+                return "false";
+            }
+            else{
+                return "true";
+            }
         }
+
         
     }
 
 
     @GetMapping("/validate_user")
     public String validateuser(@RequestParam String accno, @RequestParam String password) {
-        User user = userRepository.findByAccnoAndPassword(accno,password);
 
-        if(user == null){
-            return "false";
+        if(accno.length()==0 ||  password.length()==0){
+            return "Please enter valid details !!";
         }
         else{
-            return JwtUtil.generateToken(accno);
+
+            User user = userRepository.findByAccnoAndPassword(accno,password);
+
+            if(user == null){
+                return "false";
+            }
+            else{
+                return JwtUtil.generateToken(accno);
+
+            }
 
         }
+
+        
     }
 
     
@@ -200,20 +197,28 @@ public class UserController {
         // first validate the token - if valid - send the response - it case of invalid it would send the exp so keep it in try block
 
         try{
-            String accno_jwt  = JwtUtil.validateToken(token);
-
-            User user = userRepository.findByAccno(accno_jwt);
-
-            String orig_pin = user.getPin();
-
-            if( orig_pin.equals(userpin) ){
-                //the original pin and user entered old pin are same
-                return ResponseEntity.ok("true");
+            if(userpin.length()!=4 || Integer.parseInt(userpin)<0){
+                return ResponseEntity.ok("Please enter valid pin !!");
             }
             else{
-                return ResponseEntity.ok("false"); //invalid pin
-            }
 
+                String accno_jwt  = JwtUtil.validateToken(token);
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+                String orig_pin = user.getPin();
+
+                if( orig_pin.equals(userpin) ){
+                    //the original pin and user entered old pin are same
+                    return ResponseEntity.ok("true");
+                }
+                else{
+                    return ResponseEntity.ok("false"); //invalid pin
+                }
+
+
+            }
+            
 
         }
         catch(Exception e){
@@ -234,48 +239,86 @@ public class UserController {
             String tar_acc = (String) jsonBody.get("tar_acc");
             Double amt = Double.parseDouble(jsonBody.get("amount").toString());
 
+
             try{
-                String accno_jwt = JwtUtil.validateToken(token);
+
+                if(tar_acc.length()==0 || amt<=0 ){
+                    return ResponseEntity.ok("Please enter valid details !!");
+                }
+                else{
+
+                    String accno_jwt = JwtUtil.validateToken(token);
 
                 
 
-                User acc_user = userRepository.findByAccno(accno_jwt);
+                    User acc_user = userRepository.findByAccno(accno_jwt);
 
-                //check whether use had enough balance or not to debit
+                    //check whether use had enough balance or not to debit
 
-                if(amt<=0){
-                    return ResponseEntity.ok("Please enter valid amount !!");
-                }
-                else if( acc_user.getBalance() >= amt ){
-                    //enough balance
-
-                    // now check whether tar acc exists to transfer money
-                    User tar_user = userRepository.findByAccno(tar_acc);
-
-                    if(tar_user!=null){
-                        //exists
-
-                        acc_user.setBalance( acc_user.getBalance() - amt );
-
-                        userRepository.save(acc_user);
-
-                        tar_user.setBalance(tar_user.getBalance() + amt );
-
-                        userRepository.save(tar_user);
-
-                        return ResponseEntity.ok("Transaction successfull !!");
-
+                    if( acc_user.getBalance() < amt ){
+                        return ResponseEntity.ok("Insufficient balance !!");
                     }
                     else{
-                        //not exists
-                        return ResponseEntity.ok("Destination account not existing !!");
+                        
+
+                        //enough balance
+
+                        // now check whether tar acc exists to transfer money
+                        User tar_user = userRepository.findByAccno(tar_acc);
+
+                        if(tar_user!=null){
+
+                            //exists
+
+                            //now check both users are same
+
+                            if(acc_user.getAccno().equals( tar_user.getAccno()   ) ){
+                                //both are same users
+                                 return ResponseEntity.ok("Self transfer not allowed !!");
+                            }
+                            else{
+
+                                
+                                acc_user.setBalance( acc_user.getBalance() - amt );
+
+                                userRepository.save(acc_user);
+
+                                tar_user.setBalance(tar_user.getBalance() + amt );
+
+                                userRepository.save(tar_user);
+
+                                
+                                //transaction is successfull - now create the records
+                                // acc_user , tar_user , amt , credit/debit
+
+
+                                // call the transaction constructor to create the new transaction record
+                                Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit");
+                                Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit");
+
+                                transactionRepository.save(trans1);
+                                transactionRepository.save(trans2);
+
+
+                                return ResponseEntity.ok("Transaction successfull !!");
+
+
+                            }
+
+
+                        }
+                        else{
+                            //not exists
+                            return ResponseEntity.ok("Destination account not existing !!");
+                        }
+
+                        
+
                     }
 
-                    
+
                 }
-                else{
-                    return ResponseEntity.ok("Insufficient balance !!");
-                }
+                
 
             }
             catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
@@ -295,23 +338,28 @@ public class UserController {
 
 
             try{
-                String accno_jwt = JwtUtil.validateToken(token);
 
-                User user = userRepository.findByAccno(accno_jwt);
 
-                
-                user.setPin(newpin);
-                userRepository.save(user);
+                if(newpin.length()!=4 || Integer.parseInt(newpin)<0){
+                    return ResponseEntity.ok("Invalid new-pin !!");
+                }
+                else{
 
-                return ResponseEntity.ok("Pin updated succesfully!!");
-                
+                    String accno_jwt = JwtUtil.validateToken(token);
+
+                    User user = userRepository.findByAccno(accno_jwt);
+
+                    user.setPin(newpin);
+                    userRepository.save(user);
+
+                    return ResponseEntity.ok("Pin updated succesfully !!");
+                }
+   
             }
             catch(Exception e){
                 return ResponseEntity.status(401).body("Invalid token !!");
             }
-
-            
-          
+  
             
         }
 
@@ -325,16 +373,23 @@ public class UserController {
 
 
             try{
-                String accno_jwt = JwtUtil.validateToken(token);
-
-                User user = userRepository.findByAccno(accno_jwt);
-
                 
-                user.setBalance( user.getBalance() + amt );
 
-                userRepository.save(user);
+                if(amt<=0){
+                    return ResponseEntity.ok("Invalid amount !!");
+                }
+                else{
+                    String accno_jwt = JwtUtil.validateToken(token);
 
-                return ResponseEntity.ok("Amount deposited succesfully!!");
+                    User user = userRepository.findByAccno(accno_jwt);
+                    user.setBalance( user.getBalance() + amt );
+
+                    userRepository.save(user);
+
+                    return ResponseEntity.ok("Amount deposited succesfully!!");
+                }
+                
+                
                 
             }
             catch(Exception e){
@@ -351,31 +406,42 @@ public class UserController {
         public ResponseEntity<?> withdrawl(@RequestBody Map<String, Object> jsonBody) {
             String token = (String) jsonBody.get("token");
             Double amt = Double.parseDouble((String) jsonBody.get("amount"));
+            
 
             // first validate the token - if valid - deposit the money - send response
 
 
             try{
-                String accno_jwt = JwtUtil.validateToken(token);
-
-                User user = userRepository.findByAccno(accno_jwt);
-
-                Double bal = user.getBalance();
+               
 
                 //now i had the actual balance and the user requested balance - check whether i had enough bal to withdraw
-
-                if(bal>=amt){
-                    //i had enough bal - with  draw and send response
-                    user.setBalance( user.getBalance() - amt );
-
-                    userRepository.save(user);
-
-                    return ResponseEntity.ok("Amount withdrawl successfull !!");
+                if(amt<=0){
+                    return ResponseEntity.ok("Invalid amount !!");
                 }
                 else{
-                    //i dont had enought balance - as the token is valid we need to send ok response even in case of insufficient balance
-                    return ResponseEntity.ok("Insufficient balance !!");
+                     String accno_jwt = JwtUtil.validateToken(token);
+
+                    User user = userRepository.findByAccno(accno_jwt);
+
+                    Double bal = user.getBalance();
+
+                    if(bal<amt){
+
+                        return ResponseEntity.ok("Insufficient balance !!");
+                    
+                    }
+                    else{
+                        
+                        user.setBalance( user.getBalance() - amt );
+
+                        userRepository.save(user);
+
+                        return ResponseEntity.ok("Amount withdrawl successfull !!");
+                    }
+
+
                 }
+                
   
                 
             }

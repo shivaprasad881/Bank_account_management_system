@@ -1,7 +1,7 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
-
+let data;
 let url = "http://localhost:8080/user_transactions?token=" + token ;
 
 fetch(url, {
@@ -17,15 +17,16 @@ fetch(url, {
 
 .then(jsondata => {
     
-    
+        data = jsondata;
 
-        for(let i = 0; i < jsondata.length; i++) {
+        for(let i = jsondata.length-1; i>=0; i--) {
             let tar_acc_value = jsondata[i].tarAcc;
             let amount_value = jsondata[i].amount;
             let transaction_type_value = jsondata[i].transactionType;
             let transaction_date_value = jsondata[i].transactionDate;
 
-            let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,16);
+            let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,19);
+            console.log(transaction_date_value)
 
             document.getElementById("tableBody").innerHTML += `
             <tr>
@@ -54,7 +55,8 @@ function download() {
     
     let y = 20;
 
-    for(let i = 0; i < data.length; i++) {
+    
+    for(let i = data.length-1; i>=0; i--) {
         //each json object
         let str = JSON.stringify(data[i]); // each json object converted into string
         
