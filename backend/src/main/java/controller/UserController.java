@@ -163,6 +163,22 @@ public class UserController {
         
     }
 
+    
+    @GetMapping("/user_name")
+    public ResponseEntity<?>  username(@RequestParam String token) {
+
+        try{
+            String accno_jwt = JwtUtil.validateToken(token);
+
+            User user = userRepository.findByAccno(accno_jwt);
+
+            return ResponseEntity.ok(user.getUname() );
+        }
+        catch(Exception e){ //exception is the parent of all the exceptions 
+            return ResponseEntity.status(401).body("Invalid token !!");
+        }
+    }
+
     @GetMapping("/user_transactions")
     public ResponseEntity<?> user_transactions(@RequestParam String token) {
         

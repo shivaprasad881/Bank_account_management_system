@@ -20,7 +20,7 @@ function user_signin() {
             } else {
                 
                
-                showToast("successful login!!",1500);
+                showToast("successful login !!",1000);
 
 
                 // logged in sucessfully - hoo we got a jwt token for our successfull login
@@ -30,7 +30,7 @@ function user_signin() {
                 
                 setTimeout(() => {
                     window.location.href = "dashboard.html?token=" + data;
-                }, 1500);
+                }, 1000);
 
             }
         })

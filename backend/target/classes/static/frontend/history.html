@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- add this in your HTML head -->
@@ -20,6 +20,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>S.no</th>
                     <th>From account</th>
                     <th>Amount</th>
                     <th>Category</th>
@@ -31,6 +32,15 @@
             </tbody>
         </table>
     </div>
+
+    <div style="position: fixed; bottom: 20px; right: 20px;">
+        <button type="button" onclick="nextpage()">Next</button>
+    </div>
+
+    <div style="position: fixed; bottom: 20px; left: 20px;">
+        <button type="button" onclick="prevpage()">Prev</button>
+    </div>
+    
     <script src="../js/toast.js"></script>
     <script src="../js/history.js"></script>
 </body>

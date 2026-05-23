@@ -137,8 +137,13 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin,token_passed) {
             }
         })
         .then(data => {
+            //transfer succesfull
             
-            showToast(data)
+            showToast(data,1500)
+            
+            setTimeout(() => {
+                window.location.href = "dashboard.html?token=" + token_with;
+            }, 1500);
 
         })
 

@@ -1,6 +1,44 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
+let fetched  = false;
+
+// function username(){
+
+//     if(fetched==true){
+//         return
+//     }
+//     //fetch backend for user name and render it in dashboard page
+
+//     let url = "http://localhost:8080/user_name?token=" + token;
+
+//     fetch(url,{
+//         method : 'get'
+//     })
+
+//     .then(response =>{
+//         if(response.status!=200){
+//             showToast("Invalid token !!")
+//             return null;
+//         }
+//         else{
+//             return response.text()
+//         }
+//     })
+
+//     .then(data =>{
+//         document.getElementById("usermessage").innerHTML= `Hello ${data} !!`
+//     })
+
+//     .catch(error => {
+//         showToast("Error in fetching user name !!");
+//     });
+
+//     fetched = true;
+// }
+
+// username()
+
 function history(){
     window.location.href = "history.html?token=" + token;
 }
