@@ -20,12 +20,17 @@ public class Transaction {
     private int transId;
 
     private String accno;
-    private String tar_acc;
+
+    @Column (name = "tar_acc")
+    private String tarAcc;
+
     private Double amount;
-    private String transaction_type;
+
+    @Column (name = "transaction_type")
+    private String transactionType;
 
     @Column(name = "transaction_date", insertable = false, updatable = false)
-    private Timestamp transaction_date;
+    private Timestamp transactionDate;
 
     // default constructor — required by JPA
     public Transaction() {}
@@ -33,16 +38,16 @@ public class Transaction {
     // constructor to create a transaction
     public Transaction(String accno, String tar_acc, Double amount, String transaction_type) {
         this.accno = accno;
-        this.tar_acc = tar_acc;
+        this.tarAcc = tar_acc;
         this.amount = amount;
-        this.transaction_type = transaction_type;
+        this.transactionType = transaction_type;
     }
 
     // getters only — no setters since transactions are immutable
     public int getTransId() { return transId; }
     public String getAccno() { return accno; }
-    public String getTarAcc() { return tar_acc; }
+    public String getTarAcc() { return tarAcc; }
     public Double getAmount() { return amount; }
-    public String getTransactionType() { return transaction_type; }
-    public Timestamp getTransactionDate() { return transaction_date; }
+    public String getTransactionType() { return transactionType; }
+    public Timestamp getTransactionDate() { return transactionDate; }
 }

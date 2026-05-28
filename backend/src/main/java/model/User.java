@@ -1,5 +1,7 @@
 package model;
+import java.time.LocalTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -22,6 +24,12 @@ public class User {
     private String accno;
     private String pin;
     private Double balance;
+
+    @Column (name = "failure_attempts")
+    private Integer failureAttempts;
+
+    @Column (name = "available_at")
+    private LocalTime availableAt;
     
     public User() {}
     
@@ -36,7 +44,7 @@ public class User {
     }
     
     // Getters
-    public Long getUserid() { return userid; }       // ✅ Long
+    public Long getUserid() { return userid; }
     public String getUname() { return uname; }
     public Integer getAge() { return age; }
     public String getCity() { return city; }
@@ -45,9 +53,11 @@ public class User {
     public String getAccno() { return accno; }
     public String getPin() { return pin; }
     public Double getBalance() { return balance; }
+    public Integer getFailureAttempts() { return failureAttempts; }
+    public LocalTime getAvailableAt() { return availableAt; }
     
     // Setters
-    public void setUserid(Long userid) { this.userid = userid; }  // ✅ Long
+    public void setUserid(Long userid) { this.userid = userid; }
     public void setUname(String uname) { this.uname = uname; }
     public void setAge(Integer age) { this.age = age; }
     public void setCity(String city) { this.city = city; }
@@ -56,4 +66,6 @@ public class User {
     public void setAccno(String accno) { this.accno = accno; }
     public void setPin(String pin) { this.pin = pin; }
     public void setBalance(Double balance) { this.balance = balance; }
+    public void setFailureAttempts(Integer failureAttempts) { this.failureAttempts = failureAttempts; }
+    public void setAvailableAt(LocalTime availableAt) { this.availableAt = availableAt ; }
 }
