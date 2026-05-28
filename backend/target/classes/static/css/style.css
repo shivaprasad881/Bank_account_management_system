@@ -4,6 +4,12 @@
           deposit, withdrawl, transfer, history
    ============================================================ */
 
+/* Assuming Amount is the 3rd column */
+#tableBody tr td:nth-child(3) {
+    color: #28a745;  /* green */
+    font-weight: bold;
+}
+
 /* ── Reset ── */
 *, *::before, *::after {
   margin: 0;

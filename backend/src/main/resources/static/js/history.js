@@ -1,66 +1,81 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
-let data;
-let start_pointer;
-let end_pointer;
+// let data;
+// let start_pointer;
+// let end_pointer;
+// let page_number;
 
+let size_his;
+let tar_page_his;
 
-let url = "http://localhost:8080/user_transactions?token=" + token ;
+let total_pages;
 
-fetch(url, {
-    method: 'GET'
-})
-.then(response => {
-    if(response.status == 200) {
-        return response.json();
-    } else {
-        showToast("Invalid token !!");
-    }
-})
+function fetch_transactions(size,tar_page){
+    console.log("fetch_transactions called with size:", size, "page:", tar_page);
+    let url = "http://localhost:8080/user_transactions?token=" + token  + "&size=" + size + "&page=" + tar_page ;
 
-.then(jsondata => {
+    fetch(url, {
+        method: 'GET'
+    })
+    .then(response => {
+        if(response.status == 200) {
+            return response.json();
+        } else {
+            showToast("Invalid token !!");
+        }
+    })
+
+    .then(jsondata => {
 
         // both are inclusive - defines current rendering pages
-        data = jsondata
-
-    start_pointer = data.length-1 // 21
-    end_pointer = data.length - 10 // 12 
         
-    display()
-    
-})
-.catch(error => {
-    showToast("error in fetching the history !!");
-});
+
+        // start_pointer = data.length-1 // 21
+        // end_pointer = data.length - 10 // 12 
+        // page_number = 1;
+        let data = jsondata.content;
+
+        total_pages = jsondata.totalPages;
+
+        size_his = size;
+        tar_page_his = tar_page;
+
+        display(data,tar_page_his,size_his)
+        
+    })
+    .catch(error => {
+        showToast("error in fetching the history !!");
+    });
+
+}
+
+fetch_transactions(10,0)
+
+
 
 function nextpage(){
 
-    if(start_pointer <= 9){
-        //there are no records left to display
-        showToast("Alreadt at Ending !!",1000)
+    if((tar_page_his + 2 ) > total_pages){
+        showToast("Already at ending !!",1500)
     }
     else{
-        start_pointer -= 10;// 11 //1 // 9    // 1
-        end_pointer -=10;// 2 // -8   // 0     // 0
-        document.getElementById("tableBody").innerHTML  = `` //first empty the page then render the data
-        display();
+        fetch_transactions(size_his,tar_page_his+1)
     }
+
+    
+    
   
 }
 
 
 function prevpage(){
 
-    if(start_pointer == (data.length -1 )){
-        // hoo the start pointer is again pointing to the its start which is the bottom of the index
-        showToast("Already at Beginning !!",1000)
+    if(tar_page_his==0){
+        showToast("Already at Beginning !!",1500)
     }
     else{
-        start_pointer += 10; // 11    21   31
-        end_pointer += 10;   // 2     12   22
-        document.getElementById("tableBody").innerHTML  = `` //first empty the page then render the data
-        display();
+        fetch_transactions(size_his,tar_page_his-1)
     }
 
     
@@ -69,12 +84,16 @@ function prevpage(){
 
 
 
-function display(){
+function display(data,current_page,page_size){
+
+        document.getElementById("tableBody").innerHTML  = `` 
         
-    console.log(start_pointer +" "+ end_pointer)
+    // console.log(start_pointer +" "+ end_pointer)
+
+        document.getElementById("heading").innerHTML = `Transactions (page - ${current_page+1})`
         
 
-        for(let i = start_pointer; i>= Math.max(0,end_pointer) ; i--) {
+        for(let i=0;i<data.length;i++) {
             let tar_acc_value = data[i].tarAcc;
             let amount_value = data[i].amount;
             let transaction_type_value = data[i].transactionType;
@@ -82,16 +101,40 @@ function display(){
 
             let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,19);
             
+            
 
-            document.getElementById("tableBody").innerHTML += `
-            <tr>
-                <td>${data.length-i}</td>
-                <td>${tar_acc_value}</td>
-                <td>${amount_value}</td>
-                <td>${transaction_type_value}</td>
-                <td>${updated}</td>
-            </tr>
-            `;
+            // console.log(transaction_type_value)//*** */
+
+            if(transaction_type_value=="credit"){
+                //green colour
+
+                document.getElementById("tableBody").innerHTML += `
+                <tr>
+                    <td>${(i+1) + page_size*(current_page) } </td>
+                    <td>${tar_acc_value}</td>
+                    <td   style="color: green"  >+ ${amount_value}</td>
+                    <td>${transaction_type_value}</td>
+                    <td>${updated}</td>
+                </tr>
+                `;
+
+
+            }
+            else{
+
+                document.getElementById("tableBody").innerHTML += `
+                <tr>
+                    <td>${(i+1) + page_size*(current_page) } </td>
+                    <td>${tar_acc_value}</td>
+                    <td   style="color: red"  >- ${amount_value}</td>
+                    <td>${transaction_type_value}</td>
+                    <td>${updated}</td>
+                </tr>
+                `;
+
+            }
+
+            
         
 
         }
@@ -134,5 +177,5 @@ function download() {
         y += 11;
     }
 
-    doc.save("first.pdf");
+    doc.save("transaction_records.pdf");
 }

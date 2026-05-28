@@ -15,7 +15,9 @@ import java.sql.Timestamp;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int trans_id;
+    
+    @Column ( name = "trans_id")
+    private int transId;
 
     private String accno;
     private String tar_acc;
@@ -37,7 +39,7 @@ public class Transaction {
     }
 
     // getters only — no setters since transactions are immutable
-    public int getTransId() { return trans_id; }
+    public int getTransId() { return transId; }
     public String getAccno() { return accno; }
     public String getTarAcc() { return tar_acc; }
     public Double getAmount() { return amount; }

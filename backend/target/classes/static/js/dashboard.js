@@ -39,6 +39,10 @@ let fetched  = false;
 
 // username()
 
+function logout(){
+    alert("logout !!")
+}
+
 function history(){
     window.location.href = "history.html?token=" + token;
 }

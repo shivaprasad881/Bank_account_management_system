@@ -1,5 +1,9 @@
 package controller;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.JwtUtil;
@@ -180,32 +184,23 @@ public class UserController {
     }
 
     @GetMapping("/user_transactions")
-    public ResponseEntity<?> user_transactions(@RequestParam String token) {
-        
-
-        //first verify token - if valid - send response
-
-        // there is a chance for exception from this token validation method -so use try catch
-        try{
-            
-            String accno_jwt = JwtUtil.validateToken(token);
-
-            List<Transaction> transactions = transactionRepository.findByAccno(accno_jwt);
-
-            return ResponseEntity.ok(transactions);
-        }
-        catch(Exception e){//exception is the parent of all the exseptions - so it can handle all the exceptions
-
-            //hoo we got a exception - so one of the stage got rejected by the backend while validation
-            // the stages are token absence - invalid token - signature mismathc - token expiry
-
-            //either one would cause token rejecttion 
-            //so we need to simply indicate the user that ur toke in invalid
-            return ResponseEntity.status(401).body("Invalid token !!");
-
-        }
-        
+public ResponseEntity<?> user_transactions(
+    @RequestParam String token,
+    @RequestParam String size,
+    @RequestParam String page
+) {
+        Integer sizee = Integer.parseInt(size);
+        Integer pagee = Integer.parseInt(page);
+    try {
+        String accno_jwt = JwtUtil.validateToken(token);
+        Pageable pageable = PageRequest.of(pagee, sizee);
+        Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
+        return ResponseEntity.ok(transactions);
+    } catch(Exception e) {
+        System.out.println("Token error: " + e.getMessage()); // ← add here
+        return ResponseEntity.status(401).body("Invalid token !!");
     }
+}
 
     @GetMapping("/validate_pin")
     public ResponseEntity<?> validatepin(@RequestParam String token,@RequestParam String userpin) {
