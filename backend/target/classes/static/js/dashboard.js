@@ -3,41 +3,44 @@ const token = params.get("token");
 
 let fetched  = false;
 
-// function username(){
+function username(){
 
-//     if(fetched==true){
-//         return
-//     }
-//     //fetch backend for user name and render it in dashboard page
 
-//     let url = "http://localhost:8080/user_name?token=" + token;
+    let url = "http://localhost:8080/user_name?token=" + token;
 
-//     fetch(url,{
-//         method : 'get'
-//     })
+    fetch(url,{
+        method : 'get'
+    })
 
-//     .then(response =>{
-//         if(response.status!=200){
-//             showToast("Invalid token !!")
-//             return null;
-//         }
-//         else{
-//             return response.text()
-//         }
-//     })
+    .then(response =>{
+        if(response.status!=200){
+            showToast("Invalid token !!")
+            return null;
+        }
+        else{
+            return response.text()
+        }
+    })
 
-//     .then(data =>{
-//         document.getElementById("usermessage").innerHTML= `Hello ${data} !!`
-//     })
+    .then(data =>{
+        
 
-//     .catch(error => {
-//         showToast("Error in fetching user name !!");
-//     });
+        let element = document.getElementById("usermessage");
+        if(element != null){
+            element.innerHTML = `Hello ${data} !!`
+        }
+        //when element is null - which indicates we are in a page where we dont need to render the user name - so ignore it
 
-//     fetched = true;
-// }
+    })
 
-// username()
+    .catch(error => {
+        showToast("Error in fetching user name !!");
+    });
+
+    
+}
+
+username()
 
 function logout(){
     alert("logout !!")
