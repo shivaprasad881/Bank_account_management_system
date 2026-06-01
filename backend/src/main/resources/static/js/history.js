@@ -1,11 +1,6 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
-// let data;
-// let start_pointer;
-// let end_pointer;
-// let page_number;
-
 let size_his;
 let tar_page_his;
 
@@ -28,12 +23,6 @@ function fetch_transactions(size,tar_page){
 
     .then(jsondata => {
 
-        // both are inclusive - defines current rendering pages
-        
-
-        // start_pointer = data.length-1 // 21
-        // end_pointer = data.length - 10 // 12 
-        // page_number = 1;
         let data = jsondata.content;
 
         total_pages = jsondata.totalPages;
@@ -53,7 +42,6 @@ function fetch_transactions(size,tar_page){
 fetch_transactions(10,0)
 
 
-
 function nextpage(){
 
     if((tar_page_his + 2 ) > total_pages){
@@ -62,10 +50,6 @@ function nextpage(){
     else{
         fetch_transactions(size_his,tar_page_his+1)
     }
-
-    
-    
-  
 }
 
 
@@ -76,19 +60,13 @@ function prevpage(){
     }
     else{
         fetch_transactions(size_his,tar_page_his-1)
-    }
-
-    
+    } 
 }
-
-
 
 
 function display(data,current_page,page_size){
 
         document.getElementById("tableBody").innerHTML  = `` 
-        
-    // console.log(start_pointer +" "+ end_pointer)
 
         document.getElementById("heading").innerHTML = `Transactions (page - ${current_page+1})`
         
@@ -100,10 +78,7 @@ function display(data,current_page,page_size){
             let transaction_date_value = data[i].transactionDate;
 
             let updated = transaction_date_value.substring(0,10) + "   " + transaction_date_value.substring(11,19);
-            
-            
 
-            // console.log(transaction_type_value)//*** */
 
             if(transaction_type_value=="credit"){
                 //green colour
@@ -117,7 +92,6 @@ function display(data,current_page,page_size){
                     <td>${updated}</td>
                 </tr>
                 `;
-
 
             }
             else{
@@ -134,23 +108,17 @@ function display(data,current_page,page_size){
 
             }
 
-            
-        
-
-        }
-
-        
+        }       
 }
 
 function download() {
-    // we need to include all the transactions of the user in a pdf and download it
+    
     const doc = new jspdf.jsPDF();
 
     // x should remain 10 but y would be increment by 10
     doc.text("Transaction records ", 65, 10);
     
     let y = 20;
-
     
     for(let i = start_pointer; i>= Math.max(0,end_pointer) ; i--) {
         //each json object

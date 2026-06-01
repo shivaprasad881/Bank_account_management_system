@@ -5,7 +5,7 @@ const token_depo = params_depo.get("token");
 function deposit(redirect_page,passed_token,passed_amount) {
 
     if(redirect_page){
-        //hoo the call came from the frontend - so first validate the pin then deposit
+        //the call came from the frontend - so first validate the pin then deposit
         let amt = document.getElementById("numberInput").value;
         let int_amt = parseInt(amt);
         
@@ -20,11 +20,9 @@ function deposit(redirect_page,passed_token,passed_amount) {
     }
     else{
 
-        
-        //hoo the call came from pin page  after validating the pin to deposti money
+        //the call came from pin page  after validating the pin to deposit money
         url = "http://localhost:8080/deposit" ;
 
-        //as we are updating a attribute - this is patch - pass input in body
         let userdata = {
             token: passed_token,
             amount: passed_amount
@@ -39,11 +37,9 @@ function deposit(redirect_page,passed_token,passed_amount) {
         })
         .then(response => {
             if(response.status!=200){
-                //hoo i got the status other than 200 p - so may be invalid tone
                 showToast("Invalid token !!")
             }
             else{
-                //hoo i got the stauts as 200 so it is valid toke and i got a valid response i shoudl render thantg in tnext ithem
                 return response.text();
             }
         })

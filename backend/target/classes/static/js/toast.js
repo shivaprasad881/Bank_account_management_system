@@ -2,7 +2,6 @@ function showToast(message, duration = 2500) {
     // Create toast element
     const toast = document.createElement('div');
     
-    // Check if message contains newline or <br> - use innerHTML, otherwise textContent
     if(message.includes('\n') || message.includes('<br')) {
         toast.innerHTML = message;
         toast.style.whiteSpace = 'pre-line';

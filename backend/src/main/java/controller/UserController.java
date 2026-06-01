@@ -86,13 +86,16 @@ public class UserController {
         
     }
 
+
+
+
     @GetMapping("/failure_authentication")
         public String failure_attempts(@RequestParam String accno) {
             
              User user = userRepository.findByAccno(accno);
 
             if( user.getFailureAttempts() >= 3 ){
-                //hoo attempts exhausted - check time when they would be available
+                //attempts exhausted - check time when they would be available
 
                 Duration diff = Duration.between( LocalTime.now(),user.getAvailableAt());
 
@@ -108,9 +111,7 @@ public class UserController {
                 else{
                     return "Please try after "+sec+" seconds !!";
                 }
-
-                
-                
+  
             }
             else{
                 return "";
@@ -136,11 +137,7 @@ public class UserController {
             }
 
         }
-
-        
     }
-
-    
 
     @GetMapping("/check_balance")
     public ResponseEntity<?> checkBalance(@RequestParam String token) {
@@ -156,7 +153,7 @@ public class UserController {
 
 
         }
-        catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
+        catch(Exception e){
 
             return ResponseEntity.status(401).body("Invalid token !!");
 
@@ -167,18 +164,8 @@ public class UserController {
     @GetMapping("/user_details")
     public ResponseEntity<?>  userdetails(@RequestParam String token) {
 
-        // first validate the token then send the response
 
-        // in case of valid token - it would return the accno
-        // in case of invalid token - it would return the exception - so we need to hangle the exp in the cathc block
-
-        // as there is a chance for exp - keep the that error code in the try bloack - when ecp occurs then catch block will execute
-
-        // to return dynamic datatypes we would use repository - in frontend based on the status code woudl would take the responsein according datatypes
-
-
-        try{// make sure that take the accno from teh token but nto from the url , because if u take the accno from the url thne by cahnging the accno inthe url the data would be fetcehed , so if u take teh accno from the token as the attacker cant change the accno in the otken it would remain safe and give the according reseultr
-            // as we had thatjava function somewhere - we need to atleast specify the file in which it is parent so that we would search fo rthat file an dcheck for tha tethod in tit
+        try{
             String accno_jwt = JwtUtil.validateToken(token);
 
             User user = userRepository.findByAccno(accno_jwt);
@@ -189,18 +176,14 @@ public class UserController {
 
 
         }
-        catch(Exception e){// exceoptions is the parent of all the exceptions - it would havleany exp - it is the main root
+        catch(Exception e){
 
             return ResponseEntity.status(401).body("Invalid token !!");
 
         }
-
-        
-
-        
+ 
     }
 
-    
     @GetMapping("/user_name")
     public ResponseEntity<?>  username(@RequestParam String token) {
 
@@ -217,23 +200,23 @@ public class UserController {
     }
 
     @GetMapping("/user_transactions")
-public ResponseEntity<?> user_transactions(
-    @RequestParam String token,
-    @RequestParam String size,
-    @RequestParam String page
-) {
-        Integer sizee = Integer.parseInt(size);
-        Integer pagee = Integer.parseInt(page);
-    try {
-        String accno_jwt = JwtUtil.validateToken(token);
-        Pageable pageable = PageRequest.of(pagee, sizee);
-        Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
-        return ResponseEntity.ok(transactions);
-    } catch(Exception e) {
-        System.out.println("Token error: " + e.getMessage()); // ← add here
-        return ResponseEntity.status(401).body("Invalid token !!");
+    public ResponseEntity<?> user_transactions(
+        @RequestParam String token,
+        @RequestParam String size,
+        @RequestParam String page
+    ) {
+            Integer sizee = Integer.parseInt(size);
+            Integer pagee = Integer.parseInt(page);
+        try {
+            String accno_jwt = JwtUtil.validateToken(token);
+            Pageable pageable = PageRequest.of(pagee, sizee);
+            Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
+            return ResponseEntity.ok(transactions);
+        } catch(Exception e) {
+            System.out.println("Token error: " + e.getMessage()); // ← add here
+            return ResponseEntity.status(401).body("Invalid token !!");
+        }
     }
-}
 
     @GetMapping("/validate_pin")
     public ResponseEntity<?> validatepin(@RequestParam String token,@RequestParam String userpin) {
@@ -253,28 +236,23 @@ public ResponseEntity<?> user_transactions(
                 String orig_pin = user.getPin();
 
                 if( orig_pin.equals(userpin) ){
-                    //the original pin and user entered old pin are same
+                   \
                     return ResponseEntity.ok("true");
                 }
                 else{
-                    return ResponseEntity.ok("false"); //invalid pin
+                    return ResponseEntity.ok("false");
                 }
-
-
             }
-            
-
         }
         catch(Exception e){
             // invalid token
             return ResponseEntity.status(401).body("Invalid token !!");
         }
-        
-
-
-        
-         
+ 
     }
+
+
+
 
 
     @PatchMapping("/failure_authentication")
@@ -286,7 +264,7 @@ public ResponseEntity<?> user_transactions(
             user.setFailureAttempts( user.getFailureAttempts() + 1    );
 
             if(user.getFailureAttempts() >= 3){
-                //hoo limit reached - now assign a time - so after that time the attempts would be avaiable
+                // limit reached - now assign a time - so after that time the attempts would be avaiable
 
                 user.setAvailableAt( LocalTime.now().plusSeconds(20) );
             }
@@ -445,9 +423,6 @@ public ResponseEntity<?> user_transactions(
             String token = (String) jsonBody.get("token");
             Double amt = Double.parseDouble((String) jsonBody.get("amount"));
 
-            // first validate the token - if valid - deposit the money - send response
-
-
             try{
                 
 
@@ -482,15 +457,11 @@ public ResponseEntity<?> user_transactions(
         public ResponseEntity<?> withdrawl(@RequestBody Map<String, Object> jsonBody) {
             String token = (String) jsonBody.get("token");
             Double amt = Double.parseDouble((String) jsonBody.get("amount"));
-            
-
-            // first validate the token - if valid - deposit the money - send response
-
-
+           
             try{
                
 
-                //now i had the actual balance and the user requested balance - check whether i had enough bal to withdraw
+                
                 if(amt<=0){
                     return ResponseEntity.ok("Invalid amount !!");
                 }

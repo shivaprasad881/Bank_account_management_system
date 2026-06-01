@@ -69,20 +69,13 @@ function profile() {
 
 function check_balance(redirect_page,passed_token){
 
-    //hoo i came here to check the blanace only - i dont know what is redirection and stuff -i just need blance
 
     if(redirect_page){
         let action = "checkbalance"
-        //hoo the functions is being called from the frontend - so we would to redirect to pin page for pin validation
+       
         window.location.href = "pin.html?token="+ token + "&action=" + action;
     }
 
-    // when the function call is made from the pin page , we would pass the redirectpage as false - so the page would not get repeated redirection
-
-    // if we came here means in the pin page the pin is declared as valid - only then this function is called with redirectpage as false then only this line would executed
-
-    
-    
     url = "http://localhost:8080/check_balance?token=" + passed_token;
 
     fetch(url, {

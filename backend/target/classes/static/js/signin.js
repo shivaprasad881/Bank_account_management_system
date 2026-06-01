@@ -22,7 +22,7 @@ function user_signin() {
                       
             }
             else{
-                //he had enough attempts - validate user - if failure - then incremnt the count
+                //he had enough attempts - validate user - if failure - then increment the count
 
                 url = "http://localhost:8080/validate_user?accno=" + useracc + "&password=" + userpass;
 
@@ -51,12 +51,7 @@ function user_signin() {
                             },
                             body: JSON.stringify(userdata)
                         })
-                        .then(response =>{
-                            
-                            
-
-
-                        })
+                        .then(response =>{})
 
                         .catch(error => {
                             showToast("Error in incrementing the failure count !!");
@@ -69,8 +64,7 @@ function user_signin() {
                     
                         showToast("successful login !!",1500);
 
-                        //reset the failure attempts to 0 - as user logged in
-
+                        //reset the failure attempts to 0 - as user logged in 
 
                         url = "http://localhost:8080/reset_failure_attempts";
 
@@ -94,12 +88,6 @@ function user_signin() {
                             showToast("Error in reseting the failure count !!");
                         });
 
-
-
-                        // logged in sucessfully - hoo we got a jwt token for our successfull login
-
-                        //now where should i store this jwt token - so that i would send for every request
-                        
                         
                         setTimeout(() => {
                             window.location.href = "dashboard.html?token=" + data;

@@ -5,7 +5,7 @@ const token_with = params_with.get("token");
 function withdrawl(redirect_page,passed_token,passed_amount) {
 
     if(redirect_page){
-        //hoo the call came from the frontend - so first validate the pin then withdrawl
+        //the call came from the frontend - so first validate the pin then withdrawl
         let amt = document.getElementById("numberInput").value;
         let int_amt = parseInt(amt);
         
@@ -13,7 +13,7 @@ function withdrawl(redirect_page,passed_token,passed_amount) {
             showToast("Please enter valid amount");
         }
         else {
-            //now we had valid amount - redirect to pin page - validate - if correct - come here with values
+            //redirect to pin page - validate - if correct - come here with values
             let action = "withdrawl"
             window.location.href = "pin.html?token=" + token_with + "&action=" + action + "&amount=" + amt;
         }
@@ -21,10 +21,9 @@ function withdrawl(redirect_page,passed_token,passed_amount) {
     else{
 
         
-        //hoo the call came from pin page  after validating the pin to deposti money
+        // the call came from pin page  after validating the pin to withdraw money
         url = "http://localhost:8080/withdrawl";
 
-        //as we are updating a attribute - this is patch - pass input in body
         let userdata = {
             token : passed_token,
             amount: passed_amount
@@ -43,7 +42,6 @@ function withdrawl(redirect_page,passed_token,passed_amount) {
                 showToast("Invalid token !!")
             }
             else{
-                //valid token
                 return response.text();
             }
         })

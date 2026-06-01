@@ -14,7 +14,6 @@ function user_signup() {
         showToast("please enter Strong Password !!",1500);
 
         setTimeout(() => {
-            // code to execute after delay
             showToast("Strong password -:-\n\n * Atleast one small alphabet \n * Atleast one big alphabet \n * Atleast one digit \n * Atleast one special character \n * Atleast 8 length  ",8000)
         }, 1500);
     }
@@ -38,26 +37,12 @@ function user_signup() {
         })
         .then(response => response.text())
         .then(data => {
-            // showToast("Registration successfull !!!",1000);
-            
-            
-            
-            // setTimeout(() => {
-            //     showToast(data,2000);
-                
-            //     setTimeout(() => {
-            //         window.location.href = "signin.html";
-            //     }, 2000)
-
-            // }, 1000);
-
             showToast(data)
 
             setTimeout(() => {
                 window.location.href = "signin.html";
             }, 3000)
 
-            
         })
         .catch(error => {
             showToast("error in registration !!");

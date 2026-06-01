@@ -1,8 +1,5 @@
-/* ============================================================
-   common.css  —  Shared stylesheet for the Banking App
-   Pages: signin, signup, dashboard, updatepin, profile,
-          deposit, withdrawl, transfer, history
-   ============================================================ */
+ /* common.css  —  Shared stylesheet for the Banking App
+   Pages: signin, signup, dashboard, updatepin, profile,deposit, withdrawl, transfer, history */
 
 /* Assuming Amount is the 3rd column */
 #tableBody tr td:nth-child(3) {
@@ -28,13 +25,7 @@ body {
   padding: 1.5rem;
 }
 
-/* ── Main card ── */
-/* Default width: 400px — matches deposit, withdrawl, updatepin originals.
-   signin  → 500px  (override below)
-   signup  → 520px  (override below)
-   profile → 550px  (override below)
-   transfer→ 450px  (override below)
-   history → 800px  (handled by .container on that page)          */
+
 .container {
   background: #ffffff;
   border-radius: 24px;
