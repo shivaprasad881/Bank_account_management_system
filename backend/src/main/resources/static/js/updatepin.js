@@ -7,10 +7,14 @@ function update_the_pin() {
     
 
     if(newpin == "") {
-        showToast("please enter all fields !!");
-    } else if (newpin.length != 4) {
-        showToast("please enter the pin of valid length !!");
-    } else {
+        showToast("please enter the pin !!");
+    } 
+    
+    else if( newpin.length!=4 || parseInt(newpin)<0 ){
+        showToast("Please enter the valid Pin !!")
+    }
+    
+    else {
             url = "http://localhost:8080/updatepin";
                 
                 let userdata = {

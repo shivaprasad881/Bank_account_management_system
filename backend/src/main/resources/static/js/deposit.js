@@ -9,8 +9,11 @@ function deposit(redirect_page,passed_token,passed_amount) {
         let amt = document.getElementById("numberInput").value;
         let int_amt = parseInt(amt);
         
-        if(amt == "" || int_amt <= 0) {
-            showToast("Please enter valid amount");
+        if(amt == "" ) {
+            showToast("Please enter the amount");
+        }
+        else if( int_amt <= 0 ){
+            showToast("Please enter the valid amount");
         }
         else {
             //now we had valid amount - redirect to pin page - validate - if correct - come here with values

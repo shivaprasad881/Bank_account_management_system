@@ -7,8 +7,14 @@ function user_signup() {
 
     console.log("password being sent: " + password);
 
-    if(uname == "" || age == "" || parseInt(age) <= 0 || city == "" || phonenumber == "" || phonenumber.length != 10 || password == "") {
-        showToast("please enter valid details !!");
+    if(uname == "" || age == ""  || city == "" || phonenumber == ""  || password == "") {
+        showToast("please fill the  details !!");
+    }
+    else if( parseInt(age) <= 0 || parseInt(age) >= 150 ){
+        showToast("please enter valid Age !!");
+    }
+    else if( phonenumber.length != 10  ){
+        showToast("please enter valid Phonenumber !!");
     }
     else if( password_strength(password)==false ){
         showToast("please enter Strong Password !!",1500);

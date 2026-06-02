@@ -2,8 +2,11 @@ function user_signin() {
     let useracc = document.getElementById("user_acc").value;
     let userpass = document.getElementById("password").value;
     
-    if(useracc == "" || userpass == "" || useracc.length!=11 || "ACC" != useracc.substring(0,3)) {
-        showToast("please fill the valid details");
+    if(useracc == "" || userpass == "") {
+        showToast("please fill the details");
+    }
+    else if(  useracc.length!=11 || "ACC"!=useracc.substring(0,3)      || isNaN( useracc.substring(3)   )   ){
+        showToast("please enter valid Accno");
     }
     else {
         //consider user entered valid accno

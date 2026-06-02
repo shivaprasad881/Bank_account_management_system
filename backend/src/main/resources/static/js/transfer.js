@@ -11,9 +11,24 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin,token_passed) {
 
         let int_amt = parseInt(tar_amt);
         
-        if(tar_acc == "" || tar_amt == "" || int_amt <= 0) {
+        if(tar_acc == "" || tar_amt == "") {
             
-            showToast("please enter valid details!!");
+            showToast("please fill the  details !!");
+
+        }
+        else if( tar_acc.length != 11  || tar_acc.substring(0,3)!="ACC"     || isNaN( useracc.substring(3)   )    ){
+
+            showToast("Please enter valid tar_acc !!")
+
+        }
+        else if(int_amt <= 0){
+
+            showToast("Please enter valid amount !!")
+
+        }
+        else if(int_amt > 100000){
+
+            showToast("Cannot transfer more than 1 lakh !!")
 
         }
         else {
@@ -48,7 +63,7 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin,token_passed) {
                     })
 
                     .catch(error => {
-                        showToast("error in checking the presence of destination user !!");
+                        showToast("Error in checking the presence of destination account !!");
                     });
 
         }

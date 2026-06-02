@@ -7,14 +7,17 @@ function check_pin(){
     // check whether user pin is valid or not
     const userpin = document.getElementById("userpin").value
 
-    if(userpin=="" || userpin.length!=4){
-        showToast("Please enter the valid pin !!")
+    if(userpin=="" ){
+        showToast("Please enter the  Pin !!")
+    }
+    else if( userpin.length!=4   ||    isNaN( userpin )   ||   parseInt(userpin)<0 ){
+        showToast("Please enter the valid Pin !!")
     }
     else{
         
             let url = "http://localhost:8080/validate_pin?token=" + token_pin + "&userpin=" + userpin;
 
-            console.log("pin page ->  token: " + token_pin);
+            //console.log("pin page ->  token: " + token_pin);
             
             fetch(url, {
                 method: 'get'

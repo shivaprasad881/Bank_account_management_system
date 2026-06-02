@@ -94,28 +94,35 @@ public class UserController {
             
              User user = userRepository.findByAccno(accno);
 
-            if( user.getFailureAttempts() >= 3 ){
-                //attempts exhausted - check time when they would be available
-
-                Duration diff = Duration.between( LocalTime.now(),user.getAvailableAt());
-
-                long sec = diff.toSeconds();
-
-                if(sec<0){
-                    //hoo the time got ended - now iam free - i got bail
-                    user.setFailureAttempts(0);
-                    user.setAvailableAt( null);
-                    userRepository.save(user);
-                    return "Hoo, now u can try attempting !!";
-                }
-                else{
-                    return "Please try after "+sec+" seconds !!";
-                }
-  
+            if(user==null){
+                return "user acc not existing !!";
             }
             else{
-                return "";
+                if( user.getFailureAttempts() >= 3 ){
+                    //attempts exhausted - check time when they would be available
+
+                    Duration diff = Duration.between( LocalTime.now(),user.getAvailableAt());
+
+                    long sec = diff.toSeconds();
+
+                    if(sec<0){
+                        //hoo the time got ended - now iam free - i got bail
+                        user.setFailureAttempts(0);
+                        user.setAvailableAt( null);
+                        userRepository.save(user);
+                        return "Hoo, now u can try attempting !!";
+                    }
+                    else{
+                        return "Please try after "+sec+" seconds !!";
+                    }
+  
+                }
+                else{
+                    return "";
+                }
             }
+
+            
         }
 
     @GetMapping("/validate_user")
@@ -236,7 +243,7 @@ public class UserController {
                 String orig_pin = user.getPin();
 
                 if( orig_pin.equals(userpin) ){
-                   \
+                   
                     return ResponseEntity.ok("true");
                 }
                 else{
@@ -384,7 +391,6 @@ public class UserController {
 
         }
 
-
     @PatchMapping("/updatepin")
         public  ResponseEntity<?> updatePin(@RequestBody Map<String, Object> jsonBody) {
             String token = (String) jsonBody.get("token");
@@ -416,7 +422,6 @@ public class UserController {
   
             
         }
-
 
     @PatchMapping("/deposit")
         public ResponseEntity<?> deposit(@RequestBody Map<String, Object> jsonBody) {
@@ -450,8 +455,6 @@ public class UserController {
             
             
         }
-
-
 
     @PatchMapping("/withdrawl")
         public ResponseEntity<?> withdrawl(@RequestBody Map<String, Object> jsonBody) {
