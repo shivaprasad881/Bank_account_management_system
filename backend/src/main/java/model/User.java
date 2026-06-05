@@ -30,6 +30,16 @@ public class User {
 
     @Column (name = "available_at")
     private LocalTime availableAt;
+
+    
+    @Column (name = "invalid_jwt_tokens")
+    private String invalidJwtTokens;
+
+
+    @Column (name = "logout_count")
+    private Integer logoutCount;
+
+
     
     public User() {}
     
@@ -40,6 +50,9 @@ public class User {
         this.phonenumber = phonenumber;
         this.password = password;
         this.balance = 0.00;
+        this.failureAttempts = 0;
+        this.invalidJwtTokens = "[]";
+        this.logoutCount = 0;
         
     }
     
@@ -55,6 +68,8 @@ public class User {
     public Double getBalance() { return balance; }
     public Integer getFailureAttempts() { return failureAttempts; }
     public LocalTime getAvailableAt() { return availableAt; }
+    public String getInvalidJwtTokens() { return invalidJwtTokens; }
+    public Integer getLogoutCount() { return logoutCount; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -68,4 +83,7 @@ public class User {
     public void setBalance(Double balance) { this.balance = balance; }
     public void setFailureAttempts(Integer failureAttempts) { this.failureAttempts = failureAttempts; }
     public void setAvailableAt(LocalTime availableAt) { this.availableAt = availableAt ; }
+    public void setInvalidJwtTokens(String invalidJwtTokens) { this.invalidJwtTokens = invalidJwtTokens; }
+    public void setLogoutCount(Integer logoutCount) { this.logoutCount = logoutCount; }
+
 }

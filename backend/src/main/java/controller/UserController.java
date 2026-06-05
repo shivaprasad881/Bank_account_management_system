@@ -1,5 +1,6 @@
 package controller;
 
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,10 @@ import java.time.LocalTime;
 import java.time.Duration;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 
 @RestController
@@ -258,6 +263,51 @@ public class UserController {
  
     }
 
+    @GetMapping("/validate_user_token")
+    public ResponseEntity<?> validate_user_token(@RequestParam String token) {
+
+        // first validate the token - if valid - send the response - it case of invalid it would send the exp so keep it in try block
+
+        try{
+
+                String accno_jwt  = JwtUtil.validateToken(token);
+
+                //the token is live - now check whether it is in user's block list or not
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+                String black_list_string = user.getInvalidJwtTokens();
+
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode black_list = mapper.readTree(black_list_string);
+
+                for (JsonNode node : black_list) {
+                    String cur_token = node.asText();
+
+                    // now compare with our token
+
+                    if(token.equals(cur_token)){
+                        //hoo they are equal - which means user trying login with the expired token - we need to reject the request
+                        return ResponseEntity.ok("reject");
+                    }
+                    
+
+                }
+
+                // we compared our token with all the black list tokens - it is not matched with anyone - so it is compareltely valid - send proceed response
+                
+
+                return ResponseEntity.ok("accept");
+    
+            
+        }
+        catch(Exception e){
+            // invalid token - this is token normally invalid due to expiry/format/ext
+            return ResponseEntity.status(401).body("Invalid token !!");
+        }
+ 
+    }
+
 
 
 
@@ -423,6 +473,52 @@ public class UserController {
             
         }
 
+    @PatchMapping("/new_black_list_token")
+        public  ResponseEntity<?> new_black_list_tokenn(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
+            
+            try{
+                String accno_jwt = JwtUtil.validateToken(token);
+
+                //its a valid token - add it to user's black list
+
+                User user = userRepository.findByAccno(accno_jwt);
+
+
+                String old_black_list_string = user.getInvalidJwtTokens();
+
+
+                ObjectMapper mapper = new ObjectMapper();
+                List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
+
+                tokenList.add(token);
+
+                String updated_black_list_string = mapper.writeValueAsString(tokenList);
+
+                //update in the object by using setters (we had the update string - just replace with the existing string)
+
+                user.setLogoutCount( user.getLogoutCount() + 1  );
+                user.setInvalidJwtTokens(updated_black_list_string);
+
+                // hoo add the changes to the database 
+                
+                userRepository.save(user);
+
+                // finally we got the current list - added the cur token - update the list - changes done on database - token got added to the list
+
+                return ResponseEntity.ok("Token added to black_list succesfully !!");
+                
+   
+            }
+            catch(Exception e){
+                // its already invalid token - no need to add it to the black_list
+                System.out.println("Logout error: " + e.getMessage());
+                return ResponseEntity.status(401).body("Invalid token !!");
+            }
+  
+            
+        }
+
     @PatchMapping("/deposit")
         public ResponseEntity<?> deposit(@RequestBody Map<String, Object> jsonBody) {
             String token = (String) jsonBody.get("token");
@@ -502,5 +598,8 @@ public class UserController {
             
             
         }//withdrawl
+
+
+    //end of endpoints
 
 }

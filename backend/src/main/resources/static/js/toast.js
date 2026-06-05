@@ -1,4 +1,4 @@
-function showToast(message, duration = 2500) {
+function showToast(message, duration = 1500) {
     // Create toast element
     const toast = document.createElement('div');
     

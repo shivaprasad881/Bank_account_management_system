@@ -1,7 +1,9 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
-let fetched  = false;
+// this is the begin for any operation - like landing page - so if we validate token here - we would allow only valid tokens for further operations - only its valid we can allow further operations - further we dont need to fear as it is already valid - reject the invalid onces 
+
+
 
 function username(){
 
@@ -43,7 +45,49 @@ function username(){
 username()
 
 function logout(){
-    alert("logout !!")
+    // add the current token to the black list - so that we can reject next time
+    console.log("Token from URL:", token); 
+
+    let url = "http://localhost:8080/new_black_list_token" ;
+
+        let userdata = {
+            token: token,
+        };
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userdata)
+        })
+        .then(response => {
+            if(response.status!=200){
+                showToast("Invalid token - no need to add to black list !!")
+            }
+            else{
+                return response.text();
+            }
+        })
+        .then(data => {
+            // its a valid token - we successfully added it in the black list
+            showToast("Successfully added token in the black_list",1500)
+
+            //now redirect to login page
+
+            // setTimeout(() => {
+            //     window.location.href = "signin.html";
+            // }, 1500);
+
+
+        })
+
+        .catch(error => {
+            showToast("Error in adding the token to black_list !!");
+        });
+
+
+
 }
 
 function history(){
@@ -51,15 +95,76 @@ function history(){
 }
 
 function update_pin_dash(redirect_page,passed_token){
-    // first use pin page to check the pin 
     
+    
+ 
+
     if(redirect_page){
-        let action = "updatepin"
-        window.location.href = "pin.html?token=" + token + "&action=" + action;
+        // first validate the token - if valid allow - if invalid reject
+
+        let url = "http://localhost:8080/validate_user_token?token=" + token;
+
+        fetch(url, {
+            method: 'GET'
+        })
+        .then(response => {
+            if(response.status == 200) {
+                return response.text();
+            } else {
+                //its an expired token
+                showToast("Invalid token !!");
+            }
+        })
+        .then(data => { 
+            //it is live token - now we would look whether it is valid or not
+
+            if(data=="reject"){
+                //hoo the user is using the expired_jwt_token - reject him
+                showToast("token in the black_list  - u are rejected  !!")
+
+                // through him in the login page
+
+                setTimeout(() => {
+
+                    window.location.href = "signin.html"
+                    
+                }, 1500);
+
+            }
+            else{
+                
+                showToast("valid token - u can proceed !!")
+
+                //now we would allow the user for next operations
+
+
+                setTimeout(() => {
+
+                    let action = "updatepin"
+                    window.location.href = "pin.html?token=" + token + "&action=" + action;
+                    
+                }, 1500);
+
+                
+
+
+            }
+
+        })
+
+        .catch(error => {
+            showToast("Error in validating the user_token with black_list !!");
+        });
+
+
+
+
+        
     }
     else{
         window.location.href = "updatepin.html?token=" + passed_token;
     }
+
 
 }
 
