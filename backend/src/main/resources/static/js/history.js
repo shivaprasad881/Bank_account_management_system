@@ -1,16 +1,19 @@
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 
-let size_his;
-let tar_page_his;
-let total_pages;
+// global variables
+let current_page = 0;
+let page_size = 9;
 
-function fetch_transactions(size,tar_page){
+let total_pages;
+let data;
+
+function fetch_transactions(){
 
     
-        console.log("fetch_transactions called with size:", size, "page:", tar_page);
+        console.log("fetch_transactions called with size:", page_size, "page:", current_page);
 
-        let url = "http://localhost:8080/user_transactions?token=" + token  + "&size=" + size + "&page=" + tar_page ;
+        let url = "http://localhost:8080/user_transactions?token=" + token  + "&size=" + page_size + "&page=" + current_page ;
 
         fetch(url, {
             method: 'GET'
@@ -29,14 +32,11 @@ function fetch_transactions(size,tar_page){
 
         .then(jsondata => {
 
-            let data = jsondata.content;
-
+            data = jsondata.content;//global
             total_pages = jsondata.totalPages;
 
-            size_his = size;
-            tar_page_his = tar_page;
 
-            display(data,tar_page_his,size_his)
+            display()
             
         })
 
@@ -48,32 +48,34 @@ function fetch_transactions(size,tar_page){
 
 }
 
-fetch_transactions(9,0)
+fetch_transactions()
 
 
 function nextpage(){
 
-    if((tar_page_his + 2 ) > total_pages){
+    if((current_page + 2 ) > total_pages){
         showToast("Already at ending !!",1500)
     }
     else{
-        fetch_transactions(size_his,tar_page_his+1)
+        current_page += 1;
+        fetch_transactions()
     }
 }
 
 
 function prevpage(){
 
-    if(tar_page_his==0){
+    if(current_page==0){
         showToast("Already at Beginning !!",1500)
     }
     else{
-        fetch_transactions(size_his,tar_page_his-1)
+        current_page -= 1;
+        fetch_transactions()
     } 
 }
 
 
-function display(data,current_page,page_size){
+function display(){
 
         document.getElementById("tableBody").innerHTML  = `` 
 
@@ -130,21 +132,23 @@ function display(data,current_page,page_size){
         
 }
 
+
+
 function download() {
     
     const doc = new jspdf.jsPDF();
 
     // x should remain 10 but y would be increment by 10
-    doc.text("Transaction records ", 65, 10);
+    doc.text("Transaction records(page - "+ (current_page + 1)+") ", 65, 10);
     
     let y = 20;
     
-    for(let i = start_pointer; i>= Math.max(0,end_pointer) ; i--) {
+    for(let i = 0; i<data.length ; i++) {
         //each json object
         let str = JSON.stringify(data[i]); // each json object converted into string
         
         //each line can hold 80 characters only
-        str = (data.length-i) + "].   " + str;
+        str = ( current_page*page_size + i + 1 ) + "].   " + str;
         
         let len = str.length;
         let start = 0;
