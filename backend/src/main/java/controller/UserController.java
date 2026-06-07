@@ -22,7 +22,7 @@ import model.Transaction;
 
 import java.time.LocalTime;
 import java.time.Duration;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -492,12 +492,41 @@ public class UserController {
                 List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
 
                 tokenList.add(token);
+                user.setLogoutCount( user.getLogoutCount() + 1  );
 
-                String updated_black_list_string = mapper.writeValueAsString(tokenList);
+
+                List<String> new_tokenList = new ArrayList<>();
+
+                // now we had the token list in the form of strings - check for expirty of each token string - remove in case of expiry
+
+                for(String cur_token : tokenList){
+                    if(!JwtUtil.isTokenExpired(cur_token) ){
+                        //hoo its a valid token - if need to retain it - add to our new list
+                        new_tokenList.add(cur_token);
+
+
+                        //when we are removing a token from the list - decrement the count to stay balanced
+                        
+                    }
+                    else{
+                        //hoo its already expired - no use of keeping it - ignore it to add to new list 
+
+                        //decrease the count - as we are ignoring this token
+                        user.setLogoutCount( user.getLogoutCount() - 1  );
+
+                    }
+                    
+                }
+
+                //now we had all the valid tokens in the new list - add then to db
+
+
+
+                String updated_black_list_string = mapper.writeValueAsString(new_tokenList);
 
                 //update in the object by using setters (we had the update string - just replace with the existing string)
 
-                user.setLogoutCount( user.getLogoutCount() + 1  );
+                
                 user.setInvalidJwtTokens(updated_black_list_string);
 
                 // hoo add the changes to the database 
@@ -512,6 +541,7 @@ public class UserController {
             }
             catch(Exception e){
                 // its already invalid token - no need to add it to the black_list
+                // incase of invalid token - now need to check and remove the expired tokens 
                 System.out.println("Logout error: " + e.getMessage());
                 return ResponseEntity.status(401).body("Invalid token !!");
             }
