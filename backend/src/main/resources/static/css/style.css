@@ -330,12 +330,7 @@ td {
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* Date column — fixed width for full timestamp */
-th:nth-child(4),
-td:nth-child(4) {
-  width: 220px;
-  white-space: nowrap;
-}
+
 
 /* ── Misc ── */
 .accent-line {

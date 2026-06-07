@@ -29,6 +29,9 @@ public class Transaction {
     @Column (name = "transaction_type")
     private String transactionType;
 
+    @Column (name = "available_balance")
+    private Double availableBalance;
+
     @Column(name = "transaction_date", insertable = false, updatable = false)
     private Timestamp transactionDate;
 
@@ -36,11 +39,12 @@ public class Transaction {
     public Transaction() {}
 
     // constructor to create a transaction
-    public Transaction(String accno, String tar_acc, Double amount, String transaction_type) {
+    public Transaction(String accno, String tar_acc, Double amount, String transaction_type,Double available_balance) {
         this.accno = accno;
         this.tarAcc = tar_acc;
         this.amount = amount;
         this.transactionType = transaction_type;
+        this.availableBalance = available_balance;
     }
 
     // getters only — no setters since transactions are immutable
@@ -50,4 +54,5 @@ public class Transaction {
     public Double getAmount() { return amount; }
     public String getTransactionType() { return transactionType; }
     public Timestamp getTransactionDate() { return transactionDate; }
+    public Double getAvailableBalance() { return availableBalance; }
 }

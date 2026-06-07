@@ -391,10 +391,12 @@ public class UserController {
 
                                 
                                 acc_user.setBalance( acc_user.getBalance() - amt );
+                                Double accuser_available_bal = acc_user.getBalance();
 
                                 userRepository.save(acc_user);
 
                                 tar_user.setBalance(tar_user.getBalance() + amt );
+                                Double taruser_available_bal = tar_user.getBalance();
 
                                 userRepository.save(tar_user);
 
@@ -404,8 +406,8 @@ public class UserController {
 
 
                                 // call the transaction constructor to create the new transaction record
-                                Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit");
-                                Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit");
+                                Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit",accuser_available_bal);
+                                Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit",taruser_available_bal);
 
                                 transactionRepository.save(trans1);
                                 transactionRepository.save(trans2);

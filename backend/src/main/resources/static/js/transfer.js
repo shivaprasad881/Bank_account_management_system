@@ -16,7 +16,7 @@ function transfer(redirect_page,tar_acc_pin,tar_amt_pin,token_passed) {
             showToast("please fill the  details !!");
 
         }
-        else if( tar_acc.length != 11  || tar_acc.substring(0,3)!="ACC"     || isNaN( useracc.substring(3)   )    ){
+        else if( tar_acc.length != 11  || tar_acc.substring(0,3)!="ACC"    ){
 
             showToast("Please enter valid tar_acc !!")
 
