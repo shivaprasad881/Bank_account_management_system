@@ -15,38 +15,10 @@ function update_the_pin() {
     }
     
     else {
-            url = "http://localhost:8080/updatepin";
-                
-                let userdata = {
-                    token : token_upt,
-                    newpin: newpin
-                };
-                
-                fetch(url, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(userdata)
-                })
-                .then(response =>{
-                    if(response.status!=200){
-                        showToast("Invalid token !!")
-                    }
-                    else{
-                        return response.text();
 
-                    }
-                })
-                .then(data => {
-                    showToast(data,2000);
+            let action = "updatepin"
+            window.location.href = "pin.html?token=" + token_upt + "&newpin=" + newpin + "&action=" + action;
 
-                    setTimeout(() => {
-                        window.location.href = "dashboard.html?token=" + token_upt;
-                    }, 2000);
-                })
-                .catch(error => {
-                    showToast("error in updating the pin !!");
-                });
-    }//else
+           
+    }
 }

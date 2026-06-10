@@ -13,7 +13,7 @@ function username(){
         //only when we are in dashboard - then only fetch for the user name - in other pages we dont need the username
 
         
-        check_token(token).then(is_valid => {
+        check_token_in_blacklist(token).then(is_valid => {
 
             if(is_valid){
                 // continue next operation - fetch the user name
@@ -70,7 +70,7 @@ function logout(){
 
     // first validate the user then logout functinality
 
-    check_token(token).then(is_valid => {
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
             // continue next operation - he is valid user
@@ -125,52 +125,10 @@ function logout(){
 
 }//logout
 
-function check_token(tokenn){
 
-    let url = "http://localhost:8080/validate_user_token?token=" + tokenn;
-
-        return fetch(url, {
-            method: 'GET'
-        })
-        .then(response => {
-            if(response.status == 200) {
-                return response.text();
-            } else {
-                //its an expired token
-                //console.log("its not a valid token - caused for rejection")
-                return "reject";
-            }
-        })
-        .then(data => { 
-            //it is live token - now we would look whether it is valid or not
-
-            if(data=="reject"){
-
-                //console.log("the token is present in the blacklist - caused for rejection")
-
-                return false;
-
-
-            }
-            else{
-                //only when
-
-                return true;
-            }
-        
-        })
-
-        .catch(error => {
-            //showToast("Error in validating the user_token with black_list !!");
-            return false
-        });
-
-
-
-}//check token
 
 function history(){
-    check_token(token).then(is_valid => {
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
             // continue next operation - he is valid user
@@ -184,18 +142,16 @@ function history(){
     
 }
 
-function update_pin_dash(redirect_page,passed_token){
+function update_pin_dash(){
     
-    if(redirect_page){
-        // first validate the token - if valid allow - if invalid reject
-
-
-        check_token(token).then(is_valid => {
+    
+        check_token_in_blacklist(token).then(is_valid => {
 
             if(is_valid){
                 // continue next operation - he is valid user
-                let action = "updatepin"
-                window.location.href = "pin.html?token=" + token + "&action=" + action;
+                window.location.href = "updatepin.html?token=" + token;
+
+                
             }
             else{
                 showToast("It's not a valid token !!")
@@ -203,11 +159,6 @@ function update_pin_dash(redirect_page,passed_token){
 
         });
   
-    }
-    else{
-        window.location.href = "updatepin.html?token=" + passed_token;
-    }
-
 }
 
 function profile() {
@@ -217,7 +168,7 @@ function profile() {
         // Then executes the redirect logic
 
 
-    check_token(token).then(is_valid => {
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
             // continue next operation - he is valid user
@@ -230,11 +181,10 @@ function profile() {
     });
 }
 
-function check_balance(redirect_page,passed_token){
+function check_balance(){
 
-    if(redirect_page){
-
-        check_token(token).then(is_valid => {
+   
+        check_token_in_blacklist(token).then(is_valid => {
 
             if(is_valid){
                 let action = "checkbalance"
@@ -248,45 +198,12 @@ function check_balance(redirect_page,passed_token){
 
         });
   
-    }
-    else{
-
-        url = "http://localhost:8080/check_balance?token=" + passed_token;
-
-        fetch(url, {
-            method: 'get'
-        })
-        .then(response =>{
-            if(response.status!=200){
-                //invalid token
-                showToast("Invalid token !!")
-            }
-            else{
-                //valid token - send the response to the next level - then would handle the response
-                return response.text()
-            }
-        })
-        .then(data => {
-            showToast(data,2000);
-
-            //after showing balance on the pin page - we need to redirect ot the dashboard - as the user sees the balance only once
-            setTimeout(() => {
-            window.location.href = "dashboard.html?token=" + token;
-            }, 2000);
-
-
-        })
-        .catch(error => {
-            showToast("Error in fetching the balance !!");
-        });
-
-    }
-
     
-}//check balance
+    
+}
 
 function deposit_dash() {
-    check_token(token).then(is_valid => {
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
             // continue next operation - he is valid user
@@ -300,11 +217,11 @@ function deposit_dash() {
     
 }
 
-function withdrawl_dash() {
-    check_token(token).then(is_valid => {
+function withdrawl_dash() { 
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
-            // continue next operation - he is valid user
+            // redirect to withdrawl page
             window.location.href = "withdrawl.html?token=" + token;
         }
         else{
@@ -316,7 +233,7 @@ function withdrawl_dash() {
 }
 
 function transfer_dash() {
-    check_token(token).then(is_valid => {
+    check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
             // continue next operation - he is valid user
