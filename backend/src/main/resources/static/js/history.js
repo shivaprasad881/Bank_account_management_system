@@ -24,7 +24,7 @@ function fetch_transactions(){
             if(response.status == 200) {
                 return response.json();
             } else {
-                showToast("Invalid token !!");
+                showToast("Unauthorized request!!")
             }
         })
 

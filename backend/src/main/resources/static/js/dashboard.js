@@ -91,7 +91,7 @@ function logout(){
                 })
                 .then(response => {
                     if(response.status!=200){
-                        showToast("Invalid token - no need to add to black list !!")
+                        showToast("Unauthorized request!!")
                     }
                     else{
                         return response.text();
@@ -99,7 +99,7 @@ function logout(){
                 })
                 .then(data => {
                     // its a valid token - we successfully added it in the black list
-                    showToast("Successfully added token in the black_list",1500)
+                    showToast("Successfully added token in the black_list")
 
                     //now redirect to login page
 
@@ -111,13 +111,15 @@ function logout(){
                 })
 
                 .catch(error => {
+
                     showToast("Error in adding the token to black_list !!");
                 });
 
 
         }
         else{
-            showToast("It's not a valid token !!")
+            //token in blacklist
+            showToast("Unauthorized request!!")
         }
 
     });
@@ -135,7 +137,7 @@ function history(){
             window.location.href = "history.html?token=" + token;
         }
         else{
-            showToast("It's not a valid token !!")
+            showToast("Unauthorized request!!")
         }
 
     });
@@ -175,7 +177,7 @@ function profile() {
             window.location.href = "profile.html?token=" + token;
         }
         else{
-            showToast("It's not a valid token !!")
+            showToast("Unauthorized request!!")
         }
 
     });

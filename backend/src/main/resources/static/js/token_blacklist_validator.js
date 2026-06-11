@@ -1,4 +1,4 @@
-function check_token_in_blacklist(tokenn){
+function check_token_in_blacklist(tokenn){// boolean
 
     let url = "http://localhost:8080/validate_user_token?token=" + tokenn;
 

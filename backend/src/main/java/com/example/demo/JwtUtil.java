@@ -8,6 +8,11 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.http.ResponseEntity;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class JwtUtil {
 
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor("bankingsecretkey12345678901234567890".getBytes());
@@ -46,5 +51,25 @@ public class JwtUtil {
         catch(ExpiredJwtException e) {
             return true; // expired!
         }
+    }
+
+    public static boolean isTokenInBlacklist(String black_list_string,String token) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode black_list = mapper.readTree(black_list_string);
+
+        for (JsonNode node : black_list) {
+            String cur_token = node.asText();
+
+                    // now compare with our token
+
+            if(token.equals(cur_token)){
+                return true;// hoo it is present in the blacklist - reject the request
+            }
+                    
+        }
+        
+        return false; // token not present in the blacklist at all - its valid token
+
     }
 }

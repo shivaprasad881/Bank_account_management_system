@@ -11,7 +11,7 @@ const token = params.get("token");
         if(response.status == 200) {
             return response.text();
         } else {
-            showToast("Invalid token !!");
+            showToast("Unauthorized request !!")
         }
     })
     .then(data => {

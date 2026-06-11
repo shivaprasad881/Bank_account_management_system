@@ -68,30 +68,6 @@ public class UserController {
         
     } 
 
-    @PostMapping("/check_accno")
-    public String checkAccno(@RequestBody Map<String, Object> jsonBody) {
-        String accno = (String) jsonBody.get("accno");
-
-        if(accno.length()==0){
-            return "Please enter valid account number !!";
-        }
-        else{
-            
-            User user = userRepository.findByAccno(accno);
-
-            if(user==null){
-                //the user is not present
-                return "false";
-            }
-            else{
-                return "true";
-            }
-        }
-
-        
-    }
-
-
 
 
     @GetMapping("/failure_authentication")
@@ -130,7 +106,9 @@ public class UserController {
             
         }
 
-    @GetMapping("/validate_user")
+    
+    
+        @GetMapping("/validate_user")
     public String validateuser(@RequestParam String accno, @RequestParam String password) {
 
         if(accno.length()==0 ||  password.length()==0){
@@ -157,12 +135,19 @@ public class UserController {
 
         try{
             String accno_jwt = JwtUtil.validateToken(token);
-
             User user = userRepository.findByAccno(accno_jwt);
 
+            String black_list_string = user.getInvalidJwtTokens();
 
-            return ResponseEntity.ok(user.getBalance());
+            boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
+            //hoo the token is not in the blacklist - its completely valid token - return the user blance
+            if(is_token_in_blacklist){//reject
+                return ResponseEntity.status(401).body("Unauthorized request !!");
+            }
+            else{
+                return ResponseEntity.ok(user.getBalance());
+            }
 
         }
         catch(Exception e){
@@ -178,14 +163,22 @@ public class UserController {
 
 
         try{
-            String accno_jwt = JwtUtil.validateToken(token);
 
+            String accno_jwt = JwtUtil.validateToken(token);
             User user = userRepository.findByAccno(accno_jwt);
 
-            String data =  user.getAccno() +  ","   +  user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber() ;
+            String black_list_string = user.getInvalidJwtTokens();
 
-            return ResponseEntity.ok(data);
+            boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
+            if(is_token_in_blacklist){// reject
+                return ResponseEntity.status(401).body("Unauthorized request !!");
+            }
+            else{//proceed
+                String data =  user.getAccno() +  ","   +  user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber() ;
+
+                return ResponseEntity.ok(data);
+            }
 
         }
         catch(Exception e){
@@ -200,11 +193,21 @@ public class UserController {
     public ResponseEntity<?>  username(@RequestParam String token) {
 
         try{
-            String accno_jwt = JwtUtil.validateToken(token);
 
+            String accno_jwt = JwtUtil.validateToken(token);
             User user = userRepository.findByAccno(accno_jwt);
 
-            return ResponseEntity.ok(user.getUname() );
+            String black_list_string = user.getInvalidJwtTokens();
+
+            boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+            if(is_token_in_blacklist){// reject
+                return ResponseEntity.status(401).body("Unauthorized request !!");
+            }
+            else{//proceed
+                return ResponseEntity.ok(user.getUname() );
+            }
+
         }
         catch(Exception e){ //exception is the parent of all the exceptions 
             return ResponseEntity.status(401).body("Invalid token !!");
@@ -212,22 +215,37 @@ public class UserController {
     }
 
     @GetMapping("/user_transactions")
-    public ResponseEntity<?> user_transactions(
-        @RequestParam String token,
-        @RequestParam String size,
-        @RequestParam String page
-    ) {
-            Integer sizee = Integer.parseInt(size);
-            Integer pagee = Integer.parseInt(page);
+    public ResponseEntity<?> user_transactions(@RequestParam String token,@RequestParam String size,@RequestParam String page) {
+        Integer sizee = Integer.parseInt(size);
+        Integer pagee = Integer.parseInt(page);
+
         try {
+
             String accno_jwt = JwtUtil.validateToken(token);
-            Pageable pageable = PageRequest.of(pagee, sizee);
-            Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
-            return ResponseEntity.ok(transactions);
-        } catch(Exception e) {
+            User user = userRepository.findByAccno(accno_jwt);
+
+            String black_list_string = user.getInvalidJwtTokens();
+
+            boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+            if(is_token_in_blacklist){// reject
+                return ResponseEntity.status(401).body("Unauthorized request !!");
+            }
+            else{//proceed
+                Pageable pageable = PageRequest.of(pagee, sizee);
+                Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
+                return ResponseEntity.ok(transactions);
+            }
+
+        }
+
+
+        catch(Exception e) {
             System.out.println("Token error: " + e.getMessage()); // ← add here
             return ResponseEntity.status(401).body("Invalid token !!");
         }
+
+
     }
 
     @GetMapping("/validate_pin")
@@ -241,19 +259,30 @@ public class UserController {
             }
             else{
 
-                String accno_jwt  = JwtUtil.validateToken(token);
-
+                String accno_jwt = JwtUtil.validateToken(token);
                 User user = userRepository.findByAccno(accno_jwt);
 
-                String orig_pin = user.getPin();
+                String black_list_string = user.getInvalidJwtTokens();
 
-                if( orig_pin.equals(userpin) ){
-                   
-                    return ResponseEntity.ok("true");
+                boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+                if(is_token_in_blacklist){// reject
+                    return ResponseEntity.status(401).body("Unauthorized request !!");
                 }
-                else{
-                    return ResponseEntity.ok("false");
+                else{//proceed
+
+                    String orig_pin = user.getPin();
+
+                    if( orig_pin.equals(userpin) ){
+                    
+                        return ResponseEntity.ok("true");
+                    }
+                    else{
+                        return ResponseEntity.ok("false");
+                    }
+                    
                 }
+ 
             }
         }
         catch(Exception e){
@@ -270,34 +299,19 @@ public class UserController {
 
         try{
 
-                String accno_jwt  = JwtUtil.validateToken(token);
+            String accno_jwt = JwtUtil.validateToken(token);
+            User user = userRepository.findByAccno(accno_jwt);
 
-                //the token is live - now check whether it is in user's block list or not
+            String black_list_string = user.getInvalidJwtTokens();
 
-                User user = userRepository.findByAccno(accno_jwt);
+            boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
-                String black_list_string = user.getInvalidJwtTokens();
-
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode black_list = mapper.readTree(black_list_string);
-
-                for (JsonNode node : black_list) {
-                    String cur_token = node.asText();
-
-                    // now compare with our token
-
-                    if(token.equals(cur_token)){
-                        //hoo they are equal - which means user trying login with the expired token - we need to reject the request
-                        return ResponseEntity.ok("reject");
-                    }
-                    
-
-                }
-
-                // we compared our token with all the black list tokens - it is not matched with anyone - so it is compareltely valid - send proceed response
-                
-
+            if(is_token_in_blacklist){// reject
+                return ResponseEntity.ok("reject");
+            }
+            else{//proceed
                 return ResponseEntity.ok("accept");
+            }
     
             
         }
@@ -358,76 +372,85 @@ public class UserController {
                 }
                 else{
 
+
                     String accno_jwt = JwtUtil.validateToken(token);
-
-                
-
                     User acc_user = userRepository.findByAccno(accno_jwt);
 
-                    //check whether use had enough balance or not to debit
+                    String black_list_string = acc_user.getInvalidJwtTokens();
 
-                    if( acc_user.getBalance() < amt ){
-                        return ResponseEntity.ok("Insufficient balance !!");
+                    boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+                    if(is_token_in_blacklist){// reject
+                       return ResponseEntity.status(401).body("Unauthorized request !!");
                     }
-                    else{
-                        
+                    else{//proceed
 
-                        //enough balance
-
-                        // now check whether tar acc exists to transfer money
-                        User tar_user = userRepository.findByAccno(tar_acc);
-
-                        if(tar_user!=null){
-
-                            //exists
-
-                            //now check both users are same
-
-                            if(acc_user.getAccno().equals( tar_user.getAccno()   ) ){
-                                //both are same users
-                                 return ResponseEntity.ok("Self transfer not allowed !!");
-                            }
-                            else{
-
-                                
-                                acc_user.setBalance( acc_user.getBalance() - amt );
-                                Double accuser_available_bal = acc_user.getBalance();
-
-                                userRepository.save(acc_user);
-
-                                tar_user.setBalance(tar_user.getBalance() + amt );
-                                Double taruser_available_bal = tar_user.getBalance();
-
-                                userRepository.save(tar_user);
-
-                                
-                                //transaction is successfull - now create the records
-                                // acc_user , tar_user , amt , credit/debit
-
-
-                                // call the transaction constructor to create the new transaction record
-                                Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit",accuser_available_bal);
-                                Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit",taruser_available_bal);
-
-                                transactionRepository.save(trans1);
-                                transactionRepository.save(trans2);
-
-
-                                return ResponseEntity.ok("Transaction successfull !!");
-
-
-                            }
-
-
+                        if( acc_user.getBalance() < amt ){
+                            return ResponseEntity.ok("Insufficient balance !!");
                         }
                         else{
-                            //not exists
-                            return ResponseEntity.ok("Destination account not existing !!");
+                            
+
+                            //enough balance
+
+                            // now check whether tar acc exists to transfer money
+                            User tar_user = userRepository.findByAccno(tar_acc);
+
+                            if(tar_user!=null){
+
+                                //exists
+
+                                //now check both users are same
+
+                                if(acc_user.getAccno().equals( tar_user.getAccno()   ) ){
+                                    //both are same users
+                                    return ResponseEntity.ok("Self transfer not allowed !!");
+                                }
+                                else{
+
+                                    
+                                    acc_user.setBalance( acc_user.getBalance() - amt );
+                                    Double accuser_available_bal = acc_user.getBalance();
+
+                                    userRepository.save(acc_user);
+
+                                    tar_user.setBalance(tar_user.getBalance() + amt );
+                                    Double taruser_available_bal = tar_user.getBalance();
+
+                                    userRepository.save(tar_user);
+
+                                    
+                                    //transaction is successfull - now create the records
+                                    // acc_user , tar_user , amt , credit/debit
+
+
+                                    // call the transaction constructor to create the new transaction record
+                                    Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit",accuser_available_bal);
+                                    Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit",taruser_available_bal);
+
+                                    transactionRepository.save(trans1);
+                                    transactionRepository.save(trans2);
+
+
+                                    return ResponseEntity.ok("Transaction successfull !!");
+
+
+                                }
+
+
+                            }
+                            else{
+                                //not exists
+                                return ResponseEntity.ok("Destination account not existing !!");
+                            }
+
+                            
+
                         }
 
-                        
 
-                    }
+                        
+                    }//else
 
 
                 }
@@ -457,14 +480,25 @@ public class UserController {
                 }
                 else{
 
-                    String accno_jwt = JwtUtil.validateToken(token);
 
+                    String accno_jwt = JwtUtil.validateToken(token);
                     User user = userRepository.findByAccno(accno_jwt);
 
-                    user.setPin(newpin);
-                    userRepository.save(user);
+                    String black_list_string = user.getInvalidJwtTokens();
 
-                    return ResponseEntity.ok("Pin updated succesfully !!");
+                    boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+                    if(is_token_in_blacklist){// reject
+                        return ResponseEntity.status(401).body("Unauthorized request !!");
+                    }
+                    else{//proceed
+
+                        user.setPin(newpin);
+                        userRepository.save(user);
+
+                        return ResponseEntity.ok("Pin updated succesfully !!");
+                    }
+   
                 }
    
             }
@@ -480,71 +514,82 @@ public class UserController {
             String token = (String) jsonBody.get("token");
             
             try{
+
+
                 String accno_jwt = JwtUtil.validateToken(token);
-
-                //its a valid token - add it to user's black list
-
                 User user = userRepository.findByAccno(accno_jwt);
 
+                String black_list_string = user.getInvalidJwtTokens();
 
-                String old_black_list_string = user.getInvalidJwtTokens();
+                boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
-
-                ObjectMapper mapper = new ObjectMapper();
-                List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
-
-                tokenList.add(token);
-                user.setLogoutCount( user.getLogoutCount() + 1  );
-
-
-                List<String> new_tokenList = new ArrayList<>();
-
-                // now we had the token list in the form of strings - check for expirty of each token string - remove in case of expiry
-
-                for(String cur_token : tokenList){
-                    if(!JwtUtil.isTokenExpired(cur_token) ){
-                        //hoo its a valid token - if need to retain it - add to our new list
-                        new_tokenList.add(cur_token);
+                if(is_token_in_blacklist){// reject
+                    return ResponseEntity.status(401).body("Unauthorized request !!");
+                }
+                else{//proceed
 
 
-                        //when we are removing a token from the list - decrement the count to stay balanced
+                    String old_black_list_string = user.getInvalidJwtTokens();
+
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
+
+                    tokenList.add(token);
+                    user.setLogoutCount( user.getLogoutCount() + 1  );
+
+
+                    List<String> new_tokenList = new ArrayList<>();
+
+                    // now we had the token list in the form of strings - check for expirty of each token string - remove in case of expiry
+
+                    for(String cur_token : tokenList){
+                        if(!JwtUtil.isTokenExpired(cur_token) ){
+                            //hoo its a valid token - if need to retain it - add to our new list
+                            new_tokenList.add(cur_token);
+
+
+                            //when we are removing a token from the list - decrement the count to stay balanced
+                            
+                        }
+                        else{
+                            //hoo its already expired - no use of keeping it - ignore it to add to new list 
+
+                            //decrease the count - as we are ignoring this token
+                            user.setLogoutCount( user.getLogoutCount() - 1  );
+
+                        }
                         
                     }
-                    else{
-                        //hoo its already expired - no use of keeping it - ignore it to add to new list 
 
-                        //decrease the count - as we are ignoring this token
-                        user.setLogoutCount( user.getLogoutCount() - 1  );
+                    //now we had all the valid tokens in the new list - add then to db
 
-                    }
+
+
+                    String updated_black_list_string = mapper.writeValueAsString(new_tokenList);
+
+                    //update in the object by using setters (we had the update string - just replace with the existing string)
+
+                    
+                    user.setInvalidJwtTokens(updated_black_list_string);
+
+                    // hoo add the changes to the database 
+                    
+                    userRepository.save(user);
+
+                    // finally we got the current list - added the cur token - update the list - changes done on database - token got added to the list
+
+                    return ResponseEntity.ok("Token added to black_list succesfully !!");
+
                     
                 }
 
-                //now we had all the valid tokens in the new list - add then to db
-
-
-
-                String updated_black_list_string = mapper.writeValueAsString(new_tokenList);
-
-                //update in the object by using setters (we had the update string - just replace with the existing string)
-
-                
-                user.setInvalidJwtTokens(updated_black_list_string);
-
-                // hoo add the changes to the database 
-                
-                userRepository.save(user);
-
-                // finally we got the current list - added the cur token - update the list - changes done on database - token got added to the list
-
-                return ResponseEntity.ok("Token added to black_list succesfully !!");
-                
    
             }
             catch(Exception e){
                 // its already invalid token - no need to add it to the black_list
                 // incase of invalid token - now need to check and remove the expired tokens 
-                System.out.println("Logout error: " + e.getMessage());
+                // System.out.println("Logout error: " + e.getMessage());
                 return ResponseEntity.status(401).body("Invalid token !!");
             }
   
@@ -563,18 +608,32 @@ public class UserController {
                     return ResponseEntity.ok("Invalid amount !!");
                 }
                 else{
+
                     String accno_jwt = JwtUtil.validateToken(token);
-
                     User user = userRepository.findByAccno(accno_jwt);
-                    user.setBalance( user.getBalance() + amt );
 
-                    userRepository.save(user);
+                    String black_list_string = user.getInvalidJwtTokens();
 
-                    return ResponseEntity.ok("Amount deposited succesfully!!");
+                    boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+
+
+                    if(is_token_in_blacklist){// reject
+                        return ResponseEntity.status(401).body("Unauthorized request !!");
+                    }
+                    else{//proceed
+                        
+                        user.setBalance( user.getBalance() + amt );
+
+                        userRepository.save(user);
+
+                        return ResponseEntity.ok("Amount deposited succesfully!!");
+
+                    }
+ 
                 }
                 
-                
-                
+  
             }
             catch(Exception e){
                 return ResponseEntity.status(401).body("Invalid token !!");
@@ -597,31 +656,41 @@ public class UserController {
                     return ResponseEntity.ok("Invalid amount !!");
                 }
                 else{
-                     String accno_jwt = JwtUtil.validateToken(token);
 
+
+                    String accno_jwt = JwtUtil.validateToken(token);
                     User user = userRepository.findByAccno(accno_jwt);
 
-                    Double bal = user.getBalance();
+                    String black_list_string = user.getInvalidJwtTokens();
 
-                    if(bal<amt){
+                    boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
-                        return ResponseEntity.ok("Insufficient balance !!");
-                    
+                    if(is_token_in_blacklist){// reject
+                       return ResponseEntity.status(401).body("Unauthorized request !!");
                     }
-                    else{
+                    else{//proceed
                         
-                        user.setBalance( user.getBalance() - amt );
+                        Double bal = user.getBalance();
 
-                        userRepository.save(user);
+                        if(bal<amt){
 
-                        return ResponseEntity.ok("Amount withdrawl successfull !!");
+                            return ResponseEntity.ok("Insufficient balance !!");
+                        
+                        }
+                        else{
+                            
+                            user.setBalance( user.getBalance() - amt );
+
+                            userRepository.save(user);
+
+                            return ResponseEntity.ok("Amount withdrawl successfull !!");
+                        }
+
                     }
 
 
                 }
-                
-  
-                
+
             }
             catch(Exception e){
                 return ResponseEntity.status(401).body("Invalid token !!");

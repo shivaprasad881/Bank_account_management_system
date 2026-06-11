@@ -17,19 +17,20 @@ function withdrawl(passed_token,passed_amount){
         })
         .then(response => {
             if(response.status!=200){
-                //invalid token
-                showToast("Invalid token !!")
+                
+                showToast("Unauthorized request!!")
+
             }
             else{
                 return response.text();
             }
         })
         .then(data => {
-            showToast(data,2000);
+            showToast(data);
 
-            // setTimeout(() => {
-            //     window.location.href = "dashboard.html?token=" + token_with;
-            // }, 2000);
+            setTimeout(() => {
+                window.location.href = "dashboard.html?token=" + passed_token;
+            }, 1500);
 
         })
         .catch(error => {
@@ -56,22 +57,22 @@ function deposit(passed_token,passed_amount){
         })
         .then(response => {
             if(response.status!=200){
-                showToast("Invalid token !!")
+                showToast("Unauthorized request!!")
             }
             else{
                 return response.text();
             }
         })
         .then(data => {
-            showToast(data,2000);
+            showToast(data);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + token_depo;
-            }, 2000);
+                window.location.href = "dashboard.html?token=" + passed_token;
+            }, 1500);
 
         })
         .catch(error => {
-            console.log("deposit error: " + error)
+            //console.log("deposit error: " + error)
             showToast("error in depositing amount !!");
         });
 
@@ -98,7 +99,7 @@ function transfer(tar_acc,tar_amt,token_passed){
         
         .then(response =>{
             if(response.status!=200){
-                showToast("Invalid token !!")
+                showToast("Unauthorized request!!")
             }
             else{
                 return response.text()
@@ -107,10 +108,10 @@ function transfer(tar_acc,tar_amt,token_passed){
         .then(data => {
             //transfer succesfull
             
-            showToast(data,1500)
+            showToast(data)
             
             setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + token_with;
+                window.location.href = "dashboard.html?token=" + token_passed;
             }, 1500);
 
         })
@@ -141,7 +142,7 @@ function update_pin(token,newpin){
                 })
                 .then(response =>{
                     if(response.status!=200){
-                        showToast("Invalid token !!")
+                        showToast("Unauthorized request!!")
                     }
                     else{
                         return response.text();
@@ -149,11 +150,11 @@ function update_pin(token,newpin){
                     }
                 })
                 .then(data => {
-                    showToast(data,2000);
+                    showToast(data);
 
                     setTimeout(() => {
                         window.location.href = "dashboard.html?token=" + token;
-                    }, 2000);
+                    }, 1500);
                 })
                 .catch(error => {
                     showToast("error in updating the pin !!");
@@ -172,7 +173,7 @@ function check_balance(token){
         .then(response =>{
             if(response.status!=200){
                 //invalid token
-                showToast("Invalid token !!")
+                showToast("Unauthorized request!!")
             }
             else{
                 //valid token - send the response to the next level - then would handle the response
@@ -180,12 +181,12 @@ function check_balance(token){
             }
         })
         .then(data => {
-            showToast(data,2000);
+            showToast(data);
 
             //after showing balance on the pin page - we need to redirect ot the dashboard - as the user sees the balance only once
             setTimeout(() => {
             window.location.href = "dashboard.html?token=" + token;
-            }, 2000);
+            }, 1500);
 
 
         })

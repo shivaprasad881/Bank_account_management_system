@@ -82,7 +82,7 @@ function check_pin(){
                     })
 
                     .catch(error => {
-                        console.log("pin error: " + error)
+                        //console.log("pin error: " + error)
                         showToast("Error in validating the pin !!");
                     });
 
@@ -90,7 +90,7 @@ function check_pin(){
 
                 }
                 else{
-                    showToast("It's not a valid token !!")
+                    showToast("Unauthorized request!!")
                 }
 
             });

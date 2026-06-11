@@ -36,7 +36,7 @@ function user_signin() {
                 .then(data => {
                     if(data == "false") {
 
-                        showToast("Invalid credentials !!",1500);
+                        showToast("Invalid credentials !!");
 
                         //hoo attempt failed - increment the count
 
