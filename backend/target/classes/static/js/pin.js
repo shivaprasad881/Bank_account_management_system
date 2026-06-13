@@ -3,7 +3,11 @@ const token_pin = params_pin.get("token");
 const action = params_pin.get("action");
 
 
+
 function check_pin(){
+
+    
+
     // check whether user pin is valid or not
     const userpin = document.getElementById("userpin").value
 
@@ -14,6 +18,15 @@ function check_pin(){
         showToast("Please enter the valid Pin !!")
     }
     else{
+
+            // if the user came here means - he definately get the either response - it may be actula res or else una request
+
+            
+                //hoo the user not yet executed - let him execute
+                
+                            
+            
+
             // 1.blacklist validation
 
             check_token_in_blacklist(token_pin).then(is_valid => {
@@ -41,7 +54,9 @@ function check_pin(){
                     })
 
                     .then(data => {
+                        
                         if(data=="true"){
+
                             if(action=="withdrawl"){
                                 const amt = params_pin.get("amount");
 
@@ -95,7 +110,9 @@ function check_pin(){
 
             });
 
-    }//else  
+    }
+    //ignore - the user is trying to re-execute
+
 }
 
 

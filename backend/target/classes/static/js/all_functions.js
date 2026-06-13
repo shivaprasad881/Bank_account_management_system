@@ -28,9 +28,9 @@ function withdrawl(passed_token,passed_amount){
         .then(data => {
             showToast(data);
 
-            setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + passed_token;
-            }, 1500);
+            // setTimeout(() => {
+            //     window.location.href = "dashboard.html?token=" + passed_token;
+            // }, 1500);
 
         })
         .catch(error => {
