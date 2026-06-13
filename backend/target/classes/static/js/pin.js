@@ -7,15 +7,18 @@ const action = params_pin.get("action");
 function check_pin(){
 
     
-
     // check whether user pin is valid or not
     const userpin = document.getElementById("userpin").value
 
     if(userpin=="" ){
         showToast("Please enter the  Pin !!")
+        //enable the button so that i user can re-enter the pin
+        document.getElementById("pin_button").disabled = false;
     }
     else if( userpin.length!=4   ||    isNaN( userpin )   ||   parseInt(userpin)<0 ){
         showToast("Please enter the valid Pin !!")
+        //enable the button so that user can re-enter the valid pin
+        document.getElementById("pin_button").disabled = false;
     }
     else{
 
@@ -57,6 +60,8 @@ function check_pin(){
                         
                         if(data=="true"){
 
+                            //once it enters here i user would definetely get a response - so keep the button disabled
+
                             if(action=="withdrawl"){
                                 const amt = params_pin.get("amount");
 
@@ -93,6 +98,8 @@ function check_pin(){
                         }
                         else{
                             showToast("Invalid pin !!")
+                            //enable the button - so that the user can enter the valid pin
+                            document.getElementById("pin_button").disabled = false;
                         }
                     })
 
