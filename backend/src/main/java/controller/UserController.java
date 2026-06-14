@@ -627,6 +627,13 @@ public class UserController {
 
                         userRepository.save(user);
 
+                        //hoo the deposit is successfull completed - now we need to create the transactoin record
+                        // useracc , self , amt , "credit" , available bal
+
+                        Transaction trans = new Transaction(accno_jwt,"self",amt,"credit",user.getBalance());
+
+                        transactionRepository.save(trans);
+
                         return ResponseEntity.ok("Amount deposited succesfully!!");
 
                     }
@@ -682,6 +689,13 @@ public class UserController {
                             user.setBalance( user.getBalance() - amt );
 
                             userRepository.save(user);
+
+                            //now withdrawl is successfull - now we need to create the record
+                            // useracc ->  useracc , amt , debit(-withdrawl) , avaiable bal
+
+                            Transaction trans = new Transaction(accno_jwt,"self",amt,"debit",user.getBalance());
+
+                            transactionRepository.save(trans);
 
                             return ResponseEntity.ok("Amount withdrawl successfull !!");
                         }
