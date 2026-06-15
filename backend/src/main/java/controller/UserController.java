@@ -40,7 +40,7 @@ public class UserController {
     private TransactionRepository transactionRepository;
 
     @PostMapping("/register")
-    public String register(@RequestBody Map<String, Object> jsonBody) {
+    public ResponseEntity<?> register(@RequestBody Map<String, Object> jsonBody) {
 
         String uname = (String) jsonBody.get("uname");
         Integer age = Integer.parseInt((String) jsonBody.get("age"));
@@ -49,20 +49,38 @@ public class UserController {
         String password = (String) jsonBody.get("password");
 
         if(uname == null || uname.isEmpty() || city == null || city.isEmpty() || phonenumber == null || phonenumber.isEmpty()  || phonenumber.length()!=10 || password == null || password.isEmpty() || age <= 0){
-            return "Please enter valid details !!";
+            
+            return ResponseEntity.status(400).body("Please enter valid details !!");
+
         }
         else{
-            User newUser = new User(uname, age, city, phonenumber,password);
-            User savedUser = userRepository.save(newUser);
+            // first check whether user already exists with that phone number
 
-            String accno = "ACC" + String.format("%08d", savedUser.getUserid());
-            String pin = String.format("%04d", savedUser.getUserid() % 10000);
+            User user = userRepository.findByPhonenumber(phonenumber);
+
+            if(user==null){
+                //hoo user with that number not existing - we can create the new user with that phoennumber
+                User newUser = new User(uname, age, city, phonenumber,password);
+                User savedUser = userRepository.save(newUser);
+
+                String accno = "ACC" + String.format("%08d", savedUser.getUserid());
+                String pin = String.format("%04d", savedUser.getUserid() % 10000);
+                
+                savedUser.setAccno(accno);
+                savedUser.setPin(pin);
+                userRepository.save(savedUser);
+
+                return ResponseEntity.ok("Account Number: " + accno + " | PIN: " + pin);
+               
+            }
+            else{
+                //hoo user is already existing with that number - reject the request
+                return ResponseEntity.status(409).body("Phonenumber is already registered !!");
+
+            }
+
+
             
-            savedUser.setAccno(accno);
-            savedUser.setPin(pin);
-            userRepository.save(savedUser);
-
-            return "Account Number: " + accno + " | PIN: " + pin;
         }
 
         
@@ -361,13 +379,16 @@ public class UserController {
     @PatchMapping("/transfer")
         public ResponseEntity<?> transfer(@RequestBody Map<String, Object> jsonBody) {
             String token = (String) jsonBody.get("token");
-            String tar_acc = (String) jsonBody.get("tar_acc");
+
+            String target = (String) jsonBody.get("target");
+            String target_type = (String) jsonBody.get("target_type");
+
             Double amt = Double.parseDouble(jsonBody.get("amount").toString());
 
 
             try{
 
-                if(tar_acc.length()==0 || amt<=0 ){
+                if(target.length()==0   ||   target_type.length()==0    ||    amt<=0 ){
                     return ResponseEntity.ok("Please enter valid details !!");
                 }
                 else{
@@ -391,10 +412,23 @@ public class UserController {
                         else{
                             
 
-                            //enough balance
+                            // find the target user based on the target type
+                            User tar_user;
 
-                            // now check whether tar acc exists to transfer money
-                            User tar_user = userRepository.findByAccno(tar_acc);
+                            if(target_type.equals("account")){
+
+                                //transfering based on account number
+                                tar_user = userRepository.findByAccno(target);
+
+                            }
+                            else{
+
+                                //transfering based on phonenumber
+                                tar_user = userRepository.findByPhonenumber(target);
+                            }
+                            
+
+                             // now check whether tar acc exists to transfer money
 
                             if(tar_user!=null){
 

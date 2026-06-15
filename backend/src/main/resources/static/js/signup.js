@@ -34,6 +34,8 @@ function user_signup() {
             password : password
         };
 
+        let status_code;
+
         fetch(url, {
             method: 'post',
             headers: {
@@ -41,13 +43,29 @@ function user_signup() {
             },
             body: JSON.stringify(userData)
         })
-        .then(response => response.text())
-        .then(data => {
-            showToast(data)
 
-            setTimeout(() => {
-                window.location.href = "signin.html";
-            }, 3000)
+
+        .then(response =>{
+            
+            status_code = response.status
+
+            return response.text() //return the body (msg)
+            
+        })
+
+
+        .then(body => {
+            showToast(body) // display msg
+
+            if(status_code==200){
+                //only when status code is success redirect to sigin
+                setTimeout(() => {
+                    window.location.href = "signin.html";
+                }, 3000)
+
+
+            }
+            
 
         })
         .catch(error => {

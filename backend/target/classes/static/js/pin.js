@@ -76,7 +76,7 @@ function check_pin(){
                                 update_pin(token_pin,newpin);
                             }
                             else if(action=="deposit"){
-
+ 
                                 const amt = params_pin.get("amount");
 
                                 deposit(token_pin,amt);
@@ -84,10 +84,12 @@ function check_pin(){
                             
                             else if(action=="transfer"){
 
-                                const tar_acc = params_pin.get("tar_acc");
+                                const target = params_pin.get("target");
+                                const target_type = params_pin.get("target_type");
+
                                 const amt = params_pin.get("amount");
 
-                                transfer(tar_acc,amt,token_pin)
+                                transfer(target,target_type,amt,token_pin)
 
                             }
                             else{

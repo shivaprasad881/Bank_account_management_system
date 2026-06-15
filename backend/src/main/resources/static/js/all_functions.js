@@ -79,13 +79,14 @@ function deposit(passed_token,passed_amount){
 }
 
 
-function transfer(tar_acc,tar_amt,token_passed){
+function transfer(target,target_type,tar_amt,token_passed){
 
     let url = "http://localhost:8080/transfer";
 
         let userdata2 = {
             token: token_passed,
-            tar_acc: tar_acc,
+            target: target,
+            target_type:target_type,
             amount: tar_amt
         };
 
