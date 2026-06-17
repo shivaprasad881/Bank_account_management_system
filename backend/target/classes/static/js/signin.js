@@ -1,18 +1,35 @@
 function user_signin() {
-    let useracc = document.getElementById("user_acc").value;
+    let identity = document.getElementById("user_identity").value;
     let userpass = document.getElementById("password").value;
+
+    let identity_type;
     
-    if(useracc == "" || userpass == "") {
+    if(identity == "" || userpass == "") {
         showToast("please fill the details");
     }
-    else if(  useracc.length!=11 || "ACC"!=useracc.substring(0,3)      || isNaN( useracc.substring(3)   )   ){
-        showToast("please enter valid Accno");
+    else if( identity.length == 10  && isNaN(identity)==false     ){
+        //phonenumber
+        identity_type = "phonenumber"
+        login(identity,identity_type,userpass)
+    }
+    else if( identity.length == 11  && identity.substring(0,3)=="ACC" &&  isNaN(identity.substring(3))==false  ){
+        //accno
+        identity_type = "account"
+        login(identity,identity_type,userpass)
     }
     else {
+        showToast("Please enter valid 10-digit phone number or ACCXXXXXXXXX account number");
+    }
+
+
+}
+
+
+function login(identity,identity_type,userpass){
         //consider user entered valid accno
 
         // check if he had attempts left - then only validate the user - otherwise reject
-        let url = "http://localhost:8080/failure_authentication?accno=" + useracc
+        let url = "http://localhost:8080/failure_authentication?identity=" + identity + "&identity_type=" + identity_type
 
         fetch(url, {
             method: 'get'
@@ -27,7 +44,7 @@ function user_signin() {
             else{
                 //he had enough attempts - validate user - if failure - then increment the count
 
-                url = "http://localhost:8080/validate_user?accno=" + useracc + "&password=" + userpass;
+                url = "http://localhost:8080/validate_user?identity=" + identity + "&identity_type=" + identity_type + "&password=" + userpass;
 
                 fetch(url, {
                     method: 'get'
@@ -44,7 +61,8 @@ function user_signin() {
 
                         
                         let userdata = {
-                            accno : useracc
+                            identity : identity,
+                            identity_type : identity_type
                         };
                         
                         fetch(url, {
@@ -73,7 +91,8 @@ function user_signin() {
 
                         
                         let userdata = {
-                            accno : useracc
+                            identity : identity,
+                            identity_type : identity_type
                         };
                         
                         fetch(url, {
@@ -111,5 +130,4 @@ function user_signin() {
             showToast("Error in Fetching the failure count !!");
         });
 
-    }
 }

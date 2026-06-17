@@ -56,29 +56,22 @@ public class UserController {
         else{
             // first check whether user already exists with that phone number
 
-            User user = userRepository.findByPhonenumber(phonenumber);
+                try {
+                    User newUser = new User(uname, age, city, phonenumber, password);
+                    User savedUser = userRepository.save(newUser);
 
-            if(user==null){
-                //hoo user with that number not existing - we can create the new user with that phoennumber
-                User newUser = new User(uname, age, city, phonenumber,password);
-                User savedUser = userRepository.save(newUser);
+                    String accno = "ACC" + String.format("%08d", savedUser.getUserid());
+                    String pin = String.format("%04d", savedUser.getUserid() % 10000);
+                    
+                    savedUser.setAccno(accno);
+                    savedUser.setPin(pin);
+                    userRepository.save(savedUser);
 
-                String accno = "ACC" + String.format("%08d", savedUser.getUserid());
-                String pin = String.format("%04d", savedUser.getUserid() % 10000);
-                
-                savedUser.setAccno(accno);
-                savedUser.setPin(pin);
-                userRepository.save(savedUser);
-
-                return ResponseEntity.ok("Account Number: " + accno + " | PIN: " + pin);
-               
-            }
-            else{
-                //hoo user is already existing with that number - reject the request
-                return ResponseEntity.status(409).body("Phonenumber is already registered !!");
-
-            }
-
+                    return ResponseEntity.ok("Account Number: " + accno + " | PIN: " + pin);
+                }
+                catch(Exception e) {
+                    return ResponseEntity.status(409).body("Phone number already registered");
+                }
 
             
         }
@@ -89,9 +82,19 @@ public class UserController {
 
 
     @GetMapping("/failure_authentication")
-        public String failure_attempts(@RequestParam String accno) {
+    public String failure_attempts(@RequestParam String identity,@RequestParam String identity_type) {
+
+        User user;
+
+            if(identity_type.equals("phonenumber")){
+                user = userRepository.findByPhonenumber(identity);
+            }
+            else{
+                //accno
+                user = userRepository.findByAccno(identity);
+            }
             
-             User user = userRepository.findByAccno(accno);
+
 
             if(user==null){
                 return "user acc not existing !!";
@@ -122,25 +125,36 @@ public class UserController {
             }
 
             
-        }
+    }
 
     
     
-        @GetMapping("/validate_user")
-    public String validateuser(@RequestParam String accno, @RequestParam String password) {
+    @GetMapping("/validate_user")
+    public String validateuser(@RequestParam String identity,@RequestParam String identity_type, @RequestParam String password) {
 
-        if(accno.length()==0 ||  password.length()==0){
+        if(identity.length()==0 || identity_type.length()==0 ||  password.length()==0){
             return "Please enter valid details !!";
         }
         else{
 
-            User user = userRepository.findByAccnoAndPassword(accno,password);
+            User user;
+
+            if(identity_type.equals("phonenumber")){
+                user = userRepository.findByPhonenumberAndPassword(identity,password);
+            }
+            else{
+                //accno
+                user = userRepository.findByAccnoAndPassword(identity,password);
+            }
+
+
+            
 
             if(user == null){
                 return "false";
             }
             else{
-                return JwtUtil.generateToken(accno);
+                return JwtUtil.generateToken(user.getAccno());
 
             }
 
@@ -346,9 +360,20 @@ public class UserController {
 
     @PatchMapping("/failure_authentication")
         public void failureauthentication(@RequestBody Map<String, Object> jsonBody) {
-            String accno = (String) jsonBody.get("accno");
+            String identity = (String) jsonBody.get("identity");
+            String identity_type = (String) jsonBody.get("identity_type");
+
+            User user;
+
+            if(identity_type.equals("phonenumber")){
+                user = userRepository.findByPhonenumber(identity);
+            }
+            else{
+                //accno
+                user = userRepository.findByAccno(identity);
+            }
             
-             User user = userRepository.findByAccno(accno);
+            
 
             user.setFailureAttempts( user.getFailureAttempts() + 1    );
 
@@ -365,9 +390,19 @@ public class UserController {
 
     @PatchMapping("/reset_failure_attempts")
         public void reset_failure_attempts(@RequestBody Map<String, Object> jsonBody) {
-            String accno = (String) jsonBody.get("accno");
             
-             User user = userRepository.findByAccno(accno);
+            String identity = (String) jsonBody.get("identity");
+            String identity_type = (String) jsonBody.get("identity_type");
+
+            User user;
+
+            if(identity_type.equals("phonenumber")){
+                user = userRepository.findByPhonenumber(identity);
+            }
+            else{
+                //accno
+                user = userRepository.findByAccno(identity);
+            }
 
             user.setFailureAttempts( 0 );
             user.setAvailableAt( null);
