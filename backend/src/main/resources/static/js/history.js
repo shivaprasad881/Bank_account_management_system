@@ -1,5 +1,8 @@
-const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
+
+const token = sessionStorage.getItem("token")
+
+console.log("dashboard token is : ",token)
+
 
 // global variables
 let current_page = 0;

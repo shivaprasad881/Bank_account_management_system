@@ -30,6 +30,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
+import java.sql.Timestamp;
+
+
 @RestController
 public class UserController {
 
@@ -178,7 +181,9 @@ public class UserController {
                 return ResponseEntity.status(401).body("Unauthorized request !!");
             }
             else{
-                return ResponseEntity.ok(user.getBalance());
+                String formatted = String.format("%.2f", user.getBalance());
+                
+                return ResponseEntity.ok(formatted);
             }
 
         }
@@ -355,6 +360,38 @@ public class UserController {
     }
 
 
+    @GetMapping("/check_transfered_amount")
+    public ResponseEntity<?>  check_transfered_amount(@RequestParam String token) {
+
+
+        try{
+
+            String accno = JwtUtil.validateToken(token);
+            
+
+            // now fetch the transactions records based on the useracc , transactiontype , date
+
+            // transaction type - > debit (only consider the money which is transfered from the user acc but nt somene transfered in)
+
+            // date -> only consider the records of last 24 hours , transaction_date should be after (>=)  (date.now()-24 hours ) - this means that the time after the yesterdays current time - which inderectly measn the las t24hours
+
+            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000);
+
+            System.out.println("yesterdays current time is : "+yesterday);
+            Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno,"debit",yesterday,"self");
+               
+
+                return ResponseEntity.ok(transfered_amt);
+            
+
+        }
+        catch(Exception e){
+
+            return ResponseEntity.status(401).body("Invalid token !!");
+
+        }
+ 
+    }
 
 
 
@@ -445,73 +482,93 @@ public class UserController {
                             return ResponseEntity.ok("Insufficient balance !!");
                         }
                         else{
+                            //now user is valid and he had enough bal to transfer - now check whether he exceeded daily transaction limit or not
+
+                            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000);
+
                             
+                            Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno_jwt,"debit",yesterday,"self");
 
-                            // find the target user based on the target type
-                            User tar_user;
 
-                            if(target_type.equals("account")){
-
-                                //transfering based on account number
-                                tar_user = userRepository.findByAccno(target);
-
+                            if( (transfered_amt + amt)>100000  ){
+                                //the limit is exceeding the 1,00,000 -unable to transfer
+                                return ResponseEntity.ok("Amount exceeds daily transaction limit !!");
                             }
                             else{
+                                //the amt is within the limit - the user can safely transfer the amount
 
-                                //transfering based on phonenumber
-                                tar_user = userRepository.findByPhonenumber(target);
-                            }
-                            
+                                // find the target user based on the target type
+                                User tar_user;
 
-                             // now check whether tar acc exists to transfer money
+                                if(target_type.equals("account")){
 
-                            if(tar_user!=null){
+                                    //transfering based on account number
+                                    tar_user = userRepository.findByAccno(target);
 
-                                //exists
-
-                                //now check both users are same
-
-                                if(acc_user.getAccno().equals( tar_user.getAccno()   ) ){
-                                    //both are same users
-                                    return ResponseEntity.ok("Self transfer not allowed !!");
                                 }
                                 else{
 
-                                    
-                                    acc_user.setBalance( acc_user.getBalance() - amt );
-                                    Double accuser_available_bal = acc_user.getBalance();
+                                    //transfering based on phonenumber
+                                    tar_user = userRepository.findByPhonenumber(target);
+                                }
+                                
 
-                                    userRepository.save(acc_user);
+                                // now check whether tar acc exists to transfer money
 
-                                    tar_user.setBalance(tar_user.getBalance() + amt );
-                                    Double taruser_available_bal = tar_user.getBalance();
+                                if(tar_user!=null){
 
-                                    userRepository.save(tar_user);
+                                    //exists
 
-                                    
-                                    //transaction is successfull - now create the records
-                                    // acc_user , tar_user , amt , credit/debit
+                                    //now check both users are same
+
+                                    if(acc_user.getAccno().equals( tar_user.getAccno()   ) ){
+                                        //both are same users
+                                        return ResponseEntity.ok("Self transfer not allowed !!");
+                                    }
+                                    else{
+
+                                        
+                                        acc_user.setBalance( acc_user.getBalance() - amt );
+                                        Double accuser_available_bal = acc_user.getBalance();
+
+                                        userRepository.save(acc_user);
+
+                                        tar_user.setBalance(tar_user.getBalance() + amt );
+                                        Double taruser_available_bal = tar_user.getBalance();
+
+                                        userRepository.save(tar_user);
+
+                                        
+                                        //transaction is successfull - now create the records
+                                        // acc_user , tar_user , amt , credit/debit
 
 
-                                    // call the transaction constructor to create the new transaction record
-                                    Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit",accuser_available_bal);
-                                    Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit",taruser_available_bal);
+                                        // call the transaction constructor to create the new transaction record
+                                        Transaction trans1 = new Transaction(acc_user.getAccno(),tar_user.getAccno(),amt,"debit",accuser_available_bal);
+                                        Transaction trans2 = new Transaction(tar_user.getAccno(),acc_user.getAccno(),amt,"credit",taruser_available_bal);
 
-                                    transactionRepository.save(trans1);
-                                    transactionRepository.save(trans2);
-
-
-                                    return ResponseEntity.ok("Transaction successfull !!");
+                                        transactionRepository.save(trans1);
+                                        transactionRepository.save(trans2);
 
 
+                                        return ResponseEntity.ok("Transaction successfull !!");
+
+
+                                    }
+
+
+                                }
+                                else{
+                                    //not exists
+                                    return ResponseEntity.ok("Destination account not existing !!");
                                 }
 
 
                             }
-                            else{
-                                //not exists
-                                return ResponseEntity.ok("Destination account not existing !!");
-                            }
+
+                            
+
+                            
 
                             
 

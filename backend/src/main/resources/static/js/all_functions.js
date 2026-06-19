@@ -29,7 +29,12 @@ function withdrawl(passed_token,passed_amount){
             showToast(data);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + passed_token;
+                //clear the extra data in the session before going back to dash
+                sessionStorage.removeItem("action");
+                sessionStorage.removeItem("amount");
+                
+
+                window.location.href = "dashboard.html"
             }, 1500);
 
         })
@@ -67,7 +72,11 @@ function deposit(passed_token,passed_amount){
             showToast(data);
 
             setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + passed_token;
+                //clear extra data - go back to dash with its state
+                sessionStorage.removeItem("action");
+                sessionStorage.removeItem("amount");
+
+                window.location.href = "dashboard.html"
             }, 1500);
 
         })
@@ -112,7 +121,14 @@ function transfer(target,target_type,tar_amt,token_passed){
             showToast(data)
             
             setTimeout(() => {
-                window.location.href = "dashboard.html?token=" + token_passed;
+
+                sessionStorage.removeItem("action");
+                sessionStorage.removeItem("amount");
+                sessionStorage.removeItem("target");
+                sessionStorage.removeItem("target_type");
+
+
+                window.location.href = "dashboard.html"
             }, 1500);
 
         })
@@ -154,7 +170,11 @@ function update_pin(token,newpin){
                     showToast(data);
 
                     setTimeout(() => {
-                        window.location.href = "dashboard.html?token=" + token;
+
+                        sessionStorage.removeItem("action");
+                        sessionStorage.removeItem("newpin");
+
+                        window.location.href = "dashboard.html"
                     }, 1500);
                 })
                 .catch(error => {
@@ -186,7 +206,11 @@ function check_balance(token){
 
             //after showing balance on the pin page - we need to redirect ot the dashboard - as the user sees the balance only once
             setTimeout(() => {
-            window.location.href = "dashboard.html?token=" + token;
+
+                sessionStorage.removeItem("action");
+                
+
+            window.location.href = "dashboard.html"
             }, 1500);
 
 

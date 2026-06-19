@@ -1,6 +1,5 @@
 //acc number passed from dashboard
-const params_depo = new URLSearchParams(window.location.search);
-const token_depo = params_depo.get("token");
+
 
 function deposit() {
 
@@ -17,8 +16,12 @@ function deposit() {
         }
         else {
             //now we had valid amount - redirect to pin page - validate - if correct - come here with values
-            let action = "deposit"
-            window.location.href = "pin.html?token=" + token_depo + "&action=" + action + "&amount=" + amt;
+
+            sessionStorage.setItem("action", "deposit");
+            sessionStorage.setItem("amount", amt);
+
+            
+            window.location.href = "pin.html"
         }
    
 }

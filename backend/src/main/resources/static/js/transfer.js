@@ -1,5 +1,3 @@
-const params_trans = new URLSearchParams(window.location.search);
-const token_trans = params_trans.get("token");
 
 function transfer() {
 
@@ -36,7 +34,13 @@ function transfer() {
 
             let action = "transfer"
 
-            window.location.href = "pin.html?token=" + token_trans + "&action=" + action   + "&target=" + target + "&target_type=" + target_type + "&amount=" + tar_amt;
+            sessionStorage.setItem("action", "transfer");
+            sessionStorage.setItem("amount", tar_amt);
+            sessionStorage.setItem("target", target);
+            sessionStorage.setItem("target_type", target_type);
+
+
+            window.location.href = "pin.html"
 
 
         }
@@ -47,7 +51,12 @@ function transfer() {
 
             let action = "transfer"
 
-            window.location.href = "pin.html?token=" + token_trans + "&action=" + action   + "&target=" + target + "&target_type=" + target_type + "&amount=" + tar_amt;
+            sessionStorage.setItem("action", "transfer");
+            sessionStorage.setItem("amount", tar_amt);
+            sessionStorage.setItem("target", target);
+            sessionStorage.setItem("target_type", target_type);
+
+            window.location.href = "pin.html"
 
         }
         else {

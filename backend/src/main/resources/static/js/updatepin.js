@@ -1,6 +1,4 @@
-// parameters passed from prev page - parameter chaining
-const params = new URLSearchParams(window.location.search);
-const token_upt = params.get("token");
+
 
 function update_the_pin() {
     let newpin = document.getElementById("newpin").value;
@@ -16,8 +14,12 @@ function update_the_pin() {
     
     else {
 
-            let action = "updatepin"
-            window.location.href = "pin.html?token=" + token_upt + "&newpin=" + newpin + "&action=" + action;
+           
+            sessionStorage.setItem("action", "updatepin");
+            sessionStorage.setItem("newpin", newpin);
+
+
+            window.location.href = "pin.html"
 
            
     }

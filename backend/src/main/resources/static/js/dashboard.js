@@ -1,5 +1,7 @@
-const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
+
+const token = sessionStorage.getItem("token")
+
+console.log("dashboard token is : ",token)
 
 // this is the begin for any operation - like landing page - so if we validate token here - we would allow only valid tokens for further operations - only its valid we can allow further operations - further we dont need to fear as it is already valid - reject the invalid onces 
 
@@ -103,9 +105,14 @@ function logout(){
 
                     //now redirect to login page
 
-                    // setTimeout(() => {
-                    //     window.location.href = "signin.html";
-                    // }, 1500);
+                    setTimeout(() => {
+
+                        //in dashboard we would only have token with us , so clear it before logout - so that the session would become fresh as like we entered earlier o this would maintain the state of the page 
+
+                        sessionStorage.removeItem("token");
+
+                        window.location.href = "signin.html";
+                    }, 1500);
 
 
                 })
@@ -134,7 +141,7 @@ function history(){
 
         if(is_valid){
             // continue next operation - he is valid user
-            window.location.href = "history.html?token=" + token;
+            window.location.href = "history.html"
         }
         else{
             showToast("Unauthorized request!!")
@@ -151,7 +158,7 @@ function update_pin_dash(){
 
             if(is_valid){
                 // continue next operation - he is valid user
-                window.location.href = "updatepin.html?token=" + token;
+                window.location.href = "updatepin.html"
 
                 
             }
@@ -174,7 +181,7 @@ function profile() {
 
         if(is_valid){
             // continue next operation - he is valid user
-            window.location.href = "profile.html?token=" + token;
+            window.location.href = "profile.html"
         }
         else{
             showToast("Unauthorized request!!")
@@ -189,9 +196,11 @@ function check_balance(){
         check_token_in_blacklist(token).then(is_valid => {
 
             if(is_valid){
-                let action = "checkbalance"
+                
+                
+                sessionStorage.setItem("action", "checkbalance");
 
-                window.location.href = "pin.html?token="+ token + "&action=" + action;
+                window.location.href = "pin.html"
 
             }
             else{
@@ -209,7 +218,7 @@ function deposit_dash() {
 
         if(is_valid){
             // continue next operation - he is valid user
-            window.location.href = "deposit.html?token=" + token;
+            window.location.href = "deposit.html"
         }
         else{
             showToast("It's not a valid token !!")
@@ -224,7 +233,7 @@ function withdrawl_dash() {
 
         if(is_valid){
             // redirect to withdrawl page
-            window.location.href = "withdrawl.html?token=" + token;
+            window.location.href = "withdrawl.html"
         }
         else{
             showToast("It's not a valid token !!")
@@ -239,7 +248,7 @@ function transfer_dash() {
 
         if(is_valid){
             // continue next operation - he is valid user
-            window.location.href = "transfer.html?token=" + token;
+            window.location.href = "transfer.html"
         }
         else{
             showToast("It's not a valid token !!")
@@ -248,3 +257,34 @@ function transfer_dash() {
     });
     
 }
+
+
+function check_transfered_amt(){
+    //now we would fetch the transfered amt in the last 24 hours by the user and display it
+
+    let url = "http://localhost:8080/check_transfered_amount?token=" + token;
+
+    fetch(url,{
+        method : 'get'
+    })
+
+    .then(response =>{
+        if(response.status!=200){
+            showToast("Invalid token !!")
+            return null;
+        }
+        else{
+            return response.text()
+        }
+        })
+
+        .then(data =>{
+
+            showToast(data);
+        })
+
+
+        .catch(error => {
+            showToast("Error in fetching user's last 24-hour transfered amount !!");
+        });
+}   

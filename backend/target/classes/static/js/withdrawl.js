@@ -1,9 +1,4 @@
 
-const params_with = new URLSearchParams(window.location.search);
-const token_with = params_with.get("token");
-
-
-
 function withdrawl() {
 
         
@@ -23,8 +18,12 @@ function withdrawl() {
             }
             else {
                 //redirect to pin page 
-                let action = "withdrawl"
-                window.location.href = "pin.html?token=" + token_with + "&action=" + action + "&amount=" + amt;
+                
+
+                sessionStorage.setItem("action", "withdrawl");
+                sessionStorage.setItem("amount", amt);
+                
+                window.location.href = "pin.html"
             }
 
             // it executed successfully - restrict the re-execution

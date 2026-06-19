@@ -1,5 +1,7 @@
-const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
+const token = sessionStorage.getItem("token")
+
+console.log("dashboard token is : ",token)
+
 
 
     url = "http://localhost:8080/user_details?token=" + token;

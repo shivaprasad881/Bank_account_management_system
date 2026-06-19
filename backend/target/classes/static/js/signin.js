@@ -102,18 +102,23 @@ function login(identity,identity_type,userpass){
                             },
                             body: JSON.stringify(userdata)
                         })
+
+
                         .then(response =>{
                            
+                            setTimeout(() => {
+                                sessionStorage.setItem("token", data);
+                                
+                                window.location.href = "dashboard.html"
+                            }, 1500);
+
                         })
+
+
 
                         .catch(error => {
                             showToast("Error in reseting the failure count !!");
                         });
-
-                        
-                        setTimeout(() => {
-                            window.location.href = "dashboard.html?token=" + data;
-                        }, 1500);
 
                     }
                 })

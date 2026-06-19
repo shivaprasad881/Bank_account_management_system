@@ -1,6 +1,9 @@
-const params_pin = new URLSearchParams(window.location.search);
-const token_pin = params_pin.get("token");
-const action = params_pin.get("action");
+
+const token_pin = sessionStorage.getItem("token")
+
+const action = sessionStorage.getItem("action")
+
+console.log("dashboard token is : ",token_pin)
 
 
 
@@ -63,7 +66,7 @@ function check_pin(){
                             //once it enters here i user would definetely get a response - so keep the button disabled
 
                             if(action=="withdrawl"){
-                                const amt = params_pin.get("amount");
+                                const amt = sessionStorage.getItem("amount")
 
                                 withdrawl(token_pin,amt);
                             }
@@ -72,23 +75,25 @@ function check_pin(){
                                 check_balance(token_pin);
                             }
                             else if(action=="updatepin"){
-                                const newpin = params_pin.get("newpin");
+
+                                const newpin = sessionStorage.getItem("newpin")
+                                
                                 update_pin(token_pin,newpin);
                             }
                             else if(action=="deposit"){
- 
-                                const amt = params_pin.get("amount");
+
+                                const amt = sessionStorage.getItem("amount")
 
                                 deposit(token_pin,amt);
                             }
                             
                             else if(action=="transfer"){
 
-                                const target = params_pin.get("target");
-                                const target_type = params_pin.get("target_type");
+                                const amt = sessionStorage.getItem("amount")
+                                const target = sessionStorage.getItem("target")
+                                const target_type = sessionStorage.getItem("target_type")
 
-                                const amt = params_pin.get("amount");
-
+                               
                                 transfer(target,target_type,amt,token_pin)
 
                             }
