@@ -3,6 +3,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import model.User;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
    
@@ -10,5 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByPhonenumberAndPassword(String phonenumber, String password);
     User findByAccno(String accno);
     User findByPhonenumber(String phonenumber);
+
+    List<User> findAll();
 
 }

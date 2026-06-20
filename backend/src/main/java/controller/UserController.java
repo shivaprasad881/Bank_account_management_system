@@ -60,7 +60,15 @@ public class UserController {
             // first check whether user already exists with that phone number
 
                 try {
-                    User newUser = new User(uname, age, city, phonenumber, password);
+                    //now instead of storing hte plain password in the database - whichi is exposed ot the admin - we would store its hash
+
+                    //now hash the password
+
+                    String hashed_password = util.PasswordUtil.hashPassword(password);
+
+                    //now store this hashed password in teh db so that even admin cant see the original password
+
+                    User newUser = new User(uname, age, city, phonenumber, hashed_password);
                     User savedUser = userRepository.save(newUser);
 
                     String accno = "ACC" + String.format("%08d", savedUser.getUserid());
@@ -140,16 +148,26 @@ public class UserController {
         }
         else{
 
+            // first get the user based on the accno or phone number
+
+            // then get the users hash password to compare with cur password
+
             User user;
 
             if(identity_type.equals("phonenumber")){
-                user = userRepository.findByPhonenumberAndPassword(identity,password);
+                //phone
+                user = userRepository.findByPhonenumber(identity);
+            }
+            else if(identity_type.equals("account")){
+                
+                //accno
+                user = userRepository.findByAccno(identity);
             }
             else{
-                //accno
-                user = userRepository.findByAccnoAndPassword(identity,password);
+                return "false";
             }
 
+            
 
             
 
@@ -157,7 +175,20 @@ public class UserController {
                 return "false";
             }
             else{
-                return JwtUtil.generateToken(user.getAccno());
+                //now the user is existing - check whether the user hashed password matches with the cur password
+
+                String hashed_password = user.getPassword();
+
+                if(util.PasswordUtil.verifyPassword(password,hashed_password)){
+                    //hoo both matched - valid user
+                    return JwtUtil.generateToken(user.getAccno());
+                }
+                else{
+                    //hoo incorrect password - increment the invalid count
+                    return "false";
+                }
+
+                
 
             }
 
@@ -367,6 +398,7 @@ public class UserController {
         try{
 
             String accno = JwtUtil.validateToken(token);
+
             
 
             // now fetch the transactions records based on the useracc , transactiontype , date
@@ -380,6 +412,10 @@ public class UserController {
             System.out.println("yesterdays current time is : "+yesterday);
             Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno,"debit",yesterday,"self");
                
+
+            System.out.println("Current Java time: " + new Timestamp(System.currentTimeMillis()));
+            System.out.println("Yesterday time: " + yesterday);
+            System.out.println("Default timezone: " + java.util.TimeZone.getDefault());
 
                 return ResponseEntity.ok(transfered_amt);
             

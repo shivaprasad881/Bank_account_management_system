@@ -3,5 +3,7 @@ repository\UserRepository.class
 com\example\demo\JwtUtil.class
 model\Transaction.class
 model\User.class
+controller\UserController$1.class
 repository\TransactionRepository.class
 com\example\demo\Main.class
+util\PasswordUtil.class
