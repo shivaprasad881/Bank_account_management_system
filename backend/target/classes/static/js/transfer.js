@@ -1,7 +1,7 @@
 
 function transfer() {
 
-
+ 
         let target = document.getElementById("target").value;
         let tar_amt = document.getElementById("useramount").value;
 

@@ -302,6 +302,18 @@ public class UserController {
             else{//proceed
                 Pageable pageable = PageRequest.of(pagee, sizee);
                 Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
+
+                for (Transaction t : transactions.getContent()) {
+                    System.out.printf("%-8d %-15s %-15s %-10.2f %-10s %-15.2f %-20s%n",
+                            t.getTransId(),
+                            t.getAccno(),
+                            t.getTarAcc(),
+                            t.getAmount(),
+                            t.getTransactionType(),
+                            t.getAvailableBalance(),
+                            t.getTransactionDate());
+                }
+
                 return ResponseEntity.ok(transactions);
             }
 
@@ -407,15 +419,15 @@ public class UserController {
 
             // date -> only consider the records of last 24 hours , transaction_date should be after (>=)  (date.now()-24 hours ) - this means that the time after the yesterdays current time - which inderectly measn the las t24hours
 
-            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000);
+            Timestamp yesterday  =  new Timestamp(System.currentTimeMillis() - 72L * 60 * 60 * 1000 );
 
             System.out.println("yesterdays current time is : "+yesterday);
             Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno,"debit",yesterday,"self");
                
 
-            System.out.println("Current Java time: " + new Timestamp(System.currentTimeMillis()));
-            System.out.println("Yesterday time: " + yesterday);
-            System.out.println("Default timezone: " + java.util.TimeZone.getDefault());
+            // System.out.println("Current Java time: " + new Timestamp(System.currentTimeMillis()));
+            // System.out.println("Yesterday time: " + yesterday);
+            // System.out.println("Default timezone: " + java.util.TimeZone.getDefault());
 
                 return ResponseEntity.ok(transfered_amt);
             
@@ -520,7 +532,7 @@ public class UserController {
                         else{
                             //now user is valid and he had enough bal to transfer - now check whether he exceeded daily transaction limit or not
 
-                            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000);
+                            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 72L * 60 * 60 * 1000);
 
                             
                             Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno_jwt,"debit",yesterday,"self");

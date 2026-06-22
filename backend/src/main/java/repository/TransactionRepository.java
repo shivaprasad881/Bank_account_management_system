@@ -12,9 +12,11 @@ import org.springframework.data.domain.Pageable;
 import java.sql.Timestamp;
 
 
-@Repository 
+@Repository  
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     Page<Transaction> findByAccnoOrderByTransIdDesc(String accno, Pageable pageable);
+
+    
 
    @Query("""
        SELECT COALESCE(SUM(t.amount), 0)
