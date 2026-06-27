@@ -39,11 +39,13 @@ public class User {
     @Column (name = "logout_count")
     private Integer logoutCount;
 
+    private String email;
+
 
     
     public User() {}
     
-    public User(String uname, Integer age, String city, String phonenumber,String password) {
+    public User(String uname, Integer age, String city, String phonenumber,String password,String email) {
         this.uname = uname;
         this.age = age;
         this.city = city;
@@ -53,7 +55,7 @@ public class User {
         this.failureAttempts = 0;
         this.invalidJwtTokens = "[]";
         this.logoutCount = 0;
-        
+        this.email = email;
     }
     
     // Getters
@@ -70,6 +72,7 @@ public class User {
     public LocalTime getAvailableAt() { return availableAt; }
     public String getInvalidJwtTokens() { return invalidJwtTokens; }
     public Integer getLogoutCount() { return logoutCount; }
+    public String getEmail() { return email; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -85,5 +88,6 @@ public class User {
     public void setAvailableAt(LocalTime availableAt) { this.availableAt = availableAt ; }
     public void setInvalidJwtTokens(String invalidJwtTokens) { this.invalidJwtTokens = invalidJwtTokens; }
     public void setLogoutCount(Integer logoutCount) { this.logoutCount = logoutCount; }
+    public void setEmail(String email) { this.email = email; }
 
 }

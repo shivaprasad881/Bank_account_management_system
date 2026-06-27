@@ -2,6 +2,9 @@ function user_signin() {
     let identity = document.getElementById("user_identity").value;
     let userpass = document.getElementById("password").value;
 
+    identity = identity.trim();
+    userpass = userpass.trim();
+
     let identity_type;
     
     if(identity == "" || userpass == "") {

@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>User Information</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .email-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .email-group .field {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .email-group button {
+            margin-bottom: 0.1rem;
+            white-space: nowrap;
+            padding: 10px 16px;
+        }
+    </style>
 </head>
 <body>
 
@@ -39,7 +55,12 @@
             <input type="password" id="password" placeholder="Enter your password" autocomplete="off">
         </div>
 
-        <button type="button" onclick="user_signup()">Submit</button>
+        
+        
+
+        
+
+        <button type="button" onclick="user_signup()">Register</button>
     </div>
     <script src="../js/toast.js"></script>
     <script src="../js/password_checker.js"></script>

@@ -221,3 +221,116 @@ function check_balance(token){
 
 
 }
+
+
+function register(){
+    let uname = sessionStorage.getItem('uname');
+    let age = sessionStorage.getItem('age');
+    let city = sessionStorage.getItem('city');
+    let phonenumber = sessionStorage.getItem('phonenumber');
+    let email = sessionStorage.getItem('email');
+    let password = sessionStorage.getItem('password');
+
+    let url = "http://localhost:8080/register";
+
+        let userData = {
+            uname: uname, 
+            age: age,
+            city: city,
+            phonenumber: phonenumber,
+            email : email,
+            password : password
+        };
+
+        let status_code;
+
+        fetch(url, {
+            method: 'post',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userData)
+        })
+
+
+        .then(response => {
+            if(response.status == 200) {
+                return response.text();
+            } else {
+                showToast("Unauthorized request !!")
+            }
+        })
+        .then(data => {
+
+            let userdata2 = data.split(",");
+            
+            
+            showToast("Registration successfull !!",3000);
+                
+
+            let message = "Account Number : "+userdata2[0]+"\nPin : "+userdata2[1] +"\n\n*** Please update the pin after login ***"
+
+
+
+            url = "http://localhost:8080/send_email";
+                        
+            let sendingdata = {
+                email : email,
+                subject : "Your Registration successfull !!",
+                message: message
+                
+            };
+                        
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sendingdata)
+            })
+
+            .then(response => {
+                if(response.status == 200) {
+                    return response.text();
+                } else {
+                    showToast("Unauthorized request !!")
+                }
+            })
+            
+            .then(data => {
+                if(data=="true"){
+                    setTimeout(() => { showToast("Details mailed successfully !!");
+
+                    },3000)
+
+                    setTimeout(() => {
+
+                        sessionStorage.removeItem('uname');
+                        sessionStorage.removeItem('age');
+                        sessionStorage.removeItem('city');
+                        sessionStorage.removeItem('phonenumber');
+                        sessionStorage.removeItem('email');
+                        sessionStorage.removeItem('password');
+
+                        window.location.href = "signin.html";
+                    }, 4500)
+                }
+                else{
+                    showToast("Email not registered !!");
+                }
+                
+            })
+
+            .catch(error => {
+                showToast("error in sending the email !!");
+            });
+
+
+            
+            
+
+        })
+        .catch(error => {
+            showToast("error in registration !!");
+        });
+}

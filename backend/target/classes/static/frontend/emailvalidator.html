@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="heading">
+            <h1>Email security page</h1>
+        </div>
+        <div class="content">
+            <div class="input-group">
+                <label>Email : </label>
+                <input type="text" id="useremail" placeholder="abc@gmail.com">
+            </div>
+            <button type="button" onclick="send_otp_forgot()">SEND OTP</button>
+
+            <div class="input-group">
+                <label>OTP : </label>
+                <input type="text" id="userotp" placeholder="XXXX">
+            </div>
+            <button type="button" onclick="verify_otp_forgot()">Verify</button>
+        </div>
+    </div>
+
+    
+    <script src="../js/toast.js"></script>
+    <script src="../js/otp.js"></script>
+    <script src="../js/all_functions.js"></script>
+    <script src="../js/emailvalidator.js"></script>
+    
+</body>
+</html>

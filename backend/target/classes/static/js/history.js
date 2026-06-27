@@ -35,7 +35,7 @@ function fetch_transactions(){
 
         .then(jsondata => {
 
-            console.log(JSON.stringify(jsondata, null, 2));
+            
 
             data = jsondata.content;//global
             total_pages = jsondata.totalPages;

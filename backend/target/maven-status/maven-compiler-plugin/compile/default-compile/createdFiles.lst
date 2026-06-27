@@ -2,6 +2,7 @@ controller\UserController.class
 repository\UserRepository.class
 com\example\demo\JwtUtil.class
 model\Transaction.class
+com\example\demo\EmailUtil.class
 model\User.class
 controller\UserController$1.class
 repository\TransactionRepository.class

@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 
 import org.springframework.web.bind.annotation.*;
-
+import com.example.demo.EmailUtil;
 import com.example.demo.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,11 +17,13 @@ import org.springframework.http.ResponseEntity;
 import model.User;
 import repository.TransactionRepository;
 import repository.UserRepository;
+
 import java.util.Map;
 import model.Transaction;
 
 import java.time.LocalTime;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +52,9 @@ public class UserController {
         String city = (String) jsonBody.get("city");
         String phonenumber = (String) jsonBody.get("phonenumber");
         String password = (String) jsonBody.get("password");
+        String email = (String) jsonBody.get("email");
 
-        if(uname == null || uname.isEmpty() || city == null || city.isEmpty() || phonenumber == null || phonenumber.isEmpty()  || phonenumber.length()!=10 || password == null || password.isEmpty() || age <= 0){
+        if(uname == null || uname.isEmpty() || city == null || city.isEmpty() || phonenumber == null || phonenumber.isEmpty()  || phonenumber.length()!=10 || password == null || password.isEmpty() || age <= 0   || email == null || email.isEmpty()  ){
             
             return ResponseEntity.status(400).body("Please enter valid details !!");
 
@@ -68,7 +71,7 @@ public class UserController {
 
                     //now store this hashed password in teh db so that even admin cant see the original password
 
-                    User newUser = new User(uname, age, city, phonenumber, hashed_password);
+                    User newUser = new User(uname, age, city, phonenumber, hashed_password,email);
                     User savedUser = userRepository.save(newUser);
 
                     String accno = "ACC" + String.format("%08d", savedUser.getUserid());
@@ -78,7 +81,7 @@ public class UserController {
                     savedUser.setPin(pin);
                     userRepository.save(savedUser);
 
-                    return ResponseEntity.ok("Account Number: " + accno + " | PIN: " + pin);
+                    return ResponseEntity.ok(accno+","+pin);
                 }
                 catch(Exception e) {
                     return ResponseEntity.status(409).body("Phone number already registered");
@@ -303,16 +306,7 @@ public class UserController {
                 Pageable pageable = PageRequest.of(pagee, sizee);
                 Page<Transaction> transactions = transactionRepository.findByAccnoOrderByTransIdDesc(accno_jwt, pageable);
 
-                for (Transaction t : transactions.getContent()) {
-                    System.out.printf("%-8d %-15s %-15s %-10.2f %-10s %-15.2f %-20s%n",
-                            t.getTransId(),
-                            t.getAccno(),
-                            t.getTarAcc(),
-                            t.getAmount(),
-                            t.getTransactionType(),
-                            t.getAvailableBalance(),
-                            t.getTransactionDate());
-                }
+                
 
                 return ResponseEntity.ok(transactions);
             }
@@ -419,7 +413,7 @@ public class UserController {
 
             // date -> only consider the records of last 24 hours , transaction_date should be after (>=)  (date.now()-24 hours ) - this means that the time after the yesterdays current time - which inderectly measn the las t24hours
 
-            Timestamp yesterday  =  new Timestamp(System.currentTimeMillis() - 72L * 60 * 60 * 1000 );
+            Timestamp yesterday  =  new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000 );
 
             System.out.println("yesterdays current time is : "+yesterday);
             Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno,"debit",yesterday,"self");
@@ -440,6 +434,39 @@ public class UserController {
         }
  
     }
+
+
+    @Autowired
+    private EmailUtil emailUtil;
+
+   
+
+    @PatchMapping("/send_email")
+        public ResponseEntity<?> send_email(@RequestBody Map<String, Object> jsonBody) {
+            String email = (String) jsonBody.get("email");
+            String subject = (String) jsonBody.get("subject");
+            String message = (String) jsonBody.get("message");
+
+            
+            // first check whether the email is registered or not
+        
+            // User user = userRepository.findByEmail(email);
+
+            // if(user==null){
+            //     // the email is not registered - reject the request
+            //     return ResponseEntity.ok("false");
+            // }
+            // else{
+                //hoo the email is already registered - let the user to reset his password
+                //emailUtil.sendOtp(email,"Your OTP for Password-Reset","Your OTP is : "+ generated_otp);
+
+                emailUtil.sendEmail(email,subject,message);
+            
+                return ResponseEntity.ok("true");
+            //}
+
+
+        }
 
 
 
@@ -532,7 +559,7 @@ public class UserController {
                         else{
                             //now user is valid and he had enough bal to transfer - now check whether he exceeded daily transaction limit or not
 
-                            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 72L * 60 * 60 * 1000);
+                            Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000);
 
                             
                             Double transfered_amt = transactionRepository.getTotalAmountAfterTime(accno_jwt,"debit",yesterday,"self");
@@ -597,6 +624,8 @@ public class UserController {
 
                                         transactionRepository.save(trans1);
                                         transactionRepository.save(trans2);
+
+                                        emailUtil.sendEmail(acc_user.getEmail(),"Transfer","Rupees "+amt+" debited from XXXXXXX"+accno_jwt.substring(7,11)+" at "+LocalDateTime.now().toString().substring(0,16).replace("T"," "));
 
 
                                         return ResponseEntity.ok("Transaction successfull !!");
@@ -670,6 +699,9 @@ public class UserController {
                         user.setPin(newpin);
                         userRepository.save(user);
 
+                        //now also send mail to the user - as it done rare - we need to indicate the user
+                        emailUtil.sendEmail(user.getEmail(),"Pin","Pin updated successfully !!");
+
                         return ResponseEntity.ok("Pin updated succesfully !!");
                     }
    
@@ -682,6 +714,71 @@ public class UserController {
   
             
         }
+
+    @PatchMapping("/update_password")
+        public  ResponseEntity<?> update_password(@RequestBody Map<String, Object> jsonBody) {
+            String token = (String) jsonBody.get("token");
+            String oldpass = (String) jsonBody.get("password");
+            String newpass = (String) jsonBody.get("newpass");
+
+            try{
+
+
+                if(oldpass.length()==0 || newpass.length()==0 ){
+                    return ResponseEntity.ok("please enter valid details");
+                }
+                else{
+
+
+                    String accno_jwt = JwtUtil.validateToken(token);
+                    User user = userRepository.findByAccno(accno_jwt);
+
+                    String black_list_string = user.getInvalidJwtTokens();
+
+                    boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+                    if(is_token_in_blacklist){// reject 
+                        return ResponseEntity.status(401).body("Unauthorized request !!");
+                    }
+                    else{//proceed
+
+                        //now token is valid - valid user 
+
+                        //validate the old pass
+                        String old_hashed_pass = user.getPassword();
+
+                        if(util.PasswordUtil.verifyPassword(oldpass,old_hashed_pass)){
+                            //current password - update pass
+
+                            String new_hashed_pass = util.PasswordUtil.hashPassword(newpass);
+
+                            //now update the database with this new hasdhed pass
+
+                            user.setPassword(new_hashed_pass);
+
+                            userRepository.save(user);
+
+                            return ResponseEntity.ok("true");
+
+                        }
+                        else{
+                            return ResponseEntity.status(401).body("Unauthorized request !!");
+                            
+                        }
+
+                        
+                        
+                    }
+   
+                }
+   
+            }
+            catch(Exception e){
+                return ResponseEntity.status(401).body("Invalid token !!");
+            }
+
+        }
+
 
     @PatchMapping("/new_black_list_token")
         public  ResponseEntity<?> new_black_list_tokenn(@RequestBody Map<String, Object> jsonBody) {
@@ -888,6 +985,33 @@ public class UserController {
             
         }//withdrawl
 
+
+    @PatchMapping("/resetpassword")
+        public  ResponseEntity<?> resetpassword(@RequestBody Map<String, Object> jsonBody) {
+            String useremail = (String) jsonBody.get("email");
+            String newpassword = (String) jsonBody.get("newpassword");
+
+            User user = userRepository.findByEmail(useremail);
+
+            if(user==null){
+                return ResponseEntity.ok("false");
+            }
+            else{
+                //hoo the email is valid - update the password
+
+                String new_hashed_password = util.PasswordUtil.hashPassword(newpassword);
+
+                //update
+
+                user.setPassword(new_hashed_password);
+
+                userRepository.save(user);
+
+                return ResponseEntity.ok("true");
+
+            }
+
+        }
 
     //end of endpoints
 

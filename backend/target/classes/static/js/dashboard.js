@@ -51,7 +51,7 @@ function username(){
             }
             else{
                 // user trying to use the black list token - reject him
-                showToast("It's not a valid token !!")
+                showToast("Unauthorized request!!")
             }
 
         });
@@ -163,11 +163,28 @@ function update_pin_dash(){
                 
             }
             else{
-                showToast("It's not a valid token !!")
+                showToast("Unauthorized request!!")
             }
 
         });
   
+}
+
+
+function update_pass_dash(){
+    check_token_in_blacklist(token).then(is_valid => {
+
+            if(is_valid){
+                // continue next operation - he is valid user
+                window.location.href = "updatepassword.html"
+
+                
+            }
+            else{
+                showToast("Unauthorized request!!")
+            }
+
+        });
 }
 
 function profile() {
@@ -204,7 +221,7 @@ function check_balance(){
 
             }
             else{
-                showToast("It's not a valid token !!")
+                showToast("Unauthorized request!!")
             }
 
         });
@@ -221,7 +238,7 @@ function deposit_dash() {
             window.location.href = "deposit.html"
         }
         else{
-            showToast("It's not a valid token !!")
+            showToast("Unauthorized request!!")
         }
 
     });
@@ -236,7 +253,7 @@ function withdrawl_dash() {
             window.location.href = "withdrawl.html"
         }
         else{
-            showToast("It's not a valid token !!")
+            showToast("Unauthorized request!!")
         }
 
     });
@@ -251,7 +268,7 @@ function transfer_dash() {
             window.location.href = "transfer.html"
         }
         else{
-            showToast("It's not a valid token !!")
+            showToast("Unauthorized request!!")
         }
 
     });

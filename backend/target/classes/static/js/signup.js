@@ -3,9 +3,10 @@ function user_signup() {
     let age = document.getElementById('age').value;
     let city = document.getElementById('city').value;
     let phonenumber = document.getElementById('phonenumber').value;
+    
     let password = document.getElementById('password').value;
 
-    console.log("password being sent: " + password);
+    //console.log("password being sent: " + password);
 
     if(uname == "" || age == ""  || city == "" || phonenumber == ""  || password == "") {
         showToast("please fill the  details !!");
@@ -24,52 +25,22 @@ function user_signup() {
         }, 1500);
     }
     else {
-        let url = "http://localhost:8080/register";
 
-        let userData = {
-            uname: uname, 
-            age: age,
-            city: city,
-            phonenumber: phonenumber,
-            password : password
-        };
+        sessionStorage.setItem('uname', uname);
+        sessionStorage.setItem('age', age);
+        sessionStorage.setItem('city', city);
+        sessionStorage.setItem('phonenumber', phonenumber);
+        
+        sessionStorage.setItem('password', password);
 
-        let status_code;
-
-        fetch(url, {
-            method: 'post',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(userData)
-        })
+        //email registration
+        sessionStorage.setItem('purpose', 'registration')
+        window.location.href = "emailvalidator.html"
 
 
-        .then(response =>{
-            
-            status_code = response.status
-
-            return response.text() //return the body (msg)
-            
-        })
 
 
-        .then(body => {
-            showToast(body) // display msg
 
-            if(status_code==200){
-                //only when status code is success redirect to sigin
-                setTimeout(() => {
-                    window.location.href = "signin.html";
-                }, 3000)
-
-
-            }
-            
-
-        })
-        .catch(error => {
-            showToast("error in registration !!");
-        });
+        
     }
 }
