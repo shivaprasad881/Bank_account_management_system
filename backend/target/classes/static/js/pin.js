@@ -104,7 +104,10 @@ function check_pin(){
                             
                         }
                         else{
-                            showToast("Invalid pin !!")
+                            showToast(data)
+
+
+
                             //enable the button - so that the user can enter the valid pin
                             document.getElementById("pin_button").disabled = false;
                         }

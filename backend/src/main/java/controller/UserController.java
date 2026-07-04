@@ -19,6 +19,8 @@ import repository.TransactionRepository;
 import repository.UserRepository;
 
 import java.util.Map;
+import java.util.Random;
+
 import model.Transaction;
 
 import java.time.LocalTime;
@@ -32,8 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
+
 import java.sql.Timestamp;
 
+
+import java.util.Random;
 
 @RestController
 public class UserController {
@@ -75,10 +80,17 @@ public class UserController {
                     User savedUser = userRepository.save(newUser);
 
                     String accno = "ACC" + String.format("%08d", savedUser.getUserid());
-                    String pin = String.format("%04d", savedUser.getUserid() % 10000);
+                    //String pin = String.format("%04d", savedUser.getUserid() % 10000);
+
+                    String pin = 1000 + new Random().nextInt(9000)+"";
+
+                    //store the hashed pin - so that even developer cant see it as plain text
+                    //even when the db/backup/logs are leaked - the attacker dont know the actual values of the hash - nouser - safe
+
+                    String hashed_pin = util.PasswordUtil.hashPassword(pin);
                     
                     savedUser.setAccno(accno);
-                    savedUser.setPin(pin);
+                    savedUser.setPin(hashed_pin);
                     userRepository.save(savedUser);
 
                     return ResponseEntity.ok(accno+","+pin);
@@ -344,16 +356,74 @@ public class UserController {
                     return ResponseEntity.status(401).body("Unauthorized request !!");
                 }
                 else{//proceed
-
-                    String orig_pin = user.getPin();
-
-                    if( orig_pin.equals(userpin) ){
                     
-                        return ResponseEntity.ok("true");
+                    //check whether user had enought attempts
+
+                    if(user.getFailureAttempts()<3){
+                        // user had avilable attemps - let his try the pin
+
+                        String hashed_pin_db = user.getPin();
+
+                    
+
+                        if(util.PasswordUtil.verifyPassword(userpin,hashed_pin_db)){
+
+                            //hoo the user entered the correct credentials - refresh the attemps
+                            user.setFailureAttempts(0);
+                            user.setAvailableAt(null);
+
+                            userRepository.save(user);
+                        
+                            return ResponseEntity.ok("true");
+                        }
+                        else{
+                            //hoo the user entered the iinvlaid credeintila - incremt the count
+
+                            user.setFailureAttempts( user.getFailureAttempts()+1 );
+
+                            //after incrementing check whether the limt reached so that we can start the time
+
+                            if(user.getFailureAttempts()==3){
+                                //hoo the user reached the limt - lets wtar the limiter
+                                user.setAvailableAt( LocalTime.now().plusSeconds(20) );
+                            }
+
+                            userRepository.save(user);
+                            return ResponseEntity.ok("Invalid Credentials !!");
+                        }
+
                     }
                     else{
-                        return ResponseEntity.ok("false");
+
+                        //hoo ht euser exeeeded the attemps lismt - resctvr for tsome duration
+
+                        //check whether user time limit is completed - so that we let the user to attemp again
+
+
+
+                        Duration diff = Duration.between( LocalTime.now(),user.getAvailableAt());
+
+                        long sec = diff.toSeconds();
+
+                        if(sec<0){
+                            //hoo the time got ended - now iam free - i got bail
+                            user.setFailureAttempts(0);
+                            user.setAvailableAt( null);
+                            userRepository.save(user);
+                            
+                            return  ResponseEntity.ok("Hoo, now u can try attempting !!");
+                        }
+                        else{
+                            return  ResponseEntity.ok("Please try after "+sec+" seconds !!");
+                        }
+
+                        
+                        
+                        
                     }
+
+
+                    
                     
                 }
  
@@ -443,27 +513,44 @@ public class UserController {
 
     @PatchMapping("/send_email")
         public ResponseEntity<?> send_email(@RequestBody Map<String, Object> jsonBody) {
+
             String email = (String) jsonBody.get("email");
             String subject = (String) jsonBody.get("subject");
             String message = (String) jsonBody.get("message");
-
+            String verifyemail = (String) jsonBody.get("verifyemail");
             
-            // first check whether the email is registered or not
-        
-            // User user = userRepository.findByEmail(email);
 
-            // if(user==null){
-            //     // the email is not registered - reject the request
-            //     return ResponseEntity.ok("false");
-            // }
-            // else{
-                //hoo the email is already registered - let the user to reset his password
-                //emailUtil.sendOtp(email,"Your OTP for Password-Reset","Your OTP is : "+ generated_otp);
+            if(verifyemail.equals("true")){
+
+                //first verify the user is existing or not - only when exising then only send the otp 
+
+                User user = userRepository.findByEmail(email);
+
+                if(user==null){
+                    // the email is not registered - reject the request
+
+                    return ResponseEntity.ok("false");
+                }
+                else{
+                    //hoo the email is already registered - let the user to reset his password
+
+                    emailUtil.sendEmail(email,subject,message);
+            
+                    return ResponseEntity.ok("true");
+
+                }
+
+            }
+            else{
 
                 emailUtil.sendEmail(email,subject,message);
             
                 return ResponseEntity.ok("true");
-            //}
+            }
+            
+            
+        
+            
 
 
         }
@@ -696,11 +783,13 @@ public class UserController {
                     }
                     else{//proceed
 
-                        user.setPin(newpin);
+                        String hashed_newpin = util.PasswordUtil.hashPassword(newpin);
+
+                        user.setPin(hashed_newpin);
                         userRepository.save(user);
 
                         //now also send mail to the user - as it done rare - we need to indicate the user
-                        emailUtil.sendEmail(user.getEmail(),"Pin","Pin updated successfully !!");
+                        emailUtil.sendEmail(user.getEmail(),"PIN UPDATION","Pin updated successfully !!");
 
                         return ResponseEntity.ok("Pin updated succesfully !!");
                     }

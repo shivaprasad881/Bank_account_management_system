@@ -1,9 +1,10 @@
 function sendotp(useremail){
     
+    let purpose = sessionStorage.getItem('purpose');
 
     let generated_otp = Math.floor(1000 + Math.random() * 9000);
 
-    let otp_expiry_time = Date.now() + 30*1000;
+    let otp_expiry_time = Date.now() + 120*1000;
 
     sessionStorage.setItem("email", useremail);
     sessionStorage.setItem("generated_otp", generated_otp);
@@ -12,16 +13,37 @@ function sendotp(useremail){
 
     let message = "Your OTP is : "+ generated_otp+"\n\nPlease dont share the OTP !!"
 
-
+    
 
     let url = "http://localhost:8080/send_email";
+
+    let userdata;
+
+
+            if(purpose=="resetpassword"){
+                userdata = {
+                    email : useremail,
+                    subject : "Your OTP for Password-Reset",
+                    message: message,
+                    verifyemail : "true"
+                    
+                };
+            }
+            else if(purpose=="registration"){
+                userdata = {
+                    email : useremail,
+                    subject : "Your OTP for Password-Reset",
+                    message: message,
+                    verifyemail : "false"
+                    
+                };
+            }
+            else{
+                showToast("'purpose' is none of the above !!")
                 
-    let userdata = {
-        email : useremail,
-        subject : "Your OTP for Password-Reset",
-        message: message
-        
-    };
+            }
+                
+    
                 
     return fetch(url, {
         method: 'PATCH',
@@ -40,12 +62,15 @@ function sendotp(useremail){
     })
 
     .then(data => {
-        //if(data=="true"){
+        if(data=="true"){
             showToast("OTP sent successfully !!");
-        //}
-        // else{
-        //     showToast("Email not registered !!");
-        // }
+        }
+        else if(data=="false"){
+            showToast("Email not registered*************** !!");
+        }
+        else{
+            showToast("Other than true/false response from backend - sendotp() ");
+        }
         
     })
 

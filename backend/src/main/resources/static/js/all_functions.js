@@ -265,7 +265,7 @@ function register(){
             let userdata2 = data.split(",");
             
             
-            showToast("Registration successfull !!",3000);
+            showToast("Registration successfull !!",3500);
                 
 
             let message = "Account Number : "+userdata2[0]+"\nPin : "+userdata2[1] +"\n\n*** Please update the pin after login ***"
@@ -277,8 +277,8 @@ function register(){
             let sendingdata = {
                 email : email,
                 subject : "Your Registration successfull !!",
-                message: message
-                
+                message: message,
+                verifyemail: "false"
             };
                         
             fetch(url, {
@@ -298,10 +298,11 @@ function register(){
             })
             
             .then(data => {
-                if(data=="true"){
+                    //always true - because registration is completed successfully - we should not stop the notification to user
+
                     setTimeout(() => { showToast("Details mailed successfully !!");
 
-                    },3000)
+                    },3500)
 
                     setTimeout(() => {
 
@@ -313,16 +314,12 @@ function register(){
                         sessionStorage.removeItem('password');
 
                         window.location.href = "signin.html";
-                    }, 4500)
-                }
-                else{
-                    showToast("Email not registered !!");
-                }
-                
+                    }, 5000)
+               
             })
 
             .catch(error => {
-                showToast("error in sending the email !!");
+                showToast("error in sending the email after Registration !!");
             });
 
 
@@ -331,6 +328,9 @@ function register(){
 
         })
         .catch(error => {
-            showToast("error in registration !!");
+            console.log("Error details:", error);
+            console.log("Error message:", error.message);
+            console.log("Error stack:", error.stack);
+            showToast("Error in registration(all_functions): " + error.message);
         });
 }
