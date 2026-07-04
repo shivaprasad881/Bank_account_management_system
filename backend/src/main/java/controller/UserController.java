@@ -368,7 +368,7 @@ public class UserController {
 
                         if(util.PasswordUtil.verifyPassword(userpin,hashed_pin_db)){
 
-                            //hoo the user entered the correct credentials - refresh the attemps
+                            //correct credentials - refresh the attemps
                             user.setFailureAttempts(0);
                             user.setAvailableAt(null);
 
@@ -377,14 +377,14 @@ public class UserController {
                             return ResponseEntity.ok("true");
                         }
                         else{
-                            //hoo the user entered the iinvlaid credeintila - incremt the count
+                            //invlaid credeintila - incremt the count
 
                             user.setFailureAttempts( user.getFailureAttempts()+1 );
 
-                            //after incrementing check whether the limt reached so that we can start the time
+                            
 
                             if(user.getFailureAttempts()==3){
-                                //hoo the user reached the limt - lets wtar the limiter
+                               
                                 user.setAvailableAt( LocalTime.now().plusSeconds(20) );
                             }
 
@@ -394,12 +394,6 @@ public class UserController {
 
                     }
                     else{
-
-                        //hoo ht euser exeeeded the attemps lismt - resctvr for tsome duration
-
-                        //check whether user time limit is completed - so that we let the user to attemp again
-
-
 
                         Duration diff = Duration.between( LocalTime.now(),user.getAvailableAt());
 
