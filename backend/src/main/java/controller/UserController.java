@@ -400,7 +400,7 @@ public class UserController {
                         long sec = diff.toSeconds();
 
                         if(sec<0){
-                            //hoo the time got ended - now iam free - i got bail
+                            //time got ended - let the user to try
                             user.setFailureAttempts(0);
                             user.setAvailableAt( null);
                             userRepository.save(user);
@@ -424,7 +424,7 @@ public class UserController {
             }
         }
         catch(Exception e){
-            // invalid token
+           
             return ResponseEntity.status(401).body("Invalid token !!");
         }
  
