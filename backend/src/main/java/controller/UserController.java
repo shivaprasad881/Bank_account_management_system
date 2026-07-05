@@ -882,53 +882,17 @@ public class UserController {
                 }
                 else{//proceed
 
-
+                    ObjectMapper mapper = new ObjectMapper();
                     String old_black_list_string = user.getInvalidJwtTokens();
 
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
-
-                    tokenList.add(token);
-                    user.setLogoutCount( user.getLogoutCount() + 1  );
-
-
-                    List<String> new_tokenList = new ArrayList<>();
-
-                    // now we had the token list in the form of strings - check for expirty of each token string - remove in case of expiry
-
-                    for(String cur_token : tokenList){
-                        if(!JwtUtil.isTokenExpired(cur_token) ){
-                            //hoo its a valid token - if need to retain it - add to our new list
-                            new_tokenList.add(cur_token);
-
-
-                            //when we are removing a token from the list - decrement the count to stay balanced
-                            
-                        }
-                        else{
-                            //hoo its already expired - no use of keeping it - ignore it to add to new list 
-
-                            //decrease the count - as we are ignoring this token
-                            user.setLogoutCount( user.getLogoutCount() - 1  );
-
-                        }
-                        
-                    }
-
-                    //now we had all the valid tokens in the new list - add then to db
-
+                    List<String> new_tokenList = JwtUtil.tokenCleanUp(old_black_list_string);
+                    new_tokenList.add(token);
 
 
                     String updated_black_list_string = mapper.writeValueAsString(new_tokenList);
 
-                    //update in the object by using setters (we had the update string - just replace with the existing string)
-
-                    
+                    user.setLogoutCount( new_tokenList.size() );
                     user.setInvalidJwtTokens(updated_black_list_string);
-
-                    // hoo add the changes to the database 
-                    
                     userRepository.save(user);
 
                     // finally we got the current list - added the cur token - update the list - changes done on database - token got added to the list

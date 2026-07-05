@@ -6,12 +6,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
+
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.IOException;
 
 public class JwtUtil {
 
@@ -52,6 +59,31 @@ public class JwtUtil {
             return true; // expired!
         }
     }
+
+    public static List<String> tokenCleanUp(String old_black_list_string)  throws IOException{
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<String> tokenList = mapper.readValue(old_black_list_string, new TypeReference<List<String>>() {});
+
+        List<String> new_tokenList = new ArrayList<>();
+
+                    
+
+        for(String cur_token : tokenList){
+            if(!JwtUtil.isTokenExpired(cur_token) ){
+                            //hoo its a valid token - if need to retain it - add to our new list
+                new_tokenList.add(cur_token);
+              
+            }
+                                   
+        }
+        
+
+        //now return the updated token list
+        return new_tokenList;
+
+    }
+
 
     public static boolean isTokenInBlacklist(String black_list_string,String token) throws Exception {
 
