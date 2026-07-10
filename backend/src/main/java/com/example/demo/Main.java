@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@ComponentScan(basePackages = {"controller", "com.example.demo"})
+@ComponentScan(basePackages = {"controller","service" ,"com.example.demo"})
 @EntityScan(basePackages = {"model"})
 @EnableJpaRepositories(basePackages = {"repository"})
 public class Main {

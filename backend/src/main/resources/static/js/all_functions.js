@@ -107,34 +107,35 @@ function transfer(target,target_type,tar_amt,token_passed){
             body: JSON.stringify(userdata2)
         })
         
-        .then(response =>{
-            if(response.status!=200){
-                showToast("Unauthorized request!!")
-            }
-            else{
-                return response.text()
-            }
+        .then(response => {
+            return response.text().then(text => {
+                if(response.status != 200){
+                    showToast(text);
+                    throw new Error("handled");
+                }
+                else{
+                    return text;
+                }
+            });
         })
         .then(data => {
             //transfer succesfull
             
-            showToast(data)
+            showToast(data)   // was showToast(""), now shows actual backend message "Transaction successfull !!"
             
             setTimeout(() => {
-
                 sessionStorage.removeItem("action");
                 sessionStorage.removeItem("amount");
                 sessionStorage.removeItem("target");
                 sessionStorage.removeItem("target_type");
 
-
                 window.location.href = "dashboard.html"
             }, 1500);
-
         })
 
         .catch(error => {
-            showToast("Error in money transfer  !!");
+            
+            console.error("Transfer error:", error);
         }); 
 
 
