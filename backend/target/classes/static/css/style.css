@@ -7,6 +7,8 @@
     font-weight: bold;
 }
 
+
+
 /* ── Reset ── */
 *, *::before, *::after {
   margin: 0;
@@ -229,7 +231,7 @@ button:active { background: #c2410c; transform: scale(0.98); }
   margin: 0 auto;
   background: #ffffff;
   border-radius: 10px;
-  padding: 20px;
+  padding: 70px 20px 20px 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
 }

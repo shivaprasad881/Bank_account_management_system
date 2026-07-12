@@ -305,3 +305,22 @@ function check_transfered_amt(){
             showToast("Error in fetching user's last 24-hour transfered amount !!");
         });
 }   
+
+
+function forgot_pin(){
+    check_token_in_blacklist(token).then(is_valid => {
+
+        if(is_valid){
+            // continue next operation - he is valid user
+            
+            sessionStorage.setItem('purpose', 'resetpin')
+
+            send_otp();
+
+        }
+        else{
+            showToast("Unauthorized request!!")
+        }
+
+    });
+}

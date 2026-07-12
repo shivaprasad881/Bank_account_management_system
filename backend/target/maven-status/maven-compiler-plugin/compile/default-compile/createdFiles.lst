@@ -4,6 +4,6 @@ com\example\demo\JwtUtil.class
 model\Transaction.class
 com\example\demo\EmailUtil.class
 model\User.class
+util\PasswordUtil.class
 repository\TransactionRepository.class
 com\example\demo\Main.class
-util\PasswordUtil.class

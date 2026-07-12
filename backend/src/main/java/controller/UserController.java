@@ -1,19 +1,39 @@
 package controller;
 
 import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.EmailUtil;
+import com.example.demo.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import service.UserService;
+
+import java.time.LocalTime;
 import java.util.Map;
+
+import model.Email;
+import model.User;
+
+import repository.UserRepository;
+import repository.EmailRepository;
 
 
 @RestController
 public class UserController {
 
-   
+   @Autowired
+    private UserRepository userRepository;
+
+	@Autowired
+    private EmailRepository emailRepository;
 
     @Autowired
     private UserService userService;
+
+	@Autowired
+    private EmailUtil emailUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, Object> jsonBody) {
@@ -62,6 +82,11 @@ public class UserController {
 	    return userService.username(token);
 	}
 
+	@GetMapping("/user_email")
+	public ResponseEntity<?> useremail(@RequestParam String token) {
+	    return userService.useremail(token);
+	}
+
 
 	@GetMapping("/user_transactions")
 	public ResponseEntity<?> user_transactions(@RequestParam String token,@RequestParam String size,@RequestParam String page) {
@@ -90,15 +115,15 @@ public class UserController {
 	}
 
 
-	@PatchMapping("/send_email")
-	public ResponseEntity<?> send_email(@RequestBody Map<String, Object> jsonBody) {
-	    String email = (String) jsonBody.get("email");
-	    String subject = (String) jsonBody.get("subject");
-	    String message = (String) jsonBody.get("message");
-	    String verifyemail = (String) jsonBody.get("verifyemail");
+	// @PatchMapping("/send_email")
+	// public ResponseEntity<?> send_email(@RequestBody Map<String, Object> jsonBody) {
+	//     String email = (String) jsonBody.get("email");
+	//     String subject = (String) jsonBody.get("subject");
+	//     String message = (String) jsonBody.get("message");
+	//     // String verifyemail = (String) jsonBody.get("verifyemail");
 
-	    return userService.send_email(email, subject, message, verifyemail);
-	}
+	//     return userService.send_email(email, subject, message);
+	// }
 
 
 	@PatchMapping("/failure_authentication")
@@ -184,6 +209,111 @@ public class UserController {
 
         }
 
+
+	@PatchMapping("/resetpin")
+        public  ResponseEntity<?> resetpin(@RequestBody Map<String, Object> jsonBody) {
+            String useremail = (String) jsonBody.get("email");
+            String newpin = (String) jsonBody.get("newpin");
+
+            return userService.resetpin(useremail,newpin);
+
+        }
+
+
+	@PatchMapping("/send_otp_no_verification")
+        public  String send_otp_no_verification(@RequestBody Map<String, Object> jsonBody) {
+            String useremail = (String) jsonBody.get("email");
+            
+
+            emailUtil.sendotpp(useremail);
+
+			return "true";
+
+        }
+
     //end of endpoints
+
+	@PatchMapping("/verify_email_send_otp")
+	public String verifyEmailAndSendOtp(@RequestBody Map<String, Object> jsonBody) {
+		String useremail = (String) jsonBody.get("email");
+
+		// Check if user exists with that email
+		User user = userRepository.findByEmail(useremail);
+
+		if (user == null) {
+			return "false";
+		}
+		else{
+			emailUtil.sendotpp(useremail);
+			return"true";
+		}
+
+		// Send OTP
+		
+	}
+
+
+	
+	
+	@PatchMapping("/verify_user_send_otp")
+	public ResponseEntity<?> verify_user_send_otp(@RequestBody Map<String, Object> jsonBody) {
+    	String token = (String) jsonBody.get("token");
+    // ...
+
+
+	    try{
+	        String accno_jwt = JwtUtil.validateToken(token);
+	        User user = userRepository.findByAccno(accno_jwt);
+
+	        String black_list_string = user.getInvalidJwtTokens();
+
+	        boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+	        //hoo the token is not in the blacklist - its completely valid token - return the user blance
+	        if(is_token_in_blacklist){//reject
+	            return ResponseEntity.status(401).body("Unauthorized request !!");
+	        }
+	        else{
+	            
+				emailUtil.sendotpp(user.getEmail());
+	            return ResponseEntity.ok(user.getEmail()+"");
+	        }
+
+	    }
+	    catch(Exception e){
+
+	        return ResponseEntity.status(401).body("Invalid token !!");
+
+	    }
+
+	}
+
+	@PatchMapping("/verify_otp")
+	public String verifyOtp(@RequestBody Map<String, Object> jsonBody) {
+		String useremail = (String) jsonBody.get("email");
+		String userOtp = (String) jsonBody.get("otp");
+
+		Email emailRecord = emailRepository.findByEmail(useremail);
+
+		if (emailRecord == null) {
+			return "false";
+		} 
+		else {
+			String storedOtp = emailRecord.getOtp();
+			LocalTime expireAt = emailRecord.getExpireAt();
+
+			if (LocalTime.now().isAfter(expireAt)) {
+				return "false";
+			} 
+			else {
+				if (storedOtp.equals(userOtp)) {
+					return "true";
+				} 
+				else {
+					return "false";
+				}
+			}
+		}
+	}
 
 }

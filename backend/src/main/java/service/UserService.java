@@ -273,6 +273,31 @@ public class UserService {
 	}
 
 
+	public ResponseEntity<?>  useremail(String token) {
+
+	    try{
+
+	        String accno_jwt = JwtUtil.validateToken(token);
+	        User user = userRepository.findByAccno(accno_jwt);
+
+	        String black_list_string = user.getInvalidJwtTokens();
+
+	        boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+	        if(is_token_in_blacklist){// reject
+	            return ResponseEntity.status(401).body("Unauthorized request !!");
+	        }
+	        else{//proceed
+	            return ResponseEntity.ok(user.getEmail() );
+	        }
+
+	    }
+	    catch(Exception e){ //exception is the parent of all the exceptions 
+	        return ResponseEntity.status(401).body("Invalid token !!");
+	    }
+	}
+
+
 	public ResponseEntity<?> user_transactions(String token, Integer sizee, Integer pagee) {
 
 	    try {
@@ -475,37 +500,7 @@ public class UserService {
 	}
 
 
-	public ResponseEntity<?> send_email(String email, String subject, String message, String verifyemail) {
-
-	        if(verifyemail.equals("true")){
-
-	            //first verify the user is existing or not - only when exising then only send the otp 
-
-	            User user = userRepository.findByEmail(email);
-
-	            if(user==null){
-	                // the email is not registered - reject the request
-
-	                return ResponseEntity.ok("false");
-	            }
-	            else{
-	                //hoo the email is already registered - let the user to reset his password
-
-	                emailUtil.sendEmail(email,subject,message);
-	        
-	                return ResponseEntity.ok("true");
-
-	            }
-
-	        }
-	        else{
-
-	            emailUtil.sendEmail(email,subject,message);
-	        
-	            return ResponseEntity.ok("true");
-	        }
-
-	}
+	
 
 
 	public void failureauthentication(String identity, String identity_type) {
@@ -991,5 +986,30 @@ public class UserService {
 
     }
 
+
+	public  ResponseEntity<?> resetpin(String useremail,String newpin) {
+
+           
+
+        User user = userRepository.findByEmail(useremail);
+
+        if(user==null){
+            return ResponseEntity.ok("false");
+        }
+        else{
+                //hoo the email is valid - update the pin
+
+                String new_hashed_pin = util.PasswordUtil.hashPassword(newpin);
+
+                //update
+                user.setPin(new_hashed_pin);
+
+                userRepository.save(user);
+
+                return ResponseEntity.ok("true");
+
+        }
+
+    }
 
 }

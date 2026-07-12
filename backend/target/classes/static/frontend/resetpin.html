@@ -9,22 +9,23 @@
 <body>
     <div class="container">
         <div class="heading">
-            <h1>Email security page</h1>
+            <h1>Reset pin</h1>
         </div>
         <div class="content">
             <div class="input-group">
-                <label>Email : </label>
-                <input type="text" id="useremail" placeholder="abc@gmail.com">
+                <label>New pin : </label>
+                <input type="text" id="new_pin"  placeholder="Enter pin">
             </div>
-            <button type="button" onclick="send_otp()">SEND OTP</button>
-
-           
+            <div class="input-group">
+                <label>confirm pin : </label>
+                <input type="text" id="confirm_pin" placeholder="Enter pin">
+            </div>
+            <button type="button" onclick="resetpin()" >Reset</button>
         </div>
     </div>
 
-    
     <script src="../js/toast.js"></script>
-    <script src="../js/emailvalidator.js"></script>
-    
+    <script src="../js/resetpin.js"></script>
+
 </body>
 </html>
