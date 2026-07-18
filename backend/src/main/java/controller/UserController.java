@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import service.UserService;
+import service.QRCodeService;
 
 import java.time.LocalTime;
 import java.util.Map;
@@ -18,6 +19,13 @@ import model.User;
 
 import repository.UserRepository;
 import repository.EmailRepository;
+
+
+import org.springframework.http.HttpHeaders;
+
+import org.springframework.http.MediaType;
+
+
 
 
 @RestController
@@ -34,6 +42,32 @@ public class UserController {
 
 	@Autowired
     private EmailUtil emailUtil;
+
+	@Autowired
+    private QRCodeService qrCodeService;
+
+
+
+
+	@PostMapping("/generate")
+	public ResponseEntity<byte[]> generateQR(@RequestBody Map<String, String> requestBody) {
+		try {
+			String data = requestBody.get("data");
+			if (data == null || data.isEmpty()) {
+				return ResponseEntity.badRequest().build();
+			}
+
+			byte[] qrImage = qrCodeService.generateQRCodeAsBytes(data, 300);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_PNG);
+
+			return new ResponseEntity<>(qrImage, headers, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, Object> jsonBody) {
@@ -307,6 +341,18 @@ public class UserController {
 			} 
 			else {
 				if (storedOtp.equals(userOtp)) {
+					//in case of successfull - we would remove the otp record - because as the verification is successful - he would be a legitimate user
+					//as he is legitimate user - so no need to track and inspect his bhavious 
+					//only keep the users know are not legitimate so that we can track there behavious based on noof failed requests etc
+
+					//delete the record
+
+					//get the user record then delete it
+					
+
+					emailRepository.delete(emailRecord);
+
+
 					return "true";
 				} 
 				else {

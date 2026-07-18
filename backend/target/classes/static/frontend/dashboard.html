@@ -3,10 +3,126 @@
 <head>
     <title>Simple Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+    /* ✅ Loader - Full screen overlay */
+    #loader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .loader-box {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loader-box p {
+        margin: 0;
+        font-size: 18px;
+        color: #333;
+        font-weight: bold;
+    }
+
+    /* ✅ Scanner Overlay */
+    #scanner-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9998;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .scanner-box {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        text-align: center;
+        max-width: 350px;
+        width: 90%;
+    }
+
+    .scanner-box p {
+        margin: 0 0 15px 0;
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+    }
+
+    #reader {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .close-btn {
+        margin-top: 15px;
+        background: red;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .close-btn:hover {
+        background: darkred;
+    }
+
+    button {
+        cursor: pointer;
+    }
+</style>
 </head>
 <body>
 
-    <button style="position: absolute; top: 20px; right: 20px; background: red; color: white;" type="button" onclick="logout()" >Logout</button>
+    <div id="loader">
+        <div class="loader-box">
+            <!-- Spinner -->
+            <div id="spinner" class="spinner"></div>
+            
+            <!-- Checkmark (hidden by default) -->
+            <div id="checkmark" style="display: none; font-size: 50px; color: green;">&#10003;</div>
+            
+            <!-- Dynamic message -->
+            <p id="loaderMessage">Loading...</p>
+        </div>
+    </div>
+
+    <button style="position: absolute; top: 20px; right: 20px; background: red; color: white;" type="button" onclick="logout()">Logout</button>
 
     <div class="dashboard">
         <div class="button-group">
@@ -27,12 +143,31 @@
             <button class="action-btn" onclick="transfer_dash()">Transfer</button>
             <button class="action-btn" onclick="history()">History</button>
             <button class="action-btn" onclick="check_transfered_amt()">Last 24-hours</button>
+            <button class="action-btn" onclick="temp()">My QR</button>
+
+            <button onclick="startScanner()">Scan</button>
+
+            <!-- Scanner Overlay -->
+            <div id="scanner-overlay">
+                <div class="scanner-box">
+                    <p> Scan QR Code</p>
+                    <div id="reader"></div>
+                    <button class="close-btn" onclick="stopScanner()">Close</button>
+                </div>
+            </div>
+
+
+
+            
+
         </div>
     </div>
     
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="../js/toast.js"></script>
     <script src="../js/token_blacklist_validator.js"></script>
     <script src="../js/emailvalidator.js"></script>
+    <script src="../js/transfer.js"></script>
     <script src="../js/dashboard.js"></script>
 </body>
 </html>

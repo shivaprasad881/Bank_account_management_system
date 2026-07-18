@@ -308,6 +308,10 @@ function check_transfered_amt(){
 
 
 function forgot_pin(){
+    document.getElementById('loader').style.display = 'flex';
+
+            
+
     check_token_in_blacklist(token).then(is_valid => {
 
         if(is_valid){
@@ -317,10 +321,71 @@ function forgot_pin(){
 
             send_otp();
 
+            
+
         }
         else{
             showToast("Unauthorized request!!")
         }
 
     });
+}
+
+function temp(){
+    fetch('http://localhost:8080/generate', 
+        {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: 'hello' })
+    })
+
+    .then(response => response.blob())
+
+    .then(blob => {
+        const url = URL.createObjectURL(blob);
+        window.open(url);  // Opens QR image in new tab
+    })
+
+    .catch(error => console.error('Error:', error));
+}
+
+let scanner;
+
+function startScanner() {
+    if (scanner) {
+        return;
+    }
+
+    // Show overlay
+    document.getElementById('scanner-overlay').style.display = 'flex';
+
+    scanner = new Html5Qrcode("reader");
+    scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+            // Store the result (no alert, no display)
+            
+            transferr(decodedText)
+
+
+            
+            stopScanner();
+        },
+        (error) => {}
+    ).catch(err => {
+        console.error(err);
+        stopScanner();
+    });
+}
+
+function stopScanner() {
+    if (scanner) {
+        scanner.stop().then(() => {
+            scanner = null;
+            document.getElementById('scanner-overlay').style.display = 'none';
+        }).catch(err => console.error(err));
+    } else {
+        document.getElementById('scanner-overlay').style.display = 'none';
+    }
 }

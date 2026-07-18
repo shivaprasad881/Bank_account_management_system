@@ -1,29 +1,32 @@
 
-function transfer() {
+function transferr(passed_target) {
 
  
-        let target = document.getElementById("target").value;
-        let tar_amt = document.getElementById("useramount").value;
+        let element = document.getElementById("target");
+
+        let target;
+
+        if(element!=null){
+            //we are withing the same page - use the fronted value
+            target = document.getElementById("target").value;
+        }
+        else{
+            //we are not in the same page -use the value passed from another page
+
+            target = passed_target
+        }
+        
 
         target = target.trim() // removing the leading and trailing spaces (user may unfortunetely include spaces at the ends)
 
-        let int_amt = parseInt(tar_amt);
         
-        if(target == "" || tar_amt == "") {
+        
+        if(target == "") {
             
             showToast("please fill the  details !!");
 
         }
-        else if(int_amt <= 0){
-
-            showToast("Please enter valid amount !!") 
-
-        }
-        else if(int_amt > 100000){
-
-            showToast("Cannot transfer more than 1 lakh !!")
-
-        }
+        
         //now the input amount is valid - check for target
 
         else if( target.length == 10  && isNaN(target)==false     ){
@@ -35,12 +38,12 @@ function transfer() {
             let action = "transfer"
 
             sessionStorage.setItem("action", "transfer");
-            sessionStorage.setItem("amount", tar_amt);
+            
             sessionStorage.setItem("target", target);
             sessionStorage.setItem("target_type", target_type);
 
 
-            window.location.href = "pin.html"
+            window.location.href = "amount.html"
 
 
         }
@@ -52,11 +55,11 @@ function transfer() {
             let action = "transfer"
 
             sessionStorage.setItem("action", "transfer");
-            sessionStorage.setItem("amount", tar_amt);
+            
             sessionStorage.setItem("target", target);
             sessionStorage.setItem("target_type", target_type);
 
-            window.location.href = "pin.html"
+            window.location.href = "amount.html"
 
         }
         else {

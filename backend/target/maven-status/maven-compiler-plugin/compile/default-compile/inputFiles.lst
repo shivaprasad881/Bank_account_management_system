@@ -1,5 +1,7 @@
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\UserService.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\controller\UserController.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\QRCodeService.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\SchedulerService.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\JwtUtil.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\UserRepository.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\EmailUtil.java
@@ -10,4 +12,5 @@ C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\User.j
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\Main.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\ScheduledTasks.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\Email.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\config\AsyncConfig.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\util\PasswordUtil.java

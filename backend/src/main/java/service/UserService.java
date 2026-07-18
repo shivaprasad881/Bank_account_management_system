@@ -34,6 +34,10 @@ public class UserService {
     @Autowired
     private EmailUtil emailUtil;
 
+	@Autowired
+	private SchedulerService schedulerService;
+
+
     
     public ResponseEntity<?> register(String uname, Integer age, String city, String phonenumber, String password, String email) {
 
@@ -109,16 +113,16 @@ public class UserService {
 
                 long sec = diff.toSeconds();
 
-                if(sec<0){
-                    //hoo the time got ended - now iam free - i got bail
-                    user.setFailureAttempts(0);
-                    user.setAvailableAt( null);
-                    userRepository.save(user);
-                    return "Hoo, now u can try attempting !!";
-                }
-                else{
+                // if(sec<0){
+                //     //hoo the time got ended - now iam free - i got bail
+                //     user.setFailureAttempts(0);
+                //     user.setAvailableAt( null);
+                //     userRepository.save(user);
+                //     return "Hoo, now u can try attempting !!";
+                // }
+                // else{
                     return "Please try after "+sec+" seconds !!";
-                }
+                //}
 
             }
             else{
@@ -382,8 +386,12 @@ public class UserService {
 	                        
 
 	                        if(user.getFailureAttempts()==3){
+
+								LocalTime time = LocalTime.now().plusSeconds(45);
 	                           
-	                            user.setAvailableAt( LocalTime.now().plusSeconds(20) );
+
+	                            user.setAvailableAt( time );
+								schedulerService.scheduleTaskAt(time,user.getAccno());
 	                        }
 
 	                        userRepository.save(user);
@@ -397,21 +405,9 @@ public class UserService {
 
 	                    long sec = diff.toSeconds();
 
-	                    if(sec<0){
-	                        //time got ended - let the user to try
-	                        user.setFailureAttempts(0);
-	                        user.setAvailableAt( null);
-	                        userRepository.save(user);
-	                        
-	                        return  ResponseEntity.ok("Hoo, now u can try attempting !!");
-	                    }
-	                    else{
-	                        return  ResponseEntity.ok("Please try after "+sec+" seconds !!");
-	                    }
+	                    
+	                    return  ResponseEntity.ok("Please try after "+sec+" seconds !!");
 
-	                    
-	                    
-	                    
 	                }
 
 
@@ -522,7 +518,15 @@ public class UserService {
 	        if(user.getFailureAttempts() >= 3){
 	            // limit reached - now assign a time - so after that time the attempts would be avaiable
 
-	            user.setAvailableAt( LocalTime.now().plusSeconds(20) );
+
+					LocalTime time = LocalTime.now().plusSeconds(45);
+
+					
+					user.setAvailableAt(time);
+					
+					schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
+
+
 	        }
 
 	        userRepository.save(user);

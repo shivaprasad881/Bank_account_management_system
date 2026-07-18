@@ -137,9 +137,15 @@ function send_otp(){
             
             sessionStorage.setItem("email", data);
 
-            showToast("OTP sent successfully !!");
+             // ✅ Replace spinner with checkmark
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('checkmark').style.display = 'block';
+            
+            // ✅ Replace text
+            document.getElementById('loaderMessage').innerText = "OTP sent successfully !!";
 
             setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
                 window.location.href = "verifyotp.html";
             }, 1500);
             
