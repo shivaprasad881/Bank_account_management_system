@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            margin: 20px auto;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        .grid-item {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .grid-item .main-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .grid-item .main-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 8px;
+        }
+        .sub-items {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 14px;
+            gap: 15px;
+        }
+        .sub-item {
+            flex: 1;
+            background: white;
+            border-radius: 14px;
+            padding: 14px 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .sub-item label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .sub-item .sub-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 6px;
+        }
+        .heading {
+            background: #f97316;
+            padding: 20px 24px;
+            text-align: center;
+        }
+        .heading h1 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            .container {
+                max-width: 100%;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heading">
+            <h1>Insights</h1>
+        </div>
+        <div class="grid-container">
+            <!-- Bank Balance -->
+            <div class="grid-item">
+                <div class="main-label">Bank Balance</div>
+                <div class="main-value" id="bankBalance">₹ 0</div>
+            </div>
+
+            <!-- Total Transactions -->
+            <div class="grid-item">
+                <div class="main-label">Total Transactions</div>
+                <div class="main-value" id="totalTransactions">0</div>
+                <div class="sub-items">
+                    <div class="sub-item">
+                        <label>Outgoing</label>
+                        <div class="sub-value" id="outgoing">0</div>
+                    </div>
+                    <div class="sub-item">
+                        <label>Incoming</label>
+                        <div class="sub-value" id="incoming">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Accounts -->
+            <div class="grid-item">
+                <div class="main-label">Total Accounts</div>
+                <div class="main-value" id="totalAccounts">0</div>
+                <div class="sub-items">
+                    <div class="sub-item">
+                        <label>Active</label>
+                        <div class="sub-value" id="active">0</div>
+                    </div>
+                    <div class="sub-item">
+                        <label>Inactive</label>
+                        <div class="sub-value" id="inactive">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Backend will fill these values
+        // document.getElementById("bankBalance").innerHTML = "₹ 1,00,000";
+        // document.getElementById("totalTransactions").innerHTML = "500";
+        // document.getElementById("outgoing").innerHTML = "300";
+        // document.getElementById("incoming").innerHTML = "200";
+        // document.getElementById("totalAccounts").innerHTML = "50";
+        // document.getElementById("active").innerHTML = "45";
+        // document.getElementById("inactive").innerHTML = "5";
+    </script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/insigts.js"></script>
+</body>
+</html>

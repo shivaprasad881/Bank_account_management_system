@@ -16,17 +16,21 @@ import java.util.Map;
 
 import model.Email;
 import model.User;
+import model.Employee;
+import model.Transaction;
 
 import repository.UserRepository;
 import repository.EmailRepository;
+import repository.EmployeeRepository;
+import repository.TransactionRepository;
 
 
 import org.springframework.http.HttpHeaders;
-
+import java.util.List;
 import org.springframework.http.MediaType;
 
 
-
+import java.sql.Timestamp;
 
 @RestController
 public class UserController {
@@ -36,6 +40,12 @@ public class UserController {
 
 	@Autowired
     private EmailRepository emailRepository;
+
+	@Autowired
+    private EmployeeRepository employeeRepository;
+
+	@Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private UserService userService;
@@ -98,6 +108,158 @@ public class UserController {
         return userService.validateuser(identity, identity_type, password);
     }
 
+	@GetMapping("/validate_emp")
+    public String validateemp(@RequestParam String empid, @RequestParam String password) {
+
+        if(empid.length()==0 ||  password.length()==0){
+            return "Please enter valid details !!";
+        }
+        else{
+
+            // first get the user based on the accno or phone number
+
+            // then get the users hash password to compare with cur password
+
+            Employee emp = employeeRepository.findByEmpid(empid);
+
+            
+            
+
+            
+
+            if(emp == null){
+                return "false";
+            }
+            else{
+                //now the user is existing - check whether the user hashed password matches with the cur password
+
+                String password_db = emp.getPassword();
+
+                if(password.equals(password_db)){
+                    //hoo both matched - valid user
+                    return JwtUtil.generateToken(emp.getEmpid());
+                }
+                else{
+                    //hoo incorrect password - increment the invalid count
+                    return "false";
+                }
+
+                
+
+            }
+
+        }
+
+    }
+
+	@GetMapping("/total_bank_balance")
+    public String total_bank_balance() {
+
+        
+		List<User> users = userRepository.findAll();
+
+		int sum = 0;
+
+		for(User user:users){
+			sum += user.getBalance();
+		}
+
+		return sum+"";
+            
+    }
+
+	@GetMapping("/bank_transactions")
+    public String bank_transactions() {
+
+        
+		Timestamp yesterday  =  new Timestamp(System.currentTimeMillis() - 240L * 60 * 60 * 1000);
+
+		List<Transaction> transactions = transactionRepository.findTransactionsAfterTime(yesterday);
+
+		double total_amt = 0;
+
+		double outgoing_amt = 0;
+
+		double incoming_amt = 0;
+		
+		for(Transaction transaction:transactions){
+			String type = transaction.getTransactionType();
+
+			if(type.equals("debit")){
+				outgoing_amt += transaction.getAmount();
+			}
+			else if(type.equals("credit")){
+				incoming_amt += transaction.getAmount();
+			}
+
+		}
+		 total_amt = outgoing_amt+ incoming_amt;
+
+		 System.out.println("total_amt : "+ transactions.size());
+
+		return outgoing_amt+ " "+incoming_amt+" "+ total_amt ;
+            
+    }
+
+	@GetMapping("/users_count_based_on_account_status")
+    public String users_count_based_on_account_status() {
+
+        
+		List<User> users = userRepository.findAll();
+
+		int active = 0;
+
+		int inactive = 0;
+
+		for(User user:users){
+
+			//60L -> 60 days
+			Timestamp last60days = new Timestamp(System.currentTimeMillis() - 60L * 24 * 60 * 60 * 1000);
+			Timestamp last_active_time = user.getLastActiveAt() ;
+
+			// now.after(yesterday)
+
+			if(last_active_time.after(last60days)){
+				active++;
+			}
+			else{
+				inactive++;
+			}
+		}
+
+		return active+" "+inactive+" "+(active+inactive);
+            
+    }
+
+	@GetMapping("/is_employee_manager")
+	public String is_employee_manager(@RequestParam String emp_token) {
+	    
+		try{
+	        String empid = JwtUtil.validateToken(emp_token);
+	       	Employee emp = employeeRepository.findByEmpid(empid);
+
+			String role = emp.getDept();
+
+			System.out.println(role);
+
+			if(role.equals("manager")){
+				//true
+				return "true";
+			}
+			else{
+				//false
+
+				return "false";
+			}
+
+
+	    }
+	    catch(Exception e){
+
+	        return "false";
+
+	    }
+	}
 
     @GetMapping("/check_balance")
 	public ResponseEntity<?> checkBalance(@RequestParam String token) {

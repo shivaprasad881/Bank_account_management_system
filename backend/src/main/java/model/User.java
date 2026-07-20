@@ -8,6 +8,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -41,6 +43,10 @@ public class User {
 
     private String email;
 
+    
+    @Column(name = "last_active_at")
+    private Timestamp lastActiveAt;
+
 
     
     public User() {}
@@ -73,6 +79,7 @@ public class User {
     public String getInvalidJwtTokens() { return invalidJwtTokens; }
     public Integer getLogoutCount() { return logoutCount; }
     public String getEmail() { return email; }
+    public Timestamp getLastActiveAt() {return lastActiveAt;}
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -89,5 +96,6 @@ public class User {
     public void setInvalidJwtTokens(String invalidJwtTokens) { this.invalidJwtTokens = invalidJwtTokens; }
     public void setLogoutCount(Integer logoutCount) { this.logoutCount = logoutCount; }
     public void setEmail(String email) { this.email = email; }
+    public void setLastActiveAt(Timestamp lastActiveAt) {this.lastActiveAt = lastActiveAt;}
 
 }

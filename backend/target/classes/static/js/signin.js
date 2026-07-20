@@ -1,28 +1,95 @@
 function user_signin() {
-    let identity = document.getElementById("user_identity").value;
-    let userpass = document.getElementById("password").value;
 
-    identity = identity.trim();
-    userpass = userpass.trim();
+    let usertype = document.getElementById("usertype").value;
 
-    let identity_type;
+    if(usertype=="customer"){
+
+        let identity = document.getElementById("user_identity").value;
+        let userpass = document.getElementById("password").value;
+
+        identity = identity.trim();
+        userpass = userpass.trim();
+
+        let identity_type;
+        
+        if(identity == "" || userpass == "") {
+            showToast("please fill the details");
+        }
+        else if( identity.length == 10  && isNaN(identity)==false     ){
+            //phonenumber
+            identity_type = "phonenumber"
+            login(identity,identity_type,userpass)
+        }
+        else if( identity.length == 11  && identity.substring(0,3)=="ACC" &&  isNaN(identity.substring(3))==false  ){
+            //accno
+            identity_type = "account"
+            login(identity,identity_type,userpass)
+        }
+        else {
+            showToast("Please enter valid 10-digit phone number or ACCXXXXXXXXX account number");
+        }
+
+    }
+    else{
+
+        let empid = document.getElementById("user_identity").value;
+        let emppass = document.getElementById("password").value;
+
+        empid = empid.trim();
+        emppass = emppass.trim();
+
+        if(empid == "" || emppass == "") {
+            showToast("please fill the details");
+        }
+        else if( empid.length == 11  && empid.substring(0,3)=="EMP" &&  isNaN(empid.substring(3))==false    ){
+           
+            login2(empid,emppass);
+        }
+        else{
+            showToast("Please enter valid 10-digit Employee-ID");
+        }
+        
+
+    }
+
     
-    if(identity == "" || userpass == "") {
-        showToast("please fill the details");
-    }
-    else if( identity.length == 10  && isNaN(identity)==false     ){
-        //phonenumber
-        identity_type = "phonenumber"
-        login(identity,identity_type,userpass)
-    }
-    else if( identity.length == 11  && identity.substring(0,3)=="ACC" &&  isNaN(identity.substring(3))==false  ){
-        //accno
-        identity_type = "account"
-        login(identity,identity_type,userpass)
-    }
-    else {
-        showToast("Please enter valid 10-digit phone number or ACCXXXXXXXXX account number");
-    }
+
+
+}
+
+function login2(empid,emppass){
+
+    url = "http://localhost:8080/validate_emp?empid=" + empid +"&password=" + emppass;
+
+                fetch(url, {
+                    method: 'get'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if(data == "false") {
+
+                        showToast("Invalid credentials !!");
+
+                    }
+                    else{
+                        
+                        showToast("successful login !!",1500);
+
+                        setTimeout(() => {
+                                sessionStorage.setItem("emp_token", data);
+                                
+                                window.location.href = "emp_dashboard.html"
+                        }, 1500);
+
+                    }
+                
+                })
+
+                .catch(error => {
+                    showToast("Error in validating the Employee credencials !!");
+                });
+
+
 
 
 }

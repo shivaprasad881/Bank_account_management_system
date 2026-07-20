@@ -26,9 +26,9 @@ public class JwtUtil {
     private static final long EXPIRY_TIME = 3600000; // 1 hour
 
     // generate token
-    public static String generateToken(String accno) {
+    public static String generateToken(String identity) {
         return Jwts.builder()
-                .setSubject(accno)
+                .setSubject(identity)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRY_TIME))
                 .signWith(SECRET_KEY)

@@ -70,6 +70,11 @@ public class UserService {
                     //even when the db/backup/logs are leaked - the attacker dont know the actual values of the hash - nouser - safe
 
                     String hashed_pin = util.PasswordUtil.hashPassword(pin);
+
+					Timestamp cur_time = new Timestamp(System.currentTimeMillis());
+					//set the last active at time
+					savedUser.setLastActiveAt(cur_time);
+					
                     
                     savedUser.setAccno(accno);
                     savedUser.setPin(hashed_pin);
@@ -174,6 +179,12 @@ public class UserService {
 
                 if(util.PasswordUtil.verifyPassword(password,hashed_password)){
                     //hoo both matched - valid user
+
+					Timestamp cur_time = new Timestamp(System.currentTimeMillis());
+					//set the last active at time
+					user.setLastActiveAt(cur_time);
+					userRepository.save(user);
+
                     return JwtUtil.generateToken(user.getAccno());
                 }
                 else{

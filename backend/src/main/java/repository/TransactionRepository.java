@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import model.Transaction;
 import org.springframework.data.domain.Pageable;
 
-
+import java.util.List;
 import java.sql.Timestamp;
 
 
@@ -32,5 +32,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
             @Param("fromTime") Timestamp fromTime,
             @Param("taracc") String taracc
     );
+
+
+    @Query("SELECT t FROM Transaction t WHERE t.transactionDate >= :time")
+    List<Transaction> findTransactionsAfterTime(@Param("time") Timestamp time);
 }
 
