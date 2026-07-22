@@ -33,3 +33,40 @@ function insigts(){
 
     
 }
+
+function getusers(){
+    //fetch the user data - based on the emp role 
+
+    window.location.href = "users_data.html"
+    
+
+}
+
+function getemployees(){
+    //only when manager clicks this then only allow him - for other employees restrict it
+
+    url = "http://localhost:8080/is_employee_manager?emp_token=" + emp_token
+
+                fetch(url, {
+                    method: 'get'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if(data=="true"){
+                        // hoo he is a manager - let him see the emp data
+                        window.location.href = "employees_data.html"
+
+                    }
+                    else{
+                        //he is not a manager - reject
+                        showToast("Only manager can access it !!");
+                        
+                    }
+                    
+                })
+
+                .catch(error => {
+                    showToast("Error in validating the 'Employee is Manager' !!");
+                });
+
+}

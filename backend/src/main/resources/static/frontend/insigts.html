@@ -95,7 +95,7 @@
         }
     </style>
 </head>
-<body>
+<body style="display: none;"> 
     <div class="container">
         <div class="heading">
             <h1>Insights</h1>
@@ -138,6 +138,12 @@
                     </div>
                 </div>
             </div>
+
+            <!-- New Users -->
+            <div class="grid-item">
+                <div class="main-label">New Users</div>
+                <div class="main-value" id="newUsers">0</div>
+            </div>
         </div>
     </div>
 
@@ -150,6 +156,7 @@
         // document.getElementById("totalAccounts").innerHTML = "50";
         // document.getElementById("active").innerHTML = "45";
         // document.getElementById("inactive").innerHTML = "5";
+        // document.getElementById("newUsers").innerHTML = "10";
     </script>
     <script src="../js/toast.js"></script>
     <script src="../js/insigts.js"></script>

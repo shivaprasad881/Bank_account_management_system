@@ -26,6 +26,10 @@ import repository.TransactionRepository;
 
 
 import org.springframework.http.HttpHeaders;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.http.MediaType;
 
@@ -154,7 +158,7 @@ public class UserController {
 
 	@GetMapping("/total_bank_balance")
     public String total_bank_balance() {
-
+		
         
 		List<User> users = userRepository.findAll();
 
@@ -214,16 +218,13 @@ public class UserController {
 		for(User user:users){
 
 			//60L -> 60 days
-			Timestamp last60days = new Timestamp(System.currentTimeMillis() - 60L * 24 * 60 * 60 * 1000);
-			Timestamp last_active_time = user.getLastActiveAt() ;
+			String accountstatus = user.getAccountStatus();
 
-			// now.after(yesterday)
-
-			if(last_active_time.after(last60days)){
-				active++;
+			if(accountstatus.equals("blocked")){
+				inactive++;
 			}
 			else{
-				inactive++;
+				active++;
 			}
 		}
 
@@ -240,7 +241,7 @@ public class UserController {
 
 			String role = emp.getDept();
 
-			System.out.println(role);
+			System.out.println("role : "+role);
 
 			if(role.equals("manager")){
 				//true
@@ -260,6 +261,124 @@ public class UserController {
 
 	    }
 	}
+
+	@GetMapping("/users_data_based_on_emp_role")
+	public ResponseEntity<?> users_data_based_on_emp_role(@RequestParam String emp_token) {
+		
+		try {
+			String empid = JwtUtil.validateToken(emp_token);
+			Employee emp = employeeRepository.findByEmpid(empid);
+			String role = emp.getDept();
+			System.out.println("role : " + role);
+
+			List<Object[]> users;
+
+			if(role.equals("manager")) {
+				users = userRepository.fetchUsersByManager();
+			}
+			else if(role.equals("cashier")) {
+				users = userRepository.fetchUsersByCashier();
+			}
+			else {
+				users = userRepository.fetchUsersByClerk();
+			}
+
+			List<Map<String, Object>> response = new ArrayList<>();
+
+			for(Object[] row : users) {
+				Map<String, Object> user = new LinkedHashMap<>();
+
+				if(role.equals("manager")) {
+					user.put("userid", row[0]);
+					user.put("uname", row[1]);
+					user.put("age", row[2]);
+					user.put("city", row[3]);
+					user.put("accno", row[4]);
+					user.put("phonenumber", row[5]);
+					user.put("email", row[6]);
+					user.put("balance", row[7]);
+				}
+				else if(role.equals("cashier")) {
+					user.put("userid", row[0]);
+					user.put("uname", row[1]);
+					user.put("accno", row[2]);
+					user.put("phonenumber", row[3]);
+					user.put("balance", row[4]);
+				}
+				else {
+					user.put("userid", row[0]);
+					user.put("uname", row[1]);
+					user.put("age", row[2]);
+					user.put("city", row[3]);
+					user.put("accno", row[4]);
+					user.put("phonenumber", row[5]);
+					user.put("email", row[6]);
+					user.put("balance", row[7]);
+					user.put("availableAt", row[8]);
+					user.put("lastActiveAt", row[9]);
+					user.put("accountStatus", row[10]);
+				}
+
+				response.add(user);
+			}
+
+			Map<String, Object> finalResponse = new LinkedHashMap<>();
+			
+			finalResponse.put("users", response);
+
+			return ResponseEntity.ok(finalResponse);
+
+		}
+		catch(Exception e) {
+    System.out.println("error: " + e.getMessage());
+    return ResponseEntity.status(401).body("Invalid token !!");
+}
+	}
+
+	@GetMapping("/employees_data")
+	public ResponseEntity<?>  employees_data(@RequestParam String emp_token) {
+	    
+		try {
+        String empid = JwtUtil.validateToken(emp_token);
+        Employee emp = employeeRepository.findByEmpid(empid);
+
+        // only allow manager
+        if(!emp.getDept().equals("manager")) {
+            return ResponseEntity.status(403).body("Access denied !!");
+        }
+
+        List<Object[]> results = employeeRepository.fetchAllEmployeesData();
+
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for(Object[] result : results) {
+            Map<String, Object> empData = new LinkedHashMap<>();
+            empData.put("empid", result[0]);
+            empData.put("ename", result[1]);
+            empData.put("age", result[2]);
+            empData.put("salary", result[3]);
+            empData.put("dept", result[4]);
+            response.add(empData);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+    catch(Exception e) {
+        return ResponseEntity.status(401).body("Invalid token !!");
+    }
+	}
+
+	@GetMapping("/new_users")
+    public String new_users() {
+
+        
+		long noofnewusers = userRepository.countUsersJoinedToday();
+
+	
+		return noofnewusers+"";
+            
+    }
+
 
     @GetMapping("/check_balance")
 	public ResponseEntity<?> checkBalance(@RequestParam String token) {

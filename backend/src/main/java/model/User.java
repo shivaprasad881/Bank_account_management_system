@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 import java.sql.Timestamp;
+import java.sql.Date;
 
 @Entity
 @Table(name = "users")
@@ -47,11 +48,17 @@ public class User {
     @Column(name = "last_active_at")
     private Timestamp lastActiveAt;
 
+    @Column(name = "join_date")
+    private Date joinDate;
+
+
+    @Column (name = "account_status")
+    private String accountStatus;
 
     
     public User() {}
     
-    public User(String uname, Integer age, String city, String phonenumber,String password,String email) {
+    public User(String uname, Integer age, String city, String phonenumber,String password,String email,Timestamp lastactiveat,Date joindate) {
         this.uname = uname;
         this.age = age;
         this.city = city;
@@ -62,6 +69,8 @@ public class User {
         this.invalidJwtTokens = "[]";
         this.logoutCount = 0;
         this.email = email;
+        this.lastActiveAt = lastactiveat;
+        this.joinDate = joindate;
     }
     
     // Getters
@@ -80,6 +89,8 @@ public class User {
     public Integer getLogoutCount() { return logoutCount; }
     public String getEmail() { return email; }
     public Timestamp getLastActiveAt() {return lastActiveAt;}
+    public Date getJoinDate() {return joinDate;}
+    public String getAccountStatus() { return accountStatus; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -97,5 +108,5 @@ public class User {
     public void setLogoutCount(Integer logoutCount) { this.logoutCount = logoutCount; }
     public void setEmail(String email) { this.email = email; }
     public void setLastActiveAt(Timestamp lastActiveAt) {this.lastActiveAt = lastActiveAt;}
-
+    public void setAccountStatus(String accountStatus) { this.accountStatus = accountStatus; }
 }

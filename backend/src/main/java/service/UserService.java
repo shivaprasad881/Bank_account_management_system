@@ -19,7 +19,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import java.sql.Timestamp;
+import java.sql.Date;
+
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,7 +63,7 @@ public class UserService {
 
                     //now store this hashed password in teh db so that even admin cant see the original password
 
-                    User newUser = new User(uname, age, city, phonenumber, hashed_password,email);
+                    User newUser = new User(uname, age, city, phonenumber, hashed_password,email,new Timestamp(System.currentTimeMillis()),new Date(System.currentTimeMillis()));
                     User savedUser = userRepository.save(newUser);
 
                     String accno = "ACC" + String.format("%08d", savedUser.getUserid());

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 
+import java.sql.Timestamp;
+import java.sql.Date;
+
 @Component
 public class ScheduledTasks {
 
@@ -45,5 +48,38 @@ public class ScheduledTasks {
 
     }
 
+
+
+   @Scheduled(cron = "0 10 18 * * *", zone = "Asia/Kolkata")
+    public void blockInactiveUsersAccounts()   throws IOException{
+
+        List<User> allusers = userRepository.findAll();
+
+        //curtime ---- last_active_time  <  60 days = active
+
+        for(User user :allusers){
+
+            Timestamp lastActiveTime = user.getLastActiveAt();
+            Timestamp currTime = new Timestamp(System.currentTimeMillis());
+
+            long diffInMillis = currTime.getTime() - lastActiveTime.getTime();
+            long diffInDays = diffInMillis / (24 * 60 * 60 * 1000);
+
+            if(diffInDays>60){
+                //the user is inactive - block the account - indicate the user about the action
+
+
+                user.setAccountStatus("blocked");
+                userRepository.save(user);
+            }
+            //the user is active - serve the services
+
+            
+            
+
+        }
+
+
+    }
    
 }
