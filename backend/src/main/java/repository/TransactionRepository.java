@@ -36,5 +36,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     @Query("SELECT t FROM Transaction t WHERE t.transactionDate >= :time")
     List<Transaction> findTransactionsAfterTime(@Param("time") Timestamp time);
+
+    @Query(value = "SELECT trans_id, accno, tar_acc, amount, transaction_type, available_balance, transaction_date FROM transactions", nativeQuery = true)
+List<Object[]> fetchAllTransactionsData();
 }
 

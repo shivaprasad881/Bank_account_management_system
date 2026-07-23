@@ -368,6 +368,41 @@ public class UserController {
     }
 	}
 
+	@GetMapping("/transactions_data")
+	public ResponseEntity<?>  transactions_data(@RequestParam String emp_token) {
+	    
+		try {
+        String empid = JwtUtil.validateToken(emp_token);
+        Employee emp = employeeRepository.findByEmpid(empid);
+
+        // only allow manager
+        if(!emp.getDept().equals("manager")) {
+            return ResponseEntity.status(403).body("Access denied !!");
+        }
+
+        List<Object[]> results = transactionRepository.fetchAllTransactionsData();
+
+		List<Map<String, Object>> response = new ArrayList<>();
+
+		for(Object[] result : results) {
+			Map<String, Object> transData = new LinkedHashMap<>();
+			transData.put("trans_id", result[0]);
+			transData.put("accno", result[1]);
+			transData.put("tar_acc", result[2]);
+			transData.put("amount", result[3]);
+			transData.put("transaction_type", result[4]);
+			transData.put("available_balance", result[5]);
+			transData.put("transaction_date", result[6]);
+			response.add(transData);
+		}
+        return ResponseEntity.ok(response);
+    }
+    catch(Exception e) {
+        return ResponseEntity.status(401).body("Invalid token !!");
+    }
+	}
+
+
 	@GetMapping("/new_users")
     public String new_users() {
 

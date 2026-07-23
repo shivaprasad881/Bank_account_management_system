@@ -3,13 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>employees Data</title>
+    <title>Employees Data</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container history" style="max-width: 95%; overflow-x: auto;">
+        
         <div class="heading">
-            <h1>employees Data</h1>
+            <h1>Employees Data</h1>
+        </div>
+
+        <!-- search bar below heading -->
+        <div style="display: flex !important; visibility: visible !important; opacity: 1 !important; gap: 10px; padding: 15px; align-items: center;">
+            <input type="text" id="search" placeholder="Search"
+                style="display: block !important; visibility: visible !important; opacity: 1 !important;
+                       flex: 1; min-height: 40px; padding: 8px 12px; font-size: 16px;
+                       border: 1px solid #ccc; border-radius: 6px; background-color: #fff !important;
+                       color: #000 !important; box-sizing: border-box;">
+            <button type="button" onclick="search()"
+                style="display: inline-block !important; visibility: visible !important; opacity: 1 !important;
+                       min-height: 40px; padding: 8px 20px; font-size: 16px; margin-top: 0;
+                       background-color: #2563eb !important; color: #fff !important;
+                       border: none; border-radius: 6px; cursor: pointer;">
+                Search
+            </button>
         </div>
 
         <table style="width: 100%; min-width: 800px;">
@@ -19,7 +36,6 @@
             </tbody>
         </table>
     </div>
-
     <script src="../js/toast.js"></script>
     <script src="../js/employees_data.js"></script>
 </body>
