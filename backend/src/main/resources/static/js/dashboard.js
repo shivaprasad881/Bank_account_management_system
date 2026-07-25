@@ -63,6 +63,37 @@ function username(){
 
 username()
 
+function useraccno(){
+    return check_token_in_blacklist(token).then(is_valid => {
+        if(is_valid){
+            let url = "http://localhost:8080/user_accno?token=" + token;
+
+            return fetch(url, {
+                method: 'get'
+            })
+            .then(response => {
+                if(response.status != 200){
+                    showToast("Invalid token !!")
+                    return null;
+                }
+                else{
+                    return response.text()
+                }
+            })
+            .then(data => {
+                return data;
+            })
+            .catch(error => {
+                showToast("Error in fetching user accno !!");
+            });
+        }
+        else{
+            showToast("Unauthorized request!!")
+            return null;
+        }
+    });
+}
+
 function logout(){
     // add the current token to the black list - so that we can reject next time
 
@@ -332,21 +363,28 @@ function forgot_pin(){
 }
 
 function temp(){
-    fetch('http://localhost:8080/generate', 
-        {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: 'hello' })
-    })
 
-    .then(response => response.blob())
+    
+    useraccno().then(accno => {
+        console.log(accno);
+        fetch('http://localhost:8080/generate', 
+            {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: accno })
+        })
 
-    .then(blob => {
-        const url = URL.createObjectURL(blob);
-        window.open(url);  // Opens QR image in new tab
-    })
+        .then(response => response.blob())
 
-    .catch(error => console.error('Error:', error));
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            window.open(url);  // Opens QR image in new tab
+        })
+
+        .catch(error => console.error('Error:', error));
+    });
+
+    
 }
 
 let scanner;
@@ -368,7 +406,7 @@ function startScanner() {
             
             transferr(decodedText)
 
-
+            console.log(decodedText)
             
             stopScanner();
         },

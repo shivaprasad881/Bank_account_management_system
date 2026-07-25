@@ -15,6 +15,7 @@ public class Employee {
     private double salary;
     private String dept;
     private String password;
+    private String notifications;
 
     public Employee() {}
 
@@ -34,6 +35,7 @@ public class Employee {
     public double getSalary() { return salary; }
     public String getDept() { return dept; }
     public String getPassword() { return password; }
+    public String getNotifications() { return notifications; }
 
     // Setters
     public void setEmpid(String empid) { this.empid = empid; }
@@ -42,6 +44,7 @@ public class Employee {
     public void setSalary(double salary) { this.salary = salary; }
     public void setDept(String dept) { this.dept = dept; }
     public void setPassword(String password) { this.password = password; }
+    public void setNotifications(String notifications) { this.notifications = notifications; }
 
     @Override
     public String toString() {

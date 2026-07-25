@@ -262,6 +262,51 @@ public class UserController {
 	    }
 	}
 
+	@GetMapping("/send_msg")
+	public String send_msg(@RequestParam String emp_token,@RequestParam String tar_empid,@RequestParam String msg) {
+	    
+		try{
+	        String curr_empid = JwtUtil.validateToken(emp_token);
+
+	       	Employee tar_employee = employeeRepository.findByEmpid(tar_empid);
+
+			
+
+			tar_employee.setNotifications(msg);
+			employeeRepository.save(tar_employee);
+
+			return "true";
+
+
+	    }
+	    catch(Exception e){
+
+	        return "false";
+
+	    }
+	}
+
+	@GetMapping("/fetchnotifications")
+	public String fetchnotifications(@RequestParam String emp_token) {
+	    
+		try{
+	        String empid = JwtUtil.validateToken(emp_token);
+			
+	       	Employee emp = employeeRepository.findByEmpid(empid);
+
+			String noti = emp.getNotifications();
+
+			return noti;
+
+
+	    }
+	    catch(Exception e){
+
+	        return "false";
+
+	    }
+	}
+
 	@GetMapping("/users_data_based_on_emp_role")
 	public ResponseEntity<?> users_data_based_on_emp_role(@RequestParam String emp_token) {
 		
@@ -432,6 +477,11 @@ public class UserController {
 	    return userService.username(token);
 	}
 
+	@GetMapping("/user_accno")
+	public ResponseEntity<?>  useraccno(@RequestParam String token) {
+	    return userService.useraccno(token);
+	}
+
 	@GetMapping("/user_email")
 	public ResponseEntity<?> useremail(@RequestParam String token) {
 	    return userService.useremail(token);
@@ -476,7 +526,7 @@ public class UserController {
 	// }
 
 
-	
+
 
 
 	@PatchMapping("/failure_authentication")

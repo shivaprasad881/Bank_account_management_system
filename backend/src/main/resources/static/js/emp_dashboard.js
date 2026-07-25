@@ -101,3 +101,30 @@ function gettransactions(){
     
 }
 
+
+function sendmsg(){
+    window.location.href = "sendmsg.html"
+}
+
+function fetchnotifications(){
+
+    url = "http://localhost:8080/fetchnotifications?emp_token=" + emp_token
+
+                fetch(url, {
+                    method: 'get'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("notibox").innerHTML = data;
+                    
+                })
+
+                .catch(error => {
+                    showToast("Error in fetching notifications !!");
+                });
+
+
+}
+
+
+fetchnotifications()

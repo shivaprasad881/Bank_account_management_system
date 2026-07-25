@@ -35,6 +35,8 @@
         }
         .button-container {
             display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             justify-content: center;
             margin-top: 25px;
         }
@@ -59,6 +61,17 @@
             font-weight: 700;
             color: #1e293b;
         }
+        .msg-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 80px;
+            text-align: center;
+            color: #1e293b;
+            font-size: 1rem;
+        }
     </style> 
 </head>
 <body>
@@ -67,11 +80,17 @@
         <div class="balance-box"> 
             <div class="amount" id="bal">Dashboard</div>
         </div>
+
+        <div class="msg-box" id="notibox">
+            <!-- Messages will appear here -->
+        </div>
+
         <div class="button-container">
             <button class="action-btn" onclick="insigts()">Insights</button>
-            <button class="action-btn" onclick="getusers()">users</button>
-            <button class="action-btn" onclick="gettransactions()">transactions</button>
-            <button class="action-btn" onclick="getemployees()">employees</button>
+            <button class="action-btn" onclick="getusers()">Users</button>
+            <button class="action-btn" onclick="gettransactions()">Transactions</button>
+            <button class="action-btn" onclick="getemployees()">Employees</button>
+            <button class="action-btn" onclick="sendmsg()">Send Msg</button>
         </div>
     </div>
 

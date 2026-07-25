@@ -292,6 +292,29 @@ public class UserService {
 	    }
 	}
 
+	public ResponseEntity<?>  useraccno(String token) {
+
+	    try{
+
+	        String accno_jwt = JwtUtil.validateToken(token);
+	        User user = userRepository.findByAccno(accno_jwt);
+
+	        String black_list_string = user.getInvalidJwtTokens();
+
+	        boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+
+	        if(is_token_in_blacklist){// reject
+	            return ResponseEntity.status(401).body("Unauthorized request !!");
+	        }
+	        else{//proceed
+	            return ResponseEntity.ok(user.getAccno() );
+	        }
+
+	    }
+	    catch(Exception e){ //exception is the parent of all the exceptions 
+	        return ResponseEntity.status(401).body("Invalid token !!");
+	    }
+	}
 
 	public ResponseEntity<?>  useremail(String token) {
 

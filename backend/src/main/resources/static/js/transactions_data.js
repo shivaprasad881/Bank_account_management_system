@@ -82,8 +82,18 @@ function search(){
         let searchTerm = document.getElementById("search").value.toLowerCase().trim();
 
         if(searchTerm==""){
-            showToast("please enter valid input !!");
-            return
+            //render all
+            document.getElementById("tableBody").innerHTML = "";
+
+            alldata.forEach((row, index) => {
+                
+
+                let rowHtml = `<td>${index + 1}</td>`;
+                headers.forEach(key => {
+                    rowHtml += `<td>${row[key]}</td>`;
+                });
+                document.getElementById("tableBody").innerHTML += `<tr>${rowHtml}</tr>`;
+            });
         }
         else if(searchTerm.length<3){
             showToast("input length should be atleast 3 !!");

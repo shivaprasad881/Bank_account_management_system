@@ -64,7 +64,8 @@ function transferr(passed_target) {
         }
         else {
             
-            showToast("Please enter valid 10-digit phone number or ACCXXXXXXXXX account number");
+            
+            showToast("Please enter valid 10-digit phone number or ACCXXXXXXXXX account number: " + target,3000);
             
 
         }
