@@ -16,13 +16,20 @@ function send(){
                 })
                 .then(response => response.text())
                 .then(data => {
-                    
-                    showToast("msg sent successfull !!")
 
-                    setTimeout(() => {
-        
-                        window.location.href = "emp_dashboard.html"
-                    }, 1500);
+                    if(data=="true"){
+                        showToast("msg sent successfull !!")
+
+                        setTimeout(() => {
+            
+                            window.location.href = "emp_dashboard.html"
+                        }, 1500);
+                    }
+                    else{
+                                            showToast("Error in sending msg !!");
+                    }
+                    
+                    
 
                 })
 

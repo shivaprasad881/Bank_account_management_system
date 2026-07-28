@@ -68,9 +68,28 @@
             padding: 20px;
             margin-top: 20px;
             min-height: 80px;
-            text-align: center;
             color: #1e293b;
             font-size: 1rem;
+        }
+        .read-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .read-btn:hover {
+            background: #ea580c;
+        }
+        .noti-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
         }
     </style> 
 </head>
@@ -82,10 +101,16 @@
         </div>
 
         <div class="msg-box" id="notibox">
-            <!-- Messages will appear here -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button class="read-btn" onclick="markAsRead()">Mark all as read</button>
+            </div>
+            <div id="notiList">
+                <!-- Messages will appear here -->
+            </div>
         </div>
 
         <div class="button-container">
+            <button class="action-btn" onclick="fetchallnoti()">Notifications</button>
             <button class="action-btn" onclick="insigts()">Insights</button>
             <button class="action-btn" onclick="getusers()">Users</button>
             <button class="action-btn" onclick="gettransactions()">Transactions</button>

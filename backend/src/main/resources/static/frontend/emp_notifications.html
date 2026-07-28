@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notifications</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .table-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 20px auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        .read-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .read-btn:hover {
+            background: #ea580c;
+        }
+        .heading {
+            background: #f97316;
+            padding: 20px 24px;
+            text-align: center;
+        }
+        .heading h1 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <div class="heading">
+            <h1>Notifications</h1>
+        </div>
+
+        <div class="top-bar">
+            <button class="read-btn" onclick="markAsRead()">Mark all as read</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Sender</th>
+                    <th>Message</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="notiTableBody">
+            </tbody>
+        </table>
+    </div>
+
+        <script src="../js/toast.js"></script>
+    <script src="../js/emp_notifications.js"></script>
+    
+</body>
+</html>

@@ -18,12 +18,14 @@ import model.Email;
 import model.User;
 import model.Employee;
 import model.Transaction;
+import model.Notification;
+
 
 import repository.UserRepository;
 import repository.EmailRepository;
 import repository.EmployeeRepository;
 import repository.TransactionRepository;
-
+import repository.NotificationRepository;
 
 import org.springframework.http.HttpHeaders;
 
@@ -50,6 +52,8 @@ public class UserController {
 
 	@Autowired
     private TransactionRepository transactionRepository;
+	@Autowired
+    private NotificationRepository notificationRepository;
 
     @Autowired
     private UserService userService;
@@ -266,38 +270,20 @@ public class UserController {
 	public String send_msg(@RequestParam String emp_token,@RequestParam String tar_empid,@RequestParam String msg) {
 	    
 		try{
-	        String curr_empid = JwtUtil.validateToken(emp_token);
+	        String sender_empid = JwtUtil.validateToken(emp_token);
 
 	       	Employee tar_employee = employeeRepository.findByEmpid(tar_empid);
 
-			
+			if(tar_employee==null){
+				return "false";
+			}
+			else{
 
-			tar_employee.setNotifications(msg);
-			employeeRepository.save(tar_employee);
+				Notification notification = new Notification(sender_empid ,  tar_empid, msg);
+				notificationRepository.save(notification);
 
-			return "true";
-
-
-	    }
-	    catch(Exception e){
-
-	        return "false";
-
-	    }
-	}
-
-	@GetMapping("/fetchnotifications")
-	public String fetchnotifications(@RequestParam String emp_token) {
-	    
-		try{
-	        String empid = JwtUtil.validateToken(emp_token);
-			
-	       	Employee emp = employeeRepository.findByEmpid(empid);
-
-			String noti = emp.getNotifications();
-
-			return noti;
-
+				return "true";
+			}
 
 	    }
 	    catch(Exception e){
@@ -307,6 +293,45 @@ public class UserController {
 	    }
 	}
 
+	@GetMapping("/fetchnewnotifications")
+	public ResponseEntity<?> fetchnewnotifications(@RequestParam String emp_token) {
+		try {
+			String receiver_empid = JwtUtil.validateToken(emp_token);
+			List<Notification> notifications = notificationRepository.findByReceiverAndViewed(receiver_empid,false);
+			return ResponseEntity.ok(notifications);
+		} catch(Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+	@GetMapping("/fetchallnotifications")
+	public ResponseEntity<?> fetchallnotifications(@RequestParam String emp_token) {
+		try {
+			String receiver_empid = JwtUtil.validateToken(emp_token);
+			List<Notification> notifications = notificationRepository.findByReceiver(receiver_empid);
+			return ResponseEntity.ok(notifications);
+		} catch(Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+
+	@PatchMapping("/make_noti_read")
+	public ResponseEntity<?> make_noti_read(@RequestParam String emp_token) {
+		try {
+			String receiver_empid = JwtUtil.validateToken(emp_token);
+			List<Notification> notifications = notificationRepository.findByReceiverAndViewed(receiver_empid, false);
+
+			for(Notification noti : notifications) {
+				noti.setViewed(true);
+			}
+			notificationRepository.saveAll(notifications);
+
+			return ResponseEntity.ok("Notifications marked as read");
+		} catch(Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
 	@GetMapping("/users_data_based_on_emp_role")
 	public ResponseEntity<?> users_data_based_on_emp_role(@RequestParam String emp_token) {
 		

@@ -106,25 +106,42 @@ function sendmsg(){
     window.location.href = "sendmsg.html"
 }
 
-function fetchnotifications(){
+function fetchnotifications() {
+    let url = "http://localhost:8080/fetchnewnotifications?emp_token=" + emp_token;
 
-    url = "http://localhost:8080/fetchnotifications?emp_token=" + emp_token
-
-                fetch(url, {
-                    method: 'get'
-                })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("notibox").innerHTML = data;
-                    
-                })
-
-                .catch(error => {
-                    showToast("Error in fetching notifications !!");
-                });
-
-
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        let html = "";
+        data.forEach(n => {
+            let time = new Date(n.createdAt);
+            let timeStr = time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+            html += `<div class="noti-item">
+                        <span><strong>${n.sender}:</strong> ${n.message}</span>
+                        <span style="font-size: 0.8rem; color: #64748b;">${timeStr}</span>
+                    </div>`;
+        });
+        document.getElementById("notiList").innerHTML = html || "No notifications";
+    })
+    .catch(() => showToast("Error fetching notifications"));
 }
 
 
 fetchnotifications()
+
+
+function markAsRead() {
+    let url = "http://localhost:8080/make_noti_read?emp_token=" + emp_token;
+
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        showToast(data);
+        fetchnotifications()
+    })
+    .catch(() => showToast("Error making noti read"));
+}
+
+function fetchallnoti(){
+     window.location.href = "emp_notifications.html"
+}
