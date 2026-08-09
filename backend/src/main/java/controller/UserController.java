@@ -37,6 +37,7 @@ import org.springframework.http.MediaType;
 
 
 import java.sql.Timestamp;
+import java.util.Collection;
 
 @RestController
 public class UserController {
@@ -309,6 +310,15 @@ public class UserController {
 		try {
 			String receiver_empid = JwtUtil.validateToken(emp_token);
 			List<Notification> notifications = notificationRepository.findByReceiver(receiver_empid);
+
+			//custom comparator - because the java dont know based on which column it need to sort 
+			// so we need to explicitly specify the column and the order 
+
+			//now sort based on the id column of notifications - desc order
+
+			//in place sorting
+			notifications.sort( (a,b) -> b.getId()-a.getId());
+
 			return ResponseEntity.ok(notifications);
 		} catch(Exception e) {
 			return ResponseEntity.status(401).body("Invalid token");
