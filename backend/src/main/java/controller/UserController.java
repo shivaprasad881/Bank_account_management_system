@@ -316,7 +316,7 @@ public class UserController {
 	}
 
 
-	@PatchMapping("/make_noti_read")
+	@GetMapping("/make_noti_read")
 	public ResponseEntity<?> make_noti_read(@RequestParam String emp_token) {
 		try {
 			String receiver_empid = JwtUtil.validateToken(emp_token);
@@ -324,8 +324,9 @@ public class UserController {
 
 			for(Notification noti : notifications) {
 				noti.setViewed(true);
+				notificationRepository.save(noti);
 			}
-			notificationRepository.saveAll(notifications);
+			
 
 			return ResponseEntity.ok("Notifications marked as read");
 		} catch(Exception e) {

@@ -33,7 +33,7 @@ public class Notification {
     public String getSender() { return sender; }
     public String getReceiver() { return receiver; }
     public String getMessage() { return message; }
-    public boolean isViewed() { return viewed; }
+    public boolean getViewed() { return viewed; }
     public Timestamp getCreatedAt() { return createdAt; }
 
     // Setters
