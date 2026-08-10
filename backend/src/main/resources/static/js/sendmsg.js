@@ -26,7 +26,7 @@ function send(){
                         }, 1500);
                     }
                     else{
-                                            showToast("Error in sending msg !!");
+                        showToast("Error in sending msg !!");
                     }
                     
                     
