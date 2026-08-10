@@ -105,7 +105,6 @@ function gettransactions(){
 function sendmsg(){
     window.location.href = "sendmsg.html"
 }
-
 function fetchnotifications() {
     let url = "http://localhost:8080/fetchnewnotifications?emp_token=" + emp_token;
 
@@ -114,18 +113,18 @@ function fetchnotifications() {
     .then(data => {
         let html = "";
         data.forEach(n => {
-            let time = new Date(n.createdAt);
-            let timeStr = time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+            let date = new Date(n.createdAt);
+            let dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            let timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
             html += `<div class="noti-item">
                         <span><strong>${n.sender}:</strong> ${n.message}</span>
-                        <span style="font-size: 0.8rem; color: #64748b;">${timeStr}</span>
+                        <span style="font-size: 0.8rem; color: #64748b;">${dateStr} ${timeStr}</span>
                     </div>`;
         });
         document.getElementById("notiList").innerHTML = html || "No notifications";
     })
     .catch(() => showToast("Error fetching notifications"));
 }
-
 
 fetchnotifications()
 

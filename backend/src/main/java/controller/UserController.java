@@ -280,8 +280,22 @@ public class UserController {
 			}
 			else{
 
-				Notification notification = new Notification(sender_empid ,  tar_empid, msg);
-				notificationRepository.save(notification);
+				List<Employee> employees = employeeRepository.findAll();
+
+				//now send this message to all the employees except himself 
+
+				// sender would be same - receiver would change
+
+				for(Employee emp:employees){
+					String tarempid = emp.getEmpid();
+
+					if(!tarempid.equals(sender_empid)){
+						Notification notification = new Notification(sender_empid ,  tarempid, msg);
+						notificationRepository.save(notification);
+					}
+				}
+
+				
 
 				return "true";
 			}
@@ -298,7 +312,16 @@ public class UserController {
 	public ResponseEntity<?> fetchnewnotifications(@RequestParam String emp_token) {
 		try {
 			String receiver_empid = JwtUtil.validateToken(emp_token);
-			List<Notification> notifications = notificationRepository.findByReceiverAndViewed(receiver_empid,false);
+
+			//only fetch latest k notifications (some users may dont read notifications - so there would be lot of notificaitons rendered in the dash)
+			//so to restrict it we would render only latest k messages - for more messages the user need to open the notifications tab- where the user can see entire notification history 
+
+			//fetch latest k from db - send to frontend - frontend is ready to render the top k msgs
+
+			List<Notification> notifications = notificationRepository.findLatestKByReceiverAndViewed(receiver_empid,false,5);
+
+			notifications.sort( (a,b) -> b.getId()-a.getId());
+
 			return ResponseEntity.ok(notifications);
 		} catch(Exception e) {
 			return ResponseEntity.status(401).body("Invalid token");
