@@ -1,30 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Form</title>
+    <title>Send Message</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #eef2f5;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        .container {
+            width: 450px;
+            max-width: 100%;
+            margin: 0;
+            border-radius: 24px;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .orange-heading {
+            background: #f97316;
+            padding: 20px 24px;
+            text-align: center;
+        }
+
+        .orange-heading h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.2px;
+        }
+
+        .input-section {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            color: #1e293b;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+            background: #fffaf5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        #employeeIdInput {
+            display: none;
+        }
+
+        button {
+            background: #f97316;
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 6px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #ea580c;
+            transform: scale(1.02);
+        }
+
+        button:active {
+            background: #c2410c;
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 550px) {
+            .container {
+                width: 100%;
+            }
+            .orange-heading h1 {
+                font-size: 1.35rem;
+            }
+            .input-section {
+                padding: 1.4rem;
+            }
+        }
+    </style>
 </head>
 <body>
+
     <div class="container">
-        <div class="heading">
-            <h1>Employee Details</h1>
+        <div class="orange-heading">
+            <h1>📨 Send Message</h1>
         </div>
-        <div class="content">
-            <div class="input-group">
-                <label>Employee ID</label>
+
+        <div class="input-section">
+            <!-- Dropdown -->
+            <div class="field">
+                <label for="recipientType">Send To</label>
+                <select id="recipientType" onchange="toggleInput()">
+                    <option value="employeeid">Employee ID</option>
+                    <option value="all">All</option>
+                    <option value="manager">Manager</option>
+                    <option value="cashier">Cashier</option>
+                    <option value="clerk">Clerk</option>
+                </select>
+            </div>
+
+            <!-- Employee ID Input (hidden by default) -->
+            <div id="employeeIdInput" class="field">
+                <label for="empid">Employee ID</label>
                 <input type="text" id="empid" placeholder="Enter Employee ID">
             </div>
-            <div class="input-group">
-                <label>MSG</label>
-                <input type="text" id="text" placeholder="Enter text">
+
+            <!-- Message -->
+            <div class="field">
+                <label for="message">Message</label>
+                <textarea id="message" rows="4" placeholder="Type your message here..."></textarea>
             </div>
-            <button type="button" onclick="send()">Send</button>
+
+            <!-- Send Button -->
+            <button onclick="send()">Send Message</button>
         </div>
     </div>
 
     <script src="../js/toast.js"></script>
     <script src="../js/sendmsg.js"></script>
+
 </body>
 </html>

@@ -280,31 +280,70 @@ public class UserController {
 			}
 			else{
 				Employee tar_employee = employeeRepository.findByEmpid(tar_empid);
-				
+
 				if(tar_employee==null){
 					return "false";
 				}
 				else{
 
-					List<Employee> employees = employeeRepository.findAll();
-
-					//now send this message to all the employees except himself 
-
-					// sender would be same - receiver would change
-
-					for(Employee emp:employees){
-						String tarempid = emp.getEmpid();
-
-						if(!tarempid.equals(sender_empid)){
-							Notification notification = new Notification(sender_empid ,  tarempid, msg);
+					
+							Notification notification = new Notification(sender_empid ,  tar_empid, msg);
 							notificationRepository.save(notification);
-						}
-					}
+						
 
 					
 
 					return "true";
 				}
+			}
+
+			
+
+	    }
+	    catch(Exception e){
+
+	        return "false";
+
+	    }
+	}
+
+	@GetMapping("/boardcast_msg")
+	public String boardcast_msg(@RequestParam String emp_token,@RequestParam String tar_dept,@RequestParam String msg) {
+	    
+		try{
+	        String sender_empid = JwtUtil.validateToken(emp_token);
+
+	       	
+
+			if(msg.length()>250){
+				return "false";
+			}
+			else{
+
+				List<Employee> employees;
+
+				if(tar_dept.equals("all")){
+					employees = employeeRepository.findAll();
+
+				}
+				else{
+					employees =  employeeRepository.findByDept(tar_dept);
+				}
+
+
+					for(Employee emp:employees){
+						String tarempid = emp.getEmpid();
+
+						
+							Notification notification = new Notification(sender_empid ,  tarempid, msg);
+							notificationRepository.save(notification);
+						
+					}
+
+					
+
+					return "true";
+				
 			}
 
 			
