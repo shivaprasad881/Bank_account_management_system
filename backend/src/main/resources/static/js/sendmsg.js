@@ -60,7 +60,7 @@ function send(){
                         }, 1500);
                     }
                     else{
-                        showToast("Error in sending msg !!");
+                        showToast("Only manager can boardcast the messages !!");
                     }
                     
                     

@@ -286,14 +286,15 @@ public class UserController {
 				}
 				else{
 
-					
-							Notification notification = new Notification(sender_empid ,  tar_empid, msg);
-							notificationRepository.save(notification);
-						
-
-					
-
-					return "true";
+					if(!sender_empid.equals(tar_empid)){
+						Notification notification = new Notification(sender_empid ,  tar_empid, msg);
+						notificationRepository.save(notification);
+						return "true";
+					}
+					else{
+						return "false";
+					}
+	
 				}
 			}
 
@@ -320,30 +321,44 @@ public class UserController {
 			}
 			else{
 
-				List<Employee> employees;
+				//only manager can boardcast the messages - reject others 
 
-				if(tar_dept.equals("all")){
-					employees = employeeRepository.findAll();
+				Employee curemp = employeeRepository.findByEmpid(sender_empid);
 
-				}
-				else{
-					employees =  employeeRepository.findByDept(tar_dept);
-				}
+				if(curemp.getDept().equals("manager")){
+					//hoo he belongs to manager dept - let him broadcast the messages to the team
+
+					List<Employee> employees;
+
+					if(tar_dept.equals("all")){
+						employees = employeeRepository.findAll();
+
+					}
+					else{
+						employees =  employeeRepository.findByDept(tar_dept);
+					}
 
 
 					for(Employee emp:employees){
 						String tarempid = emp.getEmpid();
 
-						
-							Notification notification = new Notification(sender_empid ,  tarempid, msg);
-							notificationRepository.save(notification);
-						
+							if(!sender_empid.equals(tarempid)){
+								Notification notification = new Notification(sender_empid ,  tarempid, msg);
+								notificationRepository.save(notification);
+							}
+							//restrict self messaging 
 					}
 
 					
 
 					return "true";
-				
+
+				}
+				else{
+					//hoo he is an emp - restrict
+					return "false";
+				}
+
 			}
 
 			
