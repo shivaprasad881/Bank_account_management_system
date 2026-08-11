@@ -268,107 +268,66 @@ public class UserController {
 	}
 
 	@GetMapping("/send_msg")
-	public String send_msg(@RequestParam String emp_token,@RequestParam String tar_empid,@RequestParam String msg) {
-	    
-		try{
-	        String sender_empid = JwtUtil.validateToken(emp_token);
+	public String send_msg(@RequestParam String emp_token, @RequestParam String tar_empid, @RequestParam String msg) {
+		try {
 
-	       	
+			String sender_empid = JwtUtil.validateToken(emp_token);
 
-			if(msg.length()>250){
-				return "false";
-			}
-			else{
-				Employee tar_employee = employeeRepository.findByEmpid(tar_empid);
+			// message validations
+			if(msg.length() > 250)                    return "msg_too_long";
+			if(util.MessageUtil.issensitivedata(msg)) return "sensitive_data";
 
-				if(tar_employee==null){
-					return "false";
-				}
-				else{
+			// target employee validations
+			Employee tar_employee = employeeRepository.findByEmpid(tar_empid);
+			if(tar_employee == null)                  return "emp_not_found";
+			if(sender_empid.equals(tar_empid))        return "self_msg";
 
-					if(!sender_empid.equals(tar_empid)){
-						Notification notification = new Notification(sender_empid ,  tar_empid, msg);
-						notificationRepository.save(notification);
-						return "true";
-					}
-					else{
-						return "false";
-					}
-	
-				}
-			}
+			// send message
+			Notification notification = new Notification(sender_empid, tar_empid, msg);
+			notificationRepository.save(notification);
+			return "success";
 
-			
-
-	    }
-	    catch(Exception e){
-
-	        return "false";
-
-	    }
+		} catch(Exception e) {
+			return "invalid_token";
+		}
 	}
 
+
 	@GetMapping("/boardcast_msg")
-	public String boardcast_msg(@RequestParam String emp_token,@RequestParam String tar_dept,@RequestParam String msg) {
-	    
-		try{
-	        String sender_empid = JwtUtil.validateToken(emp_token);
+	public String boardcast_msg(@RequestParam String emp_token, @RequestParam String tar_dept, @RequestParam String msg) {
+		try {
 
-	       	
+			String sender_empid = JwtUtil.validateToken(emp_token);
 
-			if(msg.length()>250){
-				return "false";
-			}
-			else{
+			// message validations
+			if(msg.length() > 250)                    return "msg_too_long";
+			if(util.MessageUtil.issensitivedata(msg)) return "sensitive_data";
 
-				//only manager can boardcast the messages - reject others 
+			// role validation — only manager can broadcast
+			Employee curemp = employeeRepository.findByEmpid(sender_empid);
+			if(!curemp.getDept().equals("manager"))   return "not_manager";
 
-				Employee curemp = employeeRepository.findByEmpid(sender_empid);
-
-				if(curemp.getDept().equals("manager")){
-					//hoo he belongs to manager dept - let him broadcast the messages to the team
-
-					List<Employee> employees;
-
-					if(tar_dept.equals("all")){
-						employees = employeeRepository.findAll();
-
-					}
-					else{
-						employees =  employeeRepository.findByDept(tar_dept);
-					}
-
-
-					for(Employee emp:employees){
-						String tarempid = emp.getEmpid();
-
-							if(!sender_empid.equals(tarempid)){
-								Notification notification = new Notification(sender_empid ,  tarempid, msg);
-								notificationRepository.save(notification);
-							}
-							//restrict self messaging 
-					}
-
-					
-
-					return "true";
-
-				}
-				else{
-					//hoo he is an emp - restrict
-					return "false";
-				}
-
+			// fetch target employees
+			List<Employee> employees;
+			if(tar_dept.equals("all")) {
+				employees = employeeRepository.findAll();
+			} else {
+				employees = employeeRepository.findByDept(tar_dept);
 			}
 
-			
+			// send message to each employee — skip self
+			for(Employee emp : employees) {
+				if(!sender_empid.equals(emp.getEmpid())) {
+					Notification notification = new Notification(sender_empid, emp.getEmpid(), msg);
+					notificationRepository.save(notification);
+				}
+			}
 
-	    }
-	    catch(Exception e){
+			return "success";
 
-	        return "false";
-
-	    }
+		} catch(Exception e) {
+			return "invalid_token";
+		}
 	}
 
 	@GetMapping("/fetchnewnotifications")
@@ -402,7 +361,7 @@ public class UserController {
 
 			//now sort based on the id column of notifications - desc order
 
-			//in place sorting
+			//in place sorting -it seems like sorting, but we are actually reversing the already sorted array to get desc order
 			notifications.sort( (a,b) -> b.getId()-a.getId());
 
 			return ResponseEntity.ok(notifications);
@@ -429,6 +388,7 @@ public class UserController {
 			return ResponseEntity.status(401).body("Invalid token");
 		}
 	}
+
 	@GetMapping("/users_data_based_on_emp_role")
 	public ResponseEntity<?> users_data_based_on_emp_role(@RequestParam String emp_token) {
 		
@@ -497,9 +457,9 @@ public class UserController {
 
 		}
 		catch(Exception e) {
-    System.out.println("error: " + e.getMessage());
-    return ResponseEntity.status(401).body("Invalid token !!");
-}
+			System.out.println("error: " + e.getMessage());
+			return ResponseEntity.status(401).body("Invalid token !!");
+		}
 	}
 
 	@GetMapping("/employees_data")

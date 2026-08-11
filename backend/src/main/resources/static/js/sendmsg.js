@@ -17,21 +17,7 @@ function send(){
                 })
                 .then(response => response.text())
                 .then(data => {
-
-                    if(data=="true"){
-                        showToast("msg sent successfull !!")
-
-                        setTimeout(() => {
-            
-                            window.location.href = "emp_dashboard.html"
-                        }, 1500);
-                    }
-                    else{
-                        showToast("Error in sending msg !!");
-                    }
-                    
-                    
-
+                    handleResponse(data);
                 })
 
                 .catch(error => {
@@ -50,21 +36,7 @@ function send(){
                 })
                 .then(response => response.text())
                 .then(data => {
-
-                    if(data=="true"){
-                        showToast("msg sent successfull !!")
-
-                        setTimeout(() => {
-            
-                            window.location.href = "emp_dashboard.html"
-                        }, 1500);
-                    }
-                    else{
-                        showToast("Only manager can boardcast the messages !!");
-                    }
-                    
-                    
-
+                    handleResponse(data);
                 })
 
                 .catch(error => {
@@ -74,12 +46,26 @@ function send(){
 
     }
 
-    //now send msg to empid
-    
-    
-
-
-
+}
+function handleResponse(data) {
+    if(data == "success") {
+        showToast("Message sent successfully !!");
+        setTimeout(() => {
+            window.location.href = "emp_dashboard.html";
+        }, 1500);
+    } else if(data == "msg_too_long") {
+        showToast("Message exceeds 250 characters !!");
+    } else if(data == "sensitive_data") {
+        showToast("Message contains sensitive data !!");
+    } else if(data == "emp_not_found") {
+        showToast("Employee not found !!");
+    } else if(data == "self_msg") {
+        showToast("Cannot send message to yourself !!");
+    } else if(data == "not_manager") {
+        showToast("Only manager can broadcast messages !!");
+    } else if(data == "invalid_token") {
+        showToast("Session expired, please login again !!");
+    }
 }
 
 function toggleInput() {
@@ -93,3 +79,4 @@ function toggleInput() {
         document.getElementById('empid').value = '';
     }
 }
+toggleInput() 
