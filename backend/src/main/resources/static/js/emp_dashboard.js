@@ -144,3 +144,22 @@ function markAsRead() {
 function fetchallnoti(){
      window.location.href = "emp_notifications.html"
 }
+
+function tempend(){
+    let url = "http://localhost:8080/temporary_endpoint_for_testing?emp_token=" + emp_token;
+
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+
+        if(data=="true"){
+            showToast("successfully executed that temporary endpoint !!");
+        }
+        else{
+            showToast("invalid token / expired token")
+        }
+        
+        
+    })
+    .catch(() => showToast("Error in using temporary endpoint"));
+}

@@ -370,6 +370,24 @@ public class UserController {
 		}
 	}
 
+	@GetMapping("/temporary_endpoint_for_testing")
+	public String temporary_endpoint_for_testing(@RequestParam String emp_token) {
+	    
+		try{
+	        String empid = JwtUtil.validateToken(emp_token);
+	       	Employee emp = employeeRepository.findByEmpid(empid);
+
+			util.MessageUtil.autotesting();
+
+			return "true";
+
+	    }
+	    catch(Exception e){
+
+	        return "false";
+
+	    }
+	}
 
 	@GetMapping("/make_noti_read")
 	public ResponseEntity<?> make_noti_read(@RequestParam String emp_token) {
