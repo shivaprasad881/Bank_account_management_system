@@ -3,6 +3,18 @@ package util;
 import java.util.*;
 
 public class MessageUtil {
+
+    public static void main(String[] args){
+        boolean res = issensitivedata("p@ssword is 9911");
+
+        if(res){
+            System.out.println("senstive");
+        }
+        else{
+            System.out.println("not-senstive");
+        }
+    }
+    
     public static boolean issensitivedata(String s){
 
         String original = s.toLowerCase();
@@ -24,7 +36,7 @@ public class MessageUtil {
 
         //1.original words matching
         String[] words = original.split(" ");
-        //printwords(words);
+        printwords(words);
         boolean res1 = wordmatching(words,set);
         
 
@@ -36,8 +48,9 @@ public class MessageUtil {
 
         // i.remove puntuation - then match
 
-        String nopun = original.replaceAll("[^a-zA-Z0-9 ]", "");
-        //printwords(nopun.split(" "));
+        String nopun = original.replaceAll("[^a-zA-Z0-9 @]", "");
+
+        printwords(nopun.split(" "));
         boolean res2 = wordmatching(nopun.split(" "),set);
 
 
@@ -45,7 +58,7 @@ public class MessageUtil {
         // we should apply these changes only for words , so need to keep the original number unaltered
 
         String[] updated_words = applychangestowords(nopun.split(" "));
-        //printwords(updated_words);
+        printwords(updated_words);
         boolean res3 = wordmatching(updated_words,set);
 
 
@@ -118,7 +131,9 @@ public class MessageUtil {
         System.out.println();
     }
 
+    
     public static void autotesting(){
+
 
         HashMap<String, Boolean> testCases = new HashMap<>();
 
@@ -189,4 +204,5 @@ public class MessageUtil {
         System.out.println("matched : "+matched+"  unmatched : "+(testCases.size()-matched));
         System.out.println();
     }
+
 }
