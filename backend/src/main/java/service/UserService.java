@@ -42,6 +42,9 @@ public class UserService {
 	@Autowired
 	private SchedulerService schedulerService;
 
+	@Autowired
+	private ResetAttemptsProducer resetAttemptsProducer;
+
 
     
     public ResponseEntity<?> register(String uname, Integer age, String city, String phonenumber, String password, String email) {
@@ -123,16 +126,9 @@ public class UserService {
 
                 long sec = diff.toSeconds();
 
-                // if(sec<0){
-                //     //hoo the time got ended - now iam free - i got bail
-                //     user.setFailureAttempts(0);
-                //     user.setAvailableAt( null);
-                //     userRepository.save(user);
-                //     return "Hoo, now u can try attempting !!";
-                // }
-                // else{
-                    return "Please try after "+sec+" seconds !!";
-                //}
+                
+                return "Please try after "+sec+" seconds !!";
+                
 
             }
             else{
@@ -549,9 +545,6 @@ public class UserService {
 	            //accno
 	            user = userRepository.findByAccno(identity);
 	        }
-	        
-	        
-
 	        user.setFailureAttempts( user.getFailureAttempts() + 1    );
 
 	        if(user.getFailureAttempts() >= 3){
@@ -564,13 +557,9 @@ public class UserService {
 					user.setAvailableAt(time);
 					
 					schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
-
-
+					resetAttemptsProducer.sendResetTask(user.getAccno()); 
 	        }
-
-	        userRepository.save(user);
-
-	        
+	        userRepository.save(user);    
 	}
 
 

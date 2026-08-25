@@ -2,9 +2,11 @@ C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\User
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\Employee.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\controller\UserController.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\QRCodeService.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\RabbitMQConfig.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\SchedulerService.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\JwtUtil.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\EmployeeRepository.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\ResetAttemptsProducer.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\UserRepository.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\EmailUtil.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\Transaction.java
@@ -12,6 +14,7 @@ C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\N
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\TransactionRepository.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\Notification.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\repository\EmailRepository.java
+C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\service\ResetAttemptsConsumer.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\util\MessageUtil.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\model\User.java
 C:\Users\errir\OneDrive\Desktop\bank_acc_api2\backend\src\main\java\com\example\demo\Main.java

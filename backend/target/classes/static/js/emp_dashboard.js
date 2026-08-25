@@ -146,20 +146,21 @@ function fetchallnoti(){
 }
 
 function tempend(){
-    let url = "http://localhost:8080/temporary_endpoint_for_testing?emp_token=" + emp_token;
+    // let url = "http://localhost:8080/temporary_endpoint_for_testing?emp_token=" + emp_token;
 
-    fetch(url)
-    .then(response => response.text())
-    .then(data => {
+    // fetch(url)
+    // .then(response => response.text())
+    // .then(data => {
 
-        if(data=="true"){
-            showToast("successfully executed that temporary endpoint !!");
-        }
-        else{
-            showToast("invalid token / expired token")
-        }
+    //     if(data=="true"){
+    //         showToast("successfully executed that temporary endpoint !!");
+    //     }
+    //     else{
+    //         showToast("invalid token / expired token")
+    //     }
         
         
-    })
-    .catch(() => showToast("Error in using temporary endpoint"));
+    // })
+    // .catch(() => showToast("Error in using temporary endpoint"));
+    showToast("no active tasks !!")
 }
