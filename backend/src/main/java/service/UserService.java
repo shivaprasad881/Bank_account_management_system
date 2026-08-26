@@ -547,7 +547,7 @@ public class UserService {
 	        }
 	        user.setFailureAttempts( user.getFailureAttempts() + 1    );
 
-	        if(user.getFailureAttempts() >= 3){
+	        if(user.getFailureAttempts() == 3){
 	            // limit reached - now assign a time - so after that time the attempts would be avaiable
 
 
