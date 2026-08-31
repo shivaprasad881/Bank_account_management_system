@@ -556,7 +556,7 @@ public class UserService {
 					
 					user.setAvailableAt(time);
 					
-					schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
+					//schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
 					resetAttemptsProducer.sendResetTask(user.getAccno()); 
 	        }
 	        userRepository.save(user);    
