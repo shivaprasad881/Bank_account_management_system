@@ -16,7 +16,7 @@ function resetpin(){
         const useremail = sessionStorage.getItem("email")
 
 
-                url = "http://localhost:8080/resetpin";
+                let url = `${API_BASE_URL}/resetpin`;
                 
                 let userdata = {
                     email : useremail,

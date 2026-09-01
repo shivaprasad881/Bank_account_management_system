@@ -3,7 +3,7 @@ const emp_token = sessionStorage.getItem("emp_token")
 console.log(emp_token)
 
 function fetchallnotifications() {
-        let url = "http://localhost:8080/fetchallnotifications?emp_token=" + emp_token;
+        let url = `${API_BASE_URL}/fetchallnotifications?emp_token=${emp_token}`;
 
            fetch(url)
         .then(response => response.json())

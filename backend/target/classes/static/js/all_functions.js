@@ -1,8 +1,7 @@
 
 function withdrawl(passed_token,passed_amount){
 
-        url = "http://localhost:8080/withdrawl";
-
+        let url = `${API_BASE_URL}/withdrawl`;
         let userdata = {
             token : passed_token,
             amount: passed_amount
@@ -46,7 +45,7 @@ function withdrawl(passed_token,passed_amount){
 
 function deposit(passed_token,passed_amount){
 
-     url = "http://localhost:8080/deposit" ;
+     let url = `${API_BASE_URL}/deposit` ;
 
         let userdata = {
             token: passed_token,
@@ -90,7 +89,7 @@ function deposit(passed_token,passed_amount){
 
 function transfer(target,target_type,tar_amt,token_passed){
 
-    let url = "http://localhost:8080/transfer";
+    let url = `${API_BASE_URL}/transfer`;
 
         let userdata2 = {
             token: token_passed,
@@ -144,7 +143,7 @@ function transfer(target,target_type,tar_amt,token_passed){
 
 function update_pin(token,newpin){
 
-                url = "http://localhost:8080/updatepin";
+                let url = `${API_BASE_URL}/updatepin`
                 
                 let userdata = {
                     token : token,
@@ -187,7 +186,7 @@ function update_pin(token,newpin){
 function check_balance(token){
 
 
-     url = "http://localhost:8080/check_balance?token=" + token;
+     let url = `${API_BASE_URL}/check_balance?token=${token}`;
 
         fetch(url, {
             method: 'get'
@@ -232,7 +231,7 @@ function register(){
     let email = sessionStorage.getItem('email');
     let password = sessionStorage.getItem('password');
 
-    let url = "http://localhost:8080/register";
+    let url = `${API_BASE_URL}/register`;
 
         let userData = {
             uname: uname, 
@@ -273,7 +272,7 @@ function register(){
 
 
 
-            url = "http://localhost:8080/send_email";
+             url = `${API_BASE_URL}/send_email`;
                         
             let sendingdata = {
                 email : email,

@@ -1,6 +1,6 @@
 function check_token_in_blacklist(tokenn){// boolean
 
-    let url = "http://localhost:8080/validate_user_token?token=" + tokenn;
+    let url = `${API_BASE_URL}/validate_user_token?token=${tokenn}`;
 
         return fetch(url, {
             method: 'GET'

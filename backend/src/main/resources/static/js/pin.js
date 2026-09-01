@@ -41,7 +41,7 @@ function check_pin(){
                     
                     // 2.pin validation
 
-                    let url = "http://localhost:8080/validate_pin?token=" + token_pin + "&userpin=" + userpin;
+                    let url = `${API_BASE_URL}/validate_pin?token=${token_pin}&userpin=${userpin}`;
 
                     //console.log("pin page ->  token: " + token_pin);
                     

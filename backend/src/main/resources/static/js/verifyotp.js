@@ -5,7 +5,7 @@ function verifyotp1(){
 
     let useremail = sessionStorage.getItem('email');
 
-    let url = "http://localhost:8080/verify_otp";
+    let url = `${API_BASE_URL}/verify_otp`;
 
         let userdata = {
             email : useremail,

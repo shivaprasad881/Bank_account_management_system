@@ -1,4 +1,3 @@
-
 const emp_token = sessionStorage.getItem("emp_token")
 
 console.log(emp_token)
@@ -7,7 +6,7 @@ console.log(emp_token)
 function insigts(){
     //first check whether the employee had enough role or not - if not enogh roel then reject the request
 
-    url = "http://localhost:8080/is_employee_manager?emp_token=" + emp_token
+    let url = `${API_BASE_URL}/is_employee_manager?emp_token=${emp_token}`
 
                 fetch(url, {
                     method: 'get'
@@ -45,7 +44,7 @@ function getusers(){
 function getemployees(){
     //only when manager clicks this then only allow him - for other employees restrict it
 
-    url = "http://localhost:8080/is_employee_manager?emp_token=" + emp_token
+    let url = `${API_BASE_URL}/is_employee_manager?emp_token=${emp_token}`
 
                 fetch(url, {
                     method: 'get'
@@ -74,7 +73,7 @@ function getemployees(){
 function gettransactions(){
     //first check whether the employee had enough role or not - if not enogh roel then reject the request
 
-    url = "http://localhost:8080/is_employee_manager?emp_token=" + emp_token
+    let url = `${API_BASE_URL}/is_employee_manager?emp_token=${emp_token}`
 
                 fetch(url, {
                     method: 'get'
@@ -106,7 +105,7 @@ function sendmsg(){
     window.location.href = "sendmsg.html"
 }
 function fetchnotifications() {
-    let url = "http://localhost:8080/fetchnewnotifications?emp_token=" + emp_token;
+    let url = `${API_BASE_URL}/fetchnewnotifications?emp_token=${emp_token}`;
 
     fetch(url)
     .then(response => response.json())
@@ -130,7 +129,7 @@ fetchnotifications()
 
 
 function markAsRead() {
-    let url = "http://localhost:8080/make_noti_read?emp_token=" + emp_token;
+    let url = `${API_BASE_URL}/make_noti_read?emp_token=${emp_token}`;
 
     fetch(url)
     .then(response => response.text())
@@ -146,21 +145,5 @@ function fetchallnoti(){
 }
 
 function tempend(){
-    // let url = "http://localhost:8080/temporary_endpoint_for_testing?emp_token=" + emp_token;
-
-    // fetch(url)
-    // .then(response => response.text())
-    // .then(data => {
-
-    //     if(data=="true"){
-    //         showToast("successfully executed that temporary endpoint !!");
-    //     }
-    //     else{
-    //         showToast("invalid token / expired token")
-    //     }
-        
-        
-    // })
-    // .catch(() => showToast("Error in using temporary endpoint"));
     showToast("no active tasks !!")
 }

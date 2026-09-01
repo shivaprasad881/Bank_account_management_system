@@ -20,7 +20,7 @@ function updatepass(){
 
         //1.now validate the old pass - if correct update else reject
 
-        url = "http://localhost:8080/update_password";
+        let url = `${API_BASE_URL}/update_password`;
                 
                 let userdata = {
                     token : token,

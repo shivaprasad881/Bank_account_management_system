@@ -9,7 +9,7 @@ function gettransdata(){
 
     //based on the emp role - render according user data
 
-    let url = "http://localhost:8080/transactions_data?emp_token=" + emp_token;
+    let url = `${API_BASE_URL}/transactions_data?emp_token=${emp_token}`;
 
     fetch(url, {
         method: 'GET'

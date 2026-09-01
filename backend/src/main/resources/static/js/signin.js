@@ -59,7 +59,7 @@ function user_signin() {
 
 function login2(empid,emppass){
 
-    url = "http://localhost:8080/validate_emp?empid=" + empid +"&password=" + emppass;
+    let url = `${API_BASE_URL}/validate_emp?empid=${empid}&password=${emppass}`;
 
                 fetch(url, {
                     method: 'get'
@@ -99,7 +99,7 @@ function login(identity,identity_type,userpass){
         //consider user entered valid accno
 
         // check if he had attempts left - then only validate the user - otherwise reject
-        let url = "http://localhost:8080/failure_authentication?identity=" + identity + "&identity_type=" + identity_type
+        let url = `${API_BASE_URL}/failure_authentication?identity=${identity}&identity_type=${identity_type}`
 
         fetch(url, {
             method: 'get'
@@ -114,7 +114,7 @@ function login(identity,identity_type,userpass){
             else{
                 //he had enough attempts - validate user - if failure - then increment the count
 
-                url = "http://localhost:8080/validate_user?identity=" + identity + "&identity_type=" + identity_type + "&password=" + userpass;
+                url = `${API_BASE_URL}/validate_user?identity=${identity}&identity_type=${identity_type}&password=${userpass}`;
 
                 fetch(url, {
                     method: 'get'
@@ -127,7 +127,7 @@ function login(identity,identity_type,userpass){
 
                         //hoo attempt failed - increment the count
 
-                        url = "http://localhost:8080/failure_authentication";
+                        url = `${API_BASE_URL}/failure_authentication`;
 
                         
                         let userdata = {
@@ -157,7 +157,7 @@ function login(identity,identity_type,userpass){
 
                         //reset the failure attempts to 0 - as user logged in 
 
-                        url = "http://localhost:8080/reset_failure_attempts";
+                        url = `${API_BASE_URL}/reset_failure_attempts`;
 
                         
                         let userdata = {

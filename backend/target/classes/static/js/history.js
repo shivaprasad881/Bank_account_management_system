@@ -1,4 +1,3 @@
-
 const token = sessionStorage.getItem("token")
 
 console.log("dashboard token is : ",token)
@@ -16,7 +15,7 @@ function fetch_transactions(){
     
         console.log("fetch_transactions called with size:", page_size, "page:", current_page);
 
-        let url = "http://localhost:8080/user_transactions?token=" + token  + "&size=" + page_size + "&page=" + current_page ;
+        let url = `${API_BASE_URL}/user_transactions?token=${token}&size=${page_size}&page=${current_page}`;
 
         fetch(url, {
             method: 'GET'

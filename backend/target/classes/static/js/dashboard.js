@@ -1,4 +1,3 @@
-
 const token = sessionStorage.getItem("token")
 
 console.log("dashboard token is : ",token)
@@ -20,7 +19,7 @@ function username(){
             if(is_valid){
                 // continue next operation - fetch the user name
                 
-                let url = "http://localhost:8080/user_name?token=" + token;
+                let url = `${API_BASE_URL}/user_name?token=${token}`;
 
                 fetch(url,{
                     method : 'get'
@@ -66,7 +65,7 @@ username()
 function useraccno(){
     return check_token_in_blacklist(token).then(is_valid => {
         if(is_valid){
-            let url = "http://localhost:8080/user_accno?token=" + token;
+            let url = `${API_BASE_URL}/user_accno?token=${token}`;
 
             return fetch(url, {
                 method: 'get'
@@ -109,7 +108,7 @@ function logout(){
             // continue next operation - he is valid user
            
 
-            let url = "http://localhost:8080/new_black_list_token" ;
+            let url = `${API_BASE_URL}/new_black_list_token`;
 
                 let userdata = {
                     token: token,
@@ -310,7 +309,7 @@ function transfer_dash() {
 function check_transfered_amt(){
     //now we would fetch the transfered amt in the last 24 hours by the user and display it
 
-    let url = "http://localhost:8080/check_transfered_amount?token=" + token;
+    let url = `${API_BASE_URL}/check_transfered_amount?token=${token}`;
 
     fetch(url,{
         method : 'get'
@@ -367,7 +366,7 @@ function temp(){
     
     useraccno().then(accno => {
         console.log(accno);
-        fetch('http://localhost:8080/generate', 
+        fetch(`${API_BASE_URL}/generate`, 
             {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

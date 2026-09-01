@@ -8,7 +8,7 @@ console.log(emp_token)
 
 
 function bank_balance(){
-    url = "http://localhost:8080/total_bank_balance"
+    let url = `${API_BASE_URL}/total_bank_balance`
 
                 fetch(url, {
                     method: 'get'
@@ -27,7 +27,7 @@ function bank_balance(){
 
 
 function bank_transactions(){
-    url = "http://localhost:8080/bank_transactions"
+    let url = `${API_BASE_URL}/bank_transactions`
 
                 fetch(url, {
                     method: 'get'
@@ -59,7 +59,7 @@ function bank_transactions(){
 
 
 function users_count_based_on_account_status(){
-    url = "http://localhost:8080/users_count_based_on_account_status"
+    let url = `${API_BASE_URL}/users_count_based_on_account_status`
 
                 fetch(url, {
                     method: 'get'
@@ -90,7 +90,7 @@ function users_count_based_on_account_status(){
 
 
 function newusers(){
-    url = "http://localhost:8080/new_users"
+    let url = `${API_BASE_URL}/new_users`
 
                 fetch(url, {
                     method: 'get'
@@ -113,7 +113,7 @@ function newusers(){
 function ismanager(){
     //first check whether the employee had enough role or not - if not enogh roel then reject the request
 
-    url = "http://localhost:8080/is_employee_manager?emp_token=" + emp_token
+    let url = `${API_BASE_URL}/is_employee_manager?emp_token=${emp_token}`
 
                 fetch(url, {
                     method: 'get'

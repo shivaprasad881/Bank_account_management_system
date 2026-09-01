@@ -27,7 +27,7 @@ function send_otp(){
         sessionStorage.setItem("email", useremail);
         //no verification - just send otp
 
-        let url = "http://localhost:8080/send_otp_no_verification";
+        let url = `${API_BASE_URL}/send_otp_no_verification`;
 
         let userdata = {
             email : useremail 
@@ -69,7 +69,7 @@ function send_otp(){
         //verify the existance of the email in the database - send otp
 
         
-        let url = "http://localhost:8080/verify_email_send_otp";
+        let url = `${API_BASE_URL}/verify_email_send_otp`;
 
         let userdata = {
             email : useremail
@@ -111,7 +111,7 @@ function send_otp(){
         //valid the user token - send otp
 
          
-        let url = "http://localhost:8080/verify_user_send_otp";
+        let url = `${API_BASE_URL}/verify_user_send_otp`;
 
         let userdata = {
             token:tokenn
@@ -168,7 +168,3 @@ function send_otp(){
     
 
 }
-
-
-
-

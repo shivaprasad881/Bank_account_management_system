@@ -16,7 +16,7 @@ function resetpassword(){
         const useremail = sessionStorage.getItem("email")
 
 
-                url = "http://localhost:8080/resetpassword";
+                let url = `${API_BASE_URL}/resetpassword`;
                 
                 let userdata = {
                     email : useremail,

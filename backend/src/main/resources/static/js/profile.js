@@ -4,7 +4,7 @@ console.log("dashboard token is : ",token)
 
 
 
-    url = "http://localhost:8080/user_details?token=" + token;
+    let url = `${API_BASE_URL}/user_details?token=${token}`;
 
     fetch(url, {
         method: 'GET'

@@ -7,7 +7,7 @@ function getusersdata(){
 
     //based on the emp role - render according user data
 
-    let url = "http://localhost:8080/users_data_based_on_emp_role?emp_token=" + emp_token;
+    let url = `${API_BASE_URL}/users_data_based_on_emp_role?emp_token=${emp_token}`;
 
     fetch(url, {
         method: 'GET'

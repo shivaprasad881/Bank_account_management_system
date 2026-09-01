@@ -9,7 +9,7 @@ function send(){
      if (type === 'employeeid') {
         let empid = document.getElementById('empid').value;
 
-        let url = "http://localhost:8080/send_msg?emp_token=" + emp_token + "&tar_empid=" + empid + "&msg=" + msg ;
+        let url = `${API_BASE_URL}/send_msg?emp_token=${emp_token}&tar_empid=${empid}&msg=${msg}`;
 
 
                 fetch(url, {
@@ -28,7 +28,7 @@ function send(){
     else {
        
         //send to specified category of employees
-        let url = "http://localhost:8080/boardcast_msg?emp_token=" + emp_token + "&tar_dept=" + type + "&msg=" + msg ;
+        let url = `${API_BASE_URL}/boardcast_msg?emp_token=${emp_token}&tar_dept=${type}&msg=${msg}`;
 
 
                 fetch(url, {
