@@ -2,10 +2,6 @@ const tokenn = sessionStorage.getItem("token")
 
 function send_otp(){
 
-    
-
-
-    
         let element = document.getElementById('useremail');
 
         let useremail;
@@ -13,16 +9,10 @@ function send_otp(){
         if (element!=null) {
             useremail = element.value;
         }
-       
-        
-    
-    
+
     let purpose = sessionStorage.getItem('purpose');
 
 
-
-
-    
     if(purpose=="registration"){
         sessionStorage.setItem("email", useremail);
         //no verification - just send otp
