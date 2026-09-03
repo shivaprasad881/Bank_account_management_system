@@ -55,6 +55,12 @@ public class User {
     @Column (name = "account_status")
     private String accountStatus;
 
+    @Column(name = "is_logged_in")
+    private Boolean isLoggedIn;
+
+    @Column(name = "current_token", length = 500)
+    private String currentToken;
+
     
     public User() {}
     
@@ -71,6 +77,8 @@ public class User {
         this.email = email;
         this.lastActiveAt = lastactiveat;
         this.joinDate = joindate;
+        this.isLoggedIn = false;
+        this.currentToken = null;
     }
     
     // Getters
@@ -91,6 +99,8 @@ public class User {
     public Timestamp getLastActiveAt() {return lastActiveAt;}
     public Date getJoinDate() {return joinDate;}
     public String getAccountStatus() { return accountStatus; }
+    public Boolean getIsLoggedIn() { return isLoggedIn; }
+    public String getCurrentToken() { return currentToken; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -109,4 +119,6 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public void setLastActiveAt(Timestamp lastActiveAt) {this.lastActiveAt = lastActiveAt;}
     public void setAccountStatus(String accountStatus) { this.accountStatus = accountStatus; }
+    public void setIsLoggedIn(Boolean isLoggedIn) { this.isLoggedIn = isLoggedIn; }
+    public void setCurrentToken(String currentToken) { this.currentToken = currentToken; }
 }

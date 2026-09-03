@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import java.sql.Timestamp;
+import java.io.IOException;
 import java.sql.Date;
 
 
@@ -143,7 +144,7 @@ public class UserService {
     public String validateuser(String identity, String identity_type, String password) {
 
         if(identity.length()==0 || identity_type.length()==0 ||  password.length()==0){
-            return "Please enter valid details !!";
+            return "invalid_input";
         }
         else{
 
@@ -163,7 +164,7 @@ public class UserService {
                 user = userRepository.findByAccno(identity);
             }
             else{
-                return "false";
+                return "invalid_input";
             }
 
             
@@ -171,7 +172,7 @@ public class UserService {
             
 
             if(user == null){
-                return "false";
+                return "invalid_credentails";
             }
             else{
                 //now the user is existing - check whether the user hashed password matches with the cur password
@@ -181,16 +182,36 @@ public class UserService {
                 if(util.PasswordUtil.verifyPassword(password,hashed_password)){
                     //hoo both matched - valid user
 
-					Timestamp cur_time = new Timestamp(System.currentTimeMillis());
-					//set the last active at time
-					user.setLastActiveAt(cur_time);
-					userRepository.save(user);
+					//now check for isloggedin
+					boolean isloggedin = user.getIsLoggedIn();
 
-                    return JwtUtil.generateToken(user.getAccno());
+					if(isloggedin==false){
+						//hoo the user not yet loggedin - let him by creating a new session
+						String token = JwtUtil.generateToken(user.getAccno());
+
+						//create a new session
+						user.setIsLoggedIn(true);
+						user.setCurrentToken(token);
+
+
+						Timestamp cur_time = new Timestamp(System.currentTimeMillis());
+						//set the last active at time
+						user.setLastActiveAt(cur_time);
+						userRepository.save(user);
+
+
+
+						return token;//let the user loggedin and access the services 
+					}
+					else{
+						//hoo the user already had an active session , restrict him by a msg
+						return "already_active_session_present";
+					}
+
                 }
                 else{
                     //hoo incorrect password - increment the invalid count
-                    return "false";
+                    return "invalid_credentails";
                 }
 
                 
@@ -582,6 +603,64 @@ public class UserService {
 	        
 	}
 
+	public String terminate_the_session(String identity, String identity_type) throws IOException {
+	        
+	        User user;
+
+	        if(identity_type.equals("phonenumber")){
+	            user = userRepository.findByPhonenumber(identity);
+	        }
+	        else{
+	            //accno
+	            user = userRepository.findByAccno(identity);
+	        }
+
+	        
+			//terminate the session - add the token to blacklist
+
+			String last_active_token = user.getCurrentToken();
+
+					ObjectMapper mapper = new ObjectMapper();
+	                String old_black_list_string = user.getInvalidJwtTokens();
+
+	                List<String> new_tokenList = JwtUtil.tokenCleanUp(old_black_list_string);
+	                new_tokenList.add(last_active_token);
+
+
+	                String updated_black_list_string = mapper.writeValueAsString(new_tokenList);
+
+	                user.setLogoutCount( new_tokenList.size() );
+	                user.setInvalidJwtTokens(updated_black_list_string);
+
+				
+
+					
+
+
+			//refresh the session activity
+
+					
+            		user.setCurrentToken(null);
+					user.setIsLoggedIn(false);
+
+
+			//create new session
+
+			String new_token = JwtUtil.generateToken(user.getAccno());
+
+					
+            		user.setCurrentToken(new_token);
+					user.setIsLoggedIn(true);
+
+
+	        userRepository.save(user);
+
+
+			return new_token;
+
+	        
+	}
+
 
 	public ResponseEntity<?> transfer(String token, String target, String target_type, Double amt) {
 
@@ -844,6 +923,12 @@ public class UserService {
 	            }
 	            else{//proceed
 
+					//hoo he is a valid user and trying to logout , let him logout
+
+					//terminate the session : restrict the token : add the token to the blacklist
+
+					//refresh : no active sessions : user can create new sessions 
+
 	                ObjectMapper mapper = new ObjectMapper();
 	                String old_black_list_string = user.getInvalidJwtTokens();
 
@@ -855,6 +940,17 @@ public class UserService {
 
 	                user.setLogoutCount( new_tokenList.size() );
 	                user.setInvalidJwtTokens(updated_black_list_string);
+
+					//we are done terminating the session by restricting the token by adding it to the blacklist
+
+					//now refresh the sessions :   create the new sessions in the future
+
+					user.setIsLoggedIn(false);
+            		user.setCurrentToken(null);
+
+					//we are done with the refreshment
+
+
 	                userRepository.save(user);
 
 	                // finally we got the current list - added the cur token - update the list - changes done on database - token got added to the list

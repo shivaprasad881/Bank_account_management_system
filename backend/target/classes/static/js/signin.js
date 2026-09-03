@@ -1,16 +1,19 @@
+let identity;
+let identity_type;
+
 function user_signin() {
 
     let usertype = document.getElementById("usertype").value;
 
     if(usertype=="customer"){
 
-        let identity = document.getElementById("user_identity").value;
+        identity = document.getElementById("user_identity").value;
         let userpass = document.getElementById("password").value;
 
         identity = identity.trim();
         userpass = userpass.trim();
 
-        let identity_type;
+        
         
         if(identity == "" || userpass == "") {
             showToast("please fill the details");
@@ -121,7 +124,11 @@ function login(identity,identity_type,userpass){
                 })
                 .then(response => response.text())
                 .then(data => {
-                    if(data == "false") {
+
+                    if(data == "invalid_input"){
+                        showToast("Please enter valid input !!");
+                    }
+                    else if(data == "invalid_credentails") {
 
                         showToast("Invalid credentials !!");
 
@@ -150,8 +157,23 @@ function login(identity,identity_type,userpass){
 
 
                         
-                    } else {
+                    }
+                    else if(data == "already_active_session_present"){
+                        //showToast("You already have an active session !!");
+                        //true -> a live session is already present 
+                        //take the user response
+                        // 'A live session is already present , do u want to terminate it' : yes/no
                         
+                        //no  -> nothing has happened , user himself thought to find the active session , just stay in this login page
+
+                        //yes -> user dont bother about the prev pages , terminate them , create the new session for the user 
+
+                        showModal("A live session is already present , do you want to continue : ")
+
+
+                    }
+                     else {
+                        //legitimate user with no active sessions 
                     
                         showToast("successful login !!",1500);
 
@@ -205,4 +227,67 @@ function login(identity,identity_type,userpass){
             showToast("Error in Fetching the failure count !!");
         });
 
+}
+
+function handleResponse(choice) {
+    hideModal();
+    
+    if (choice === "yes") {
+       
+        showToast("user dont bother about the active session ,we need to handle it !!");
+
+
+        let currurl = `${API_BASE_URL}/terminate_the_session`;
+
+
+        let currdata = {
+                            identity : identity,
+                            identity_type : identity_type
+                        };
+
+        //terminate_the_session and refresh_the_activity and create_new_session 
+        fetch(currurl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currdata)
+        })
+
+
+        .then(response => response.text())
+
+        .then(data =>{
+
+            //terminated -> refreshed -> new session -> land on dashboard
+            
+
+            showToast("terminated -> refresh -> new session");
+
+            setTimeout(() => {
+                                sessionStorage.setItem("token", data);
+                                
+                                window.location.href = "dashboard.html"
+                        }, 1500);
+
+
+        })
+
+        .catch(error => console.log(error));
+
+        
+        
+    } else {
+        
+        showToast("user himself thought to find the active session !!");
+        
+    }
+}
+function showModal(message) {
+    document.getElementById("modalMessage").innerHTML = message;
+    document.getElementById("responseModal").style.display = "flex";
+}
+
+function hideModal() {
+    document.getElementById("responseModal").style.display = "none";
 }

@@ -35,7 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.http.MediaType;
 
-
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collection;
 
@@ -644,6 +644,15 @@ public class UserController {
 	    String identity_type = (String) jsonBody.get("identity_type");
 
 	    userService.reset_failure_attempts(identity, identity_type);
+	}
+
+
+	@PatchMapping("/terminate_the_session")
+	public String terminate_the_session(@RequestBody Map<String, Object> jsonBody) throws IOException {
+	    String identity = (String) jsonBody.get("identity");
+	    String identity_type = (String) jsonBody.get("identity_type");
+
+	    return userService.terminate_the_session(identity, identity_type);
 	}
 
 
