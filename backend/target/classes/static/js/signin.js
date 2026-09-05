@@ -259,18 +259,24 @@ function handleResponse(choice) {
 
         .then(data =>{
 
-            //terminated -> refreshed -> new session -> land on dashboard
+            if(data=="not_found"){
+                showToast("user not found !!")
+            }
+            else{
+
             
+                //terminated -> refreshed -> new session -> land on dashboard
+                
 
-            showToast("terminated -> refresh -> new session");
+                showToast("terminated -> refresh -> new session");
 
-            setTimeout(() => {
-                                sessionStorage.setItem("token", data);
-                                
-                                window.location.href = "dashboard.html"
-                        }, 1500);
+                setTimeout(() => {
+                                    sessionStorage.setItem("token", data);
+                                    
+                                    window.location.href = "dashboard.html"
+                            }, 1500);
 
-
+            }
         })
 
         .catch(error => console.log(error));

@@ -72,11 +72,13 @@ public class User {
         this.password = password;
         this.balance = 0.00;
         this.failureAttempts = 0;
+        this.availableAt = null;
         this.invalidJwtTokens = "[]";
         this.logoutCount = 0;
         this.email = email;
         this.lastActiveAt = lastactiveat;
         this.joinDate = joindate;
+        this.accountStatus = "active";
         this.isLoggedIn = false;
         this.currentToken = null;
     }

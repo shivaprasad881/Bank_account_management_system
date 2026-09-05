@@ -23,7 +23,7 @@ import java.io.IOException;
 public class JwtUtil {
 
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor("bankingsecretkey12345678901234567890".getBytes());
-    private static final long EXPIRY_TIME = 3600000; // 1 hour
+    private static final long EXPIRY_TIME = 3600000; // 1 hour (60 * 60 * 1000)
 
     // generate token
     public static String generateToken(String identity) {

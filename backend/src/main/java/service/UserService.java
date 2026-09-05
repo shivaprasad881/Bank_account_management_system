@@ -127,6 +127,23 @@ public class UserService {
 
                 long sec = diff.toSeconds();
 
+				if(sec<0){
+							//hoo the users wait time got ended and he is still waiting , may be the schedular is failed to reset the attempts 
+
+							//so always its always our task to handlethis , we woudl handle manually so it would not affect the user experience 
+
+							user.setFailureAttempts(0);
+	                        user.setAvailableAt(null);
+
+	                        userRepository.save(user);
+
+							//respond the user that he now can try attempting 
+
+							return  "now you can try attempting !!";
+							
+
+					}
+
                 
                 return "Please try after "+sec+" seconds !!";
                 
@@ -187,11 +204,11 @@ public class UserService {
 
 					if(isloggedin==false){
 						//hoo the user not yet loggedin - let him by creating a new session
-						String token = JwtUtil.generateToken(user.getAccno());
+						String new_token = JwtUtil.generateToken(user.getAccno());
 
 						//create a new session
 						user.setIsLoggedIn(true);
-						user.setCurrentToken(token);
+						user.setCurrentToken(new_token);
 
 
 						Timestamp cur_time = new Timestamp(System.currentTimeMillis());
@@ -200,8 +217,18 @@ public class UserService {
 						userRepository.save(user);
 
 
+						//refresh the user activity after token expiry so that the user can create the new session 
+						LocalTime time = LocalTime.now().plusSeconds(120);//after 30 seconds the token gets expired , so it would refresh the activity - user can login again 
 
-						return token;//let the user loggedin and access the services 
+						String[] userdata = new String[2];
+
+						userdata[0] = user.getAccno();
+						userdata[1] = new_token;
+
+						schedulerService.scheduleTaskAt(time,"refresh_the_user_session_activity",userdata);
+
+
+						return new_token;//let the user loggedin and access the services 
 					}
 					else{
 						//hoo the user already had an active session , restrict him by a msg
@@ -445,10 +472,16 @@ public class UserService {
 
 								LocalTime time = LocalTime.now().plusSeconds(45);
 	                           
+								String[] userdata = new String[1];
+								userdata[0] = user.getAccno();
 
 	                            user.setAvailableAt( time );
-								schedulerService.scheduleTaskAt(time,user.getAccno());
+								
+								schedulerService.scheduleTaskAt(time,"reset_user_login_attempts",userdata);
 	                        }
+
+
+							//user had some more trys left ,let him try
 
 	                        userRepository.save(user);
 	                        return ResponseEntity.ok("Invalid Credentials !!");
@@ -461,6 +494,26 @@ public class UserService {
 
 	                    long sec = diff.toSeconds();
 
+						//hoo the user already hitted teh max try limit - check his time left to refresh trhem so that he can retyr attempting 
+
+						if(sec<0){
+							//hoo the users wait time got ended and he is still waiting , may be the schedular is failed to reset the attempts 
+
+							//so always its always our task to handlethis , we woudl handle manually so it would not affect the user experience 
+
+							user.setFailureAttempts(0);
+	                        user.setAvailableAt(null);
+
+	                        userRepository.save(user);
+
+							//respond the user that he now can try attempting 
+
+							return  ResponseEntity.ok("now you can try attempting !!");
+							
+
+						}
+						
+						//hoo the user had some time left to wait , he need to wait for a whiel before refresh  , lets tell the user how much more time he shoudl wait to try attempting so that it would get some idea abou tit 
 	                    
 	                    return  ResponseEntity.ok("Please try after "+sec+" seconds !!");
 
@@ -566,6 +619,8 @@ public class UserService {
 	            //accno
 	            user = userRepository.findByAccno(identity);
 	        }
+			if(user == null) return; // ← add this before incrementing
+
 	        user.setFailureAttempts( user.getFailureAttempts() + 1    );
 
 	        if(user.getFailureAttempts() == 3){
@@ -576,11 +631,22 @@ public class UserService {
 
 					
 					user.setAvailableAt(time);
+					userRepository.save(user);
+
+
+								String[] userdata = new String[1];
+								userdata[0] = user.getAccno();
+
+								schedulerService.scheduleTaskAt(time,"reset_user_login_attempts",userdata);
 					
 					//schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
-					resetAttemptsProducer.sendResetTask(user.getAccno()); 
+					//System.out.println("aaaaaa : adding the attemt-reset-task to rabbit");
+					//resetAttemptsProducer.sendResetTask(user.getAccno()); 
 	        }
-	        userRepository.save(user);    
+			else{
+				userRepository.save(user);
+			}
+	            
 	}
 
 
@@ -595,6 +661,11 @@ public class UserService {
 	            //accno
 	            user = userRepository.findByAccno(identity);
 	        }
+
+
+			if(user == null){
+				return;
+			}
 
 	        user.setFailureAttempts( 0 );
 	        user.setAvailableAt( null);
@@ -614,6 +685,11 @@ public class UserService {
 	            //accno
 	            user = userRepository.findByAccno(identity);
 	        }
+
+
+			if(user == null){
+				return "not_found";
+			}
 
 	        
 			//terminate the session - add the token to blacklist
@@ -651,6 +727,18 @@ public class UserService {
 					
             		user.setCurrentToken(new_token);
 					user.setIsLoggedIn(true);
+
+
+			//refresh the user activity - after token expiry - so that user can create new session
+
+						LocalTime time = LocalTime.now().plusSeconds(120);//after 30 seconds the token gets expired , so it would refresh the activity - user can login again 
+
+						String[] userdata = new String[2];
+
+						userdata[0] = user.getAccno();
+						userdata[1] = new_token;
+
+						schedulerService.scheduleTaskAt(time,"refresh_the_user_session_activity",userdata);
 
 
 	        userRepository.save(user);
@@ -1141,3 +1229,6 @@ public class UserService {
     }
 
 }
+
+
+//schedulerService.scheduleTaskAt(time,"reset_user_login_attempts",userdata);
