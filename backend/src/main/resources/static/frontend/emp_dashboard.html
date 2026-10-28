@@ -91,7 +91,34 @@
             padding: 8px 0;
             border-bottom: 1px solid #e2e8f0;
         }
-    </style> 
+
+        /* Response Box */
+        .response-box {
+            background: #fffaf5;
+            border: 1px solid #f97316;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        .response-header {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ea580c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #fed7aa;
+            padding-bottom: 6px;
+        }
+        .response-content {
+            color: #1e293b;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
     <div class="container-custom">
@@ -109,6 +136,14 @@
             </div>
         </div>
 
+        <!-- Text Response Box -->
+        <div class="response-box">
+            <div class="response-header">Response</div>
+            <div class="response-content" id="responseText">
+                Waiting for response...
+            </div>
+        </div>
+
         <div class="button-container">
             <button class="action-btn" onclick="fetchallnoti()">Notifications</button>
             <button class="action-btn" onclick="insigts()">Insights</button>
@@ -116,7 +151,9 @@
             <button class="action-btn" onclick="gettransactions()">Transactions</button>
             <button class="action-btn" onclick="getemployees()">Employees</button>
             <button class="action-btn" onclick="sendmsg()">Send Msg</button>
-            <button class="action-btn" onclick="tempend()">temp endpoint</button>
+            <label for="message">Message</label>
+            <textarea id="message" rows="4" placeholder="Type your message here..."></textarea>
+            <button class="action-btn" onclick="tempend()">send request</button>
         </div>
     </div>
     <script src="../js/config.js"></script>

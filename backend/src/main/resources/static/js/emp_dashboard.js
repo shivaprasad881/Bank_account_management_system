@@ -144,6 +144,30 @@ function fetchallnoti(){
      window.location.href = "emp_notifications.html"
 }
 
-function tempend(){
-    showToast("no active tasks !!")
+
+async function tempend() {
+  // Show loading
+  document.getElementById("responseText").innerText = "Loading...";
+
+  let user_requested_text = document.getElementById("message").value;
+
+  let userdata = {
+    empid: "EMP005",
+    user_requested_text: "Cancel my leave request"
+  };
+
+  try {
+    const res = await fetch("http://localhost:8000/send_user_request_to_backend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userdata)
+    });
+
+    const data = await res.json();
+
+    // ✅ Assign response to the box
+    document.getElementById("responseText").innerText = data.answer;
+  } catch (error) {
+    document.getElementById("responseText").innerText = "Error: " + error.message;
+  }
 }

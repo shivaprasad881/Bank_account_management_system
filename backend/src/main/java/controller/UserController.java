@@ -733,71 +733,52 @@ public class UserController {
 
 
 	@PatchMapping("/send_otp_no_verification")
-        public  String send_otp_no_verification(@RequestBody Map<String, Object> jsonBody) {
-            String useremail = (String) jsonBody.get("email");
-            
+	public String send_otp_no_verification(@RequestBody Map<String, Object> jsonBody) {
+		String useremail = (String) jsonBody.get("email");
 
-            emailUtil.sendotpp(useremail);
-
-			return "true";
-
-        }
-
-    //end of endpoints
+		return emailUtil.sendotpp(useremail) ? "true" : "false";
+	}
 
 	@PatchMapping("/verify_email_send_otp")
 	public String verifyEmailAndSendOtp(@RequestBody Map<String, Object> jsonBody) {
 		String useremail = (String) jsonBody.get("email");
 
-		// Check if user exists with that email
 		User user = userRepository.findByEmail(useremail);
 
 		if (user == null) {
 			return "false";
 		}
 		else{
-			emailUtil.sendotpp(useremail);
-			return"true";
+			return emailUtil.sendotpp(useremail) ? "true" : "false";
 		}
-
-		// Send OTP
-		
 	}
 
-
-	
-	
 	@PatchMapping("/verify_user_send_otp")
 	public ResponseEntity<?> verify_user_send_otp(@RequestBody Map<String, Object> jsonBody) {
-    	String token = (String) jsonBody.get("token");
-    // ...
+		String token = (String) jsonBody.get("token");
 
+		try{
+			String accno_jwt = JwtUtil.validateToken(token);
+			User user = userRepository.findByAccno(accno_jwt);
 
-	    try{
-	        String accno_jwt = JwtUtil.validateToken(token);
-	        User user = userRepository.findByAccno(accno_jwt);
+			String black_list_string = user.getInvalidJwtTokens();
 
-	        String black_list_string = user.getInvalidJwtTokens();
+			boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
 
-	        boolean is_token_in_blacklist = JwtUtil.isTokenInBlacklist(black_list_string,token);
+			if(is_token_in_blacklist){
+				return ResponseEntity.status(401).body("Unauthorized request !!");
+			}
+			else{
+				if(emailUtil.sendotpp(user.getEmail())){
+					return ResponseEntity.ok(user.getEmail()+"");
+				}
+				return ResponseEntity.status(500).body("Unable to send OTP !!");
+			}
 
-	        //hoo the token is not in the blacklist - its completely valid token - return the user blance
-	        if(is_token_in_blacklist){//reject
-	            return ResponseEntity.status(401).body("Unauthorized request !!");
-	        }
-	        else{
-	            
-				emailUtil.sendotpp(user.getEmail());
-	            return ResponseEntity.ok(user.getEmail()+"");
-	        }
-
-	    }
-	    catch(Exception e){
-
-	        return ResponseEntity.status(401).body("Invalid token !!");
-
-	    }
-
+		}
+		catch(Exception e){
+			return ResponseEntity.status(401).body("Invalid token !!");
+		}
 	}
 
 	@PatchMapping("/verify_otp")

@@ -1,6 +1,6 @@
 const tokenn = sessionStorage.getItem("token")
 
-function send_otp(){
+function send_otp(){ 
 
         let element = document.getElementById('useremail');
 
@@ -114,23 +114,26 @@ function send_otp(){
             },
             body: JSON.stringify(userdata)
         })
-
+        
         .then(response => {
-            if (response.status == 200) {
-                return response.text();
-            } else {
-                throw new Error("Unauthorized");
-            }
-        }) 
+            return response.text().then(text => {
+                if (response.status == 200) {
+                    return text;
+                } else {
+                    showToast(text);
+                    throw new Error("handled");
+                }
+            });
+        })
 
         .then(data => {
-            
+
             sessionStorage.setItem("email", data);
 
-             // ✅ Replace spinner with checkmark
+            // ✅ Replace spinner with checkmark
             document.getElementById('spinner').style.display = 'none';
             document.getElementById('checkmark').style.display = 'block';
-            
+
             // ✅ Replace text
             document.getElementById('loaderMessage').innerText = "OTP sent successfully !!";
 
@@ -138,14 +141,12 @@ function send_otp(){
                 document.getElementById('loader').style.display = 'none';
                 window.location.href = "verifyotp.html";
             }, 1500);
-            
-           
+
         })
 
         .catch(error => {
-            
             console.log(error.message);
-            showToast("Unauthorized request !!");
+            document.getElementById('loader').style.display = 'none';
         });
         
 

@@ -844,7 +844,7 @@ public class UserService {
 	                                    transactionRepository.save(trans1);
 	                                    transactionRepository.save(trans2);
 
-	                                    emailUtil.sendEmail(acc_user.getEmail(),"Transfer","Rupees "+amt+" debited from XXXXXXX"+accno_jwt.substring(7,11)+" at "+LocalDateTime.now().toString().substring(0,16).replace("T"," "));
+	                                    //emailUtil.sendEmail(acc_user.getEmail(),"Transfer","Rupees "+amt+" debited from XXXXXXX"+accno_jwt.substring(7,11)+" at "+LocalDateTime.now().toString().substring(0,16).replace("T"," "));
 
 
 	                                    return ResponseEntity.ok("Transaction successfull !!");
@@ -917,7 +917,7 @@ public class UserService {
 	                    userRepository.save(user);
 
 	                    //now also send mail to the user - as it done rare - we need to indicate the user
-	                    emailUtil.sendEmail(user.getEmail(),"PIN UPDATION","Pin updated successfully !!");
+	                    //emailUtil.sendEmail(user.getEmail(),"PIN UPDATION","Pin updated successfully !!");
 
 	                    return ResponseEntity.ok("Pin updated succesfully !!");
 	                }

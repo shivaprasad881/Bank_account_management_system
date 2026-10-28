@@ -4,11 +4,17 @@ import java.time.LocalTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import model.Email;
+import com.sendgrid.SendGrid;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.Method;
+import com.sendgrid.helpers.mail.Mail;
+
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 import repository.EmailRepository;
 
 
@@ -16,61 +22,64 @@ import repository.EmailRepository;
 public class EmailUtil {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailRepository emailRepository;
 
-    @Autowired
-    private EmailRepository emailRepository; 
+    @Value("${sendgrid.api.key}")
+    private String sendGridApiKey;
 
-   
+    @Value("${sendgrid.from.email}")
+    private String fromEmail;
 
-    @Value("${spring.mail.username}")
-    private String fromEmail;   // pulled automatically from properties!
+    public boolean sendEmail(String toEmail, String subject, String msg) {
 
-    public void sendEmail(String toEmail,String subject, String msg) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject(subject);
-        message.setText(msg);
-        mailSender.send(message);
+        try {
+            Mail mail = new Mail(
+                new Email(fromEmail),
+                subject,
+                new Email(toEmail),
+                new Content("text/plain", msg)
+            );
+
+            SendGrid sg = new SendGrid(sendGridApiKey);
+            Request request = new Request();
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+
+            Response response = sg.api(request);
+            System.out.println("SendGrid status: " + response.getStatusCode());
+
+            if (response.getStatusCode() != 202) {
+                System.out.println("SendGrid error body: " + response.getBody());
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e) {
+            System.out.println("Email error: " + e.getMessage());
+            return false;
+        }
     }
 
-    public void sendotpp(String email){
-
-        //generate otp - store it - send it
+    public boolean sendotpp(String email) {
 
         String generated_otp = 1000 + (int)(Math.random() * 9000) + "";
 
-        Email curr_user = emailRepository.findByEmail(email);
+        model.Email curr_user = emailRepository.findByEmail(email);
 
-
-        if(curr_user==null){
-            //fresh user
-
-            //create the user
-            Email new_user = new Email(email, generated_otp, LocalTime.now().plusSeconds(50));
-
-            
+        if(curr_user == null){
+            model.Email new_user = new model.Email(email, generated_otp, LocalTime.now().plusSeconds(50));
             emailRepository.save(new_user);
-
         }
         else{
-            //already present - update the details
-
             curr_user.setOtp(generated_otp);
-            curr_user.setExpireAt( LocalTime.now().plusSeconds(50) );
-
+            curr_user.setExpireAt(LocalTime.now().plusSeconds(50));
             emailRepository.save(curr_user);
         }
 
-
-
-
-
-
-        String message = "Your OTP is : "+ generated_otp+"\n\nPlease dont share the OTP !!";
+        String message = "Your OTP is : " + generated_otp + "\n\nPlease dont share the OTP !!";
         String subject = "Your OTP for Password-Reset";
 
-        sendEmail(email,subject,message);
+        return sendEmail(email, subject, message);
     }
 }
