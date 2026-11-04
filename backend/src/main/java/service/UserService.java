@@ -297,7 +297,7 @@ public class UserService {
 	            return ResponseEntity.status(401).body("Unauthorized request !!");
 	        }
 	        else{//proceed
-	            String data =  user.getAccno() +  ","   +  user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber() ;
+	            String data =  user.getAccno() +  ","   +  user.getUname() + "," + user.getAge() + "," + user.getCity()  + "," +  user.getPhonenumber()   + "," +  user.getImageUrl();
 
 	            return ResponseEntity.ok(data);
 	        }

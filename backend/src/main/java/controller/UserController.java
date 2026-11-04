@@ -1,6 +1,9 @@
 package controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+
 
 import com.example.demo.EmailUtil;
 import com.example.demo.JwtUtil;
@@ -39,6 +42,13 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collection;
 
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import java.io.IOException;
+import java.util.Map;
+
+
 @RestController
 public class UserController {
 
@@ -61,6 +71,9 @@ public class UserController {
 
 	@Autowired
     private EmailUtil emailUtil;
+
+	@Autowired
+	private Cloudinary cloudinary;
 
 	@Autowired
     private QRCodeService qrCodeService;
@@ -102,6 +115,50 @@ public class UserController {
     } 
 
 
+
+
+	@PostMapping("/upload_image")
+	public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image,@RequestParam String token) {
+
+		try {
+			//validate the user
+			String accno = JwtUtil.validateToken(token);
+			User user = userRepository.findByAccno(accno);
+
+			//upload the image
+			
+			Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
+
+			//get the url
+
+			System.out.println("**********************************");
+			System.out.println();
+
+			System.out.println(uploadResult);
+
+			System.out.println();
+
+			String image_public_url = (String) uploadResult.get("secure_url");
+
+			//store the url mapped to user record
+
+			user.setImageUrl(image_public_url);
+
+			userRepository.save(user);
+
+			//now send the response to the user that the image is succssfully uploaded 
+
+
+
+
+			return ResponseEntity.ok("Image uploaded successfully");
+		} 
+
+		catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+
+	}
 
     @GetMapping("/failure_authentication")
     public String failure_attempts(@RequestParam String identity, @RequestParam String identity_type) {

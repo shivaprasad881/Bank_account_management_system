@@ -426,3 +426,4 @@ function stopScanner() {
         document.getElementById('scanner-overlay').style.display = 'none';
     }
 }
+

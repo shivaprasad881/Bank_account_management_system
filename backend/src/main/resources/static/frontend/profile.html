@@ -5,6 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Page</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .profile-photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 0 25px 0;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .profile-photo-section img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .upload-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .upload-controls input[type="file"] {
+            font-size: 0.85rem;
+        }
+        .upload-controls button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .upload-controls button:hover {
+            background: #ea580c;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,6 +53,16 @@
             <h2>User Profile</h2>
         </div>
         <div class="fields-container">
+
+            <div class="profile-photo-section">
+                <img src="" alt="user_photo" id="rendering_user_photo">
+
+                <div class="upload-controls">
+                    <input type="file" id="uploaded_image" accept="image/*">
+                    <button onclick="upload_image()">update photo</button>
+                </div>
+            </div>
+
             <div class="field">
                 <label>Username</label>
                 <div class="value" id="uname"></div>
