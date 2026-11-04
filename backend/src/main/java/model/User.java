@@ -64,6 +64,9 @@ public class User {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+    @Column(name = "public_id", length = 255)
+    private String publicId;
+
     
     public User() {}
     
@@ -107,6 +110,7 @@ public class User {
     public Boolean getIsLoggedIn() { return isLoggedIn; }
     public String getCurrentToken() { return currentToken; }
     public String getImageUrl() { return imageUrl; }
+    public String getPublicId() { return publicId; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -128,4 +132,5 @@ public class User {
     public void setIsLoggedIn(Boolean isLoggedIn) { this.isLoggedIn = isLoggedIn; }
     public void setCurrentToken(String currentToken) { this.currentToken = currentToken; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setPublicId(String publicId) { this.publicId = publicId; }
 }

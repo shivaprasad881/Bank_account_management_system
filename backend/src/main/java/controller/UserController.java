@@ -129,26 +129,40 @@ public class UserController {
 			
 			Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
 
-			//get the url
+			
 
-			System.out.println("**********************************");
-			System.out.println();
+			// keep prev , update new , delete prev
 
-			System.out.println(uploadResult);
+			String prev_image_public_url = user.getImageUrl();
+			String prev_image_public_id = user.getPublicId();
 
-			System.out.println();
+
 
 			String image_public_url = (String) uploadResult.get("secure_url");
+			String image_public_id = (String) uploadResult.get("public_id");
+
+
 
 			//store the url mapped to user record
 
 			user.setImageUrl(image_public_url);
-
+			user.setPublicId(image_public_id);
 			userRepository.save(user);
 
+
+			if(prev_image_public_url != null){
+				//hoo we had something to store and delete further
+				
+				cloudinary.uploader().destroy(prev_image_public_id, ObjectUtils.emptyMap());
+			}
+			//hoo no prev url it is null , so we dont need to delete anything here , just create the new one and add it - by deleting the null value we would get nothing - so simply check anything we had to deleted really if not just leave dit but make sure that we ar estoring the publicid and ulr of the nw eimage because indpenedint of when it is being addded we need thoses detals to access it and delete t further 
+
+
+			
+
+
+
 			//now send the response to the user that the image is succssfully uploaded 
-
-
 
 
 			return ResponseEntity.ok("Image uploaded successfully");
