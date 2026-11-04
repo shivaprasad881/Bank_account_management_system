@@ -158,9 +158,6 @@ public class UserController {
 			//hoo no prev url it is null , so we dont need to delete anything here , just create the new one and add it - by deleting the null value we would get nothing - so simply check anything we had to deleted really if not just leave dit but make sure that we ar estoring the publicid and ulr of the nw eimage because indpenedint of when it is being addded we need thoses detals to access it and delete t further 
 
 
-			
-
-
 
 			//now send the response to the user that the image is succssfully uploaded 
 
@@ -684,20 +681,6 @@ public class UserController {
 	public ResponseEntity<?>  check_transfered_amount(@RequestParam String token) {
 	    return userService.check_transfered_amount(token);
 	}
-
-
-	// @PatchMapping("/send_email")
-	// public ResponseEntity<?> send_email(@RequestBody Map<String, Object> jsonBody) {
-	//     String email = (String) jsonBody.get("email");
-	//     String subject = (String) jsonBody.get("subject");
-	//     String message = (String) jsonBody.get("message");
-	//     // String verifyemail = (String) jsonBody.get("verifyemail");
-
-	//     return userService.send_email(email, subject, message);
-	// }
-
-
-
 
 
 	@PatchMapping("/failure_authentication")
