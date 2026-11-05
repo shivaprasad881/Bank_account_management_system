@@ -171,6 +171,48 @@ public class UserController {
 
 	}
 
+	@GetMapping("/fetch_the_target_account_user_name")
+	public ResponseEntity<?> fetch_the_target_account_user_name(@RequestParam String token, @RequestParam String target, @RequestParam String target_type) {
+		try {
+			JwtUtil.validateToken(token);
+
+			User user = null;
+			if (target_type.equals("account")) {
+				user = userRepository.findByAccno(target);
+			} else if (target_type.equals("phonenumber")) {
+				user = userRepository.findByPhonenumber(target);
+			}
+
+			if (user == null) {
+				return ResponseEntity.status(404).body("User not found");
+			}
+
+			return ResponseEntity.ok(user.getUname());
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+
+	@GetMapping("/check_the_existance_of_identity")
+	public ResponseEntity<?> checkTheExistenceOfIdentity(@RequestParam String target, @RequestParam String target_type, @RequestParam String token) {
+		try {
+			JwtUtil.validateToken(token);
+			User user = null;
+			if (target_type.equals("account")) {
+				user = userRepository.findByAccno(target);
+			} else if (target_type.equals("phonenumber")) {
+				user = userRepository.findByPhonenumber(target);
+			} else {
+				return ResponseEntity.ok("false");
+			}
+			return ResponseEntity.ok(user != null ? "true" : "false");
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
     @GetMapping("/failure_authentication")
     public String failure_attempts(@RequestParam String identity, @RequestParam String identity_type) {
 

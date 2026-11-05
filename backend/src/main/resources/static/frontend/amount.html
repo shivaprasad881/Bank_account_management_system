@@ -12,12 +12,17 @@
             <h1>Money Transfer</h1>
         </div>
         <div class="content">
+
+            <div class="input-group" id="targetGroup" style="display: none; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px;">
+                <label style="margin-bottom: 0;">To whom : </label>
+                <span id="targetName" style="font-weight: 600; color: #f97316;"></span>
+            </div>
             
             <div class="input-group">
                 <label>Enter amount : </label>
                 <input type="number" id="useramount" placeholder="1000/-">
             </div>
-            <button onclick="amount()">proceed</button>
+            <button onclick="proceed()">proceed</button>
             
 
         </div>

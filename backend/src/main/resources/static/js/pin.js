@@ -89,9 +89,15 @@ function check_pin(){
                             
                             else if(action=="transfer"){
 
-                                const amt = sessionStorage.getItem("amount")
+                                
                                 const target = sessionStorage.getItem("target")
                                 const target_type = sessionStorage.getItem("target_type")
+                                const amt = sessionStorage.getItem("amount")
+
+                                
+
+
+                                //now show this information 
 
                                
                                 transfer(target,target_type,amt,token_pin)
@@ -132,5 +138,26 @@ function check_pin(){
 
 }
 
+
+if(action=="transfer"){
+    //hoo as the action is to transfer and pin is the final page for transfer - show complete dtails tothe user for ocnfimation 
+
+    // the requried dtaisl are aleready present in the fronted , the req dtails ar ethe tasrger user name and the amont , w eknow thawt we already fetched the targer username in theam0utn pag eto show and we store it and also the we stored the amotn which we entered in the amoutn page , now we had the user anea amoutn to show
+
+     show_transfer_details();
+}
+
+
+function show_transfer_details(){
+    //the details to show are the user name and the amount , show both of them 
+
+    const target_username = sessionStorage.getItem("target_username")
+    const amount = sessionStorage.getItem("amount")
+
+    document.getElementById("summaryTo").innerHTML = "To : " + target_username;
+    document.getElementById("summaryAmount").innerHTML = "Rs " + amount + "/-";
+    document.getElementById("summaryRow").style.display = "flex";
+    
+}
 
 

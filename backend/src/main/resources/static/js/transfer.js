@@ -1,5 +1,10 @@
+const tokennn = sessionStorage.getItem("token")
 
-function transferr(passed_target) {
+console.log("dashboard token is : ",tokennn)
+
+
+
+async function transferr(passed_target) {
 
  
         let element = document.getElementById("target");
@@ -24,6 +29,7 @@ function transferr(passed_target) {
         if(target == "") {
             
             showToast("please fill the  details !!");
+            
 
         }
         
@@ -35,15 +41,29 @@ function transferr(passed_target) {
 
             let target_type = "phonenumber"
 
-            let action = "transfer"
-
-            sessionStorage.setItem("action", "transfer");
-            
-            sessionStorage.setItem("target", target);
-            sessionStorage.setItem("target_type", target_type);
 
 
-            window.location.href = "amount.html"
+
+             //now check whether an user exits with this target phonenumber
+
+            if(await check_the_existance_of_identity(target,target_type)){
+                //yes a user exits with these details 
+
+                //so continue the transfer flow
+                
+
+                sessionStorage.setItem("action", "transfer");
+                
+                sessionStorage.setItem("target", target);
+                sessionStorage.setItem("target_type", target_type);
+
+                window.location.href = "amount.html"
+
+            }
+            else{
+                //hoo no user exits with this identity - indicate no user found
+                showToast("No user found with that Phone Number")
+            }
 
 
         }
@@ -52,14 +72,30 @@ function transferr(passed_target) {
             //accno
             let target_type = "account"
 
-            let action = "transfer"
 
-            sessionStorage.setItem("action", "transfer");
+            //now check whether an user exits with this target accno 
+
+            if(await check_the_existance_of_identity(target,target_type)){
+                //yes a user exits with these details 
+
+                //so continue the transfer flow
+                
+
+                sessionStorage.setItem("action", "transfer");
+                
+                sessionStorage.setItem("target", target);
+                sessionStorage.setItem("target_type", target_type);
+
+                window.location.href = "amount.html"
+
+            }
+            else{
+                //hoo no user exits with this identity - indicate no user found
+                showToast("No user found with that Account Number")
+            }
+
+
             
-            sessionStorage.setItem("target", target);
-            sessionStorage.setItem("target_type", target_type);
-
-            window.location.href = "amount.html"
 
         }
         else {
@@ -71,5 +107,25 @@ function transferr(passed_target) {
         }
     
 
+
+}
+
+
+function check_the_existance_of_identity(target,target_type){
+
+    let url = `${API_BASE_URL}/check_the_existance_of_identity?target=${target}&target_type=${target_type}&token=${tokennn}`;
+
+    return fetch(url, {
+        method: 'GET'
+    })
+    .then(response => response.text())
+    .then(data => {
+        return data === "true";
+    })
+    .catch(error => {
+        showToast("Error checking the existance of target Account");
+        return false;
+    });
+    
 
 }
