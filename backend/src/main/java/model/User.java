@@ -67,6 +67,9 @@ public class User {
     @Column(name = "public_id", length = 255)
     private String publicId;
 
+    @Column(name = "wait_time_factor")
+    private Integer waitTimeFactor;
+
     
     public User() {}
     
@@ -87,6 +90,7 @@ public class User {
         this.accountStatus = "active";
         this.isLoggedIn = false;
         this.currentToken = null;
+        this.waitTimeFactor = 1;
     }
     
     // Getters
@@ -111,6 +115,7 @@ public class User {
     public String getCurrentToken() { return currentToken; }
     public String getImageUrl() { return imageUrl; }
     public String getPublicId() { return publicId; }
+    public Integer getWaitTimeFactor() { return waitTimeFactor; }
     
     // Setters
     public void setUserid(Long userid) { this.userid = userid; }
@@ -133,4 +138,5 @@ public class User {
     public void setCurrentToken(String currentToken) { this.currentToken = currentToken; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public void setPublicId(String publicId) { this.publicId = publicId; }
+    public void setWaitTimeFactor(Integer waitTimeFactor) { this.waitTimeFactor = waitTimeFactor; }
 }

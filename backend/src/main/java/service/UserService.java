@@ -626,17 +626,34 @@ public class UserService {
 	        if(user.getFailureAttempts() == 3){
 	            // limit reached - now assign a time - so after that time the attempts would be avaiable
 
+					//calculate the duration based on unit time and the cost factor
 
-					LocalTime time = LocalTime.now().plusSeconds(45);
+					int durationInSeconds = 30 * user.getWaitTimeFactor();
+
+
+					LocalTime time = LocalTime.now().plusSeconds(durationInSeconds);
+
+					//assign that time 
 
 					
 					user.setAvailableAt(time);
+
+
+					//now we are done calculating current wait time based on the wait factor and assigned it
+					//now as this is a failure attemtp , its a streak so we need to incremetn the mistake factor also 
+
+					//more the mistakes - increase in the pusnishement 
+
+					user.setWaitTimeFactor(user.getWaitTimeFactor() * 2);//as mistakes grow the level of punish grows 
+
+
+
+
 					userRepository.save(user);
 
-
+								//schedule it
 								String[] userdata = new String[1];
 								userdata[0] = user.getAccno();
-
 								schedulerService.scheduleTaskAt(time,"reset_user_login_attempts",userdata);
 					
 					//schedulerService.scheduleTaskAt(time,user.getAccno());//at that time our execute shsecudular would refresh the attempst - so that user would try attemptling
@@ -651,6 +668,10 @@ public class UserService {
 
 
 	public void reset_failure_attempts(String identity, String identity_type) {
+
+			//upon successful login reset the punishment 
+
+			//as the user becaome good boy , rest the pushnshment to miniimm , let hims grow
 	        
 	        User user;
 
@@ -669,6 +690,7 @@ public class UserService {
 
 	        user.setFailureAttempts( 0 );
 	        user.setAvailableAt( null);
+			user.setWaitTimeFactor( 1);
 	        userRepository.save(user);
 
 	        

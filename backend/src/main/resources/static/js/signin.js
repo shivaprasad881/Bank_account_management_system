@@ -229,6 +229,8 @@ function login(identity,identity_type,userpass){
 
 }
 
+
+
 function handleResponse(choice) {
     hideModal();
     
@@ -293,7 +295,6 @@ function showModal(message) {
     document.getElementById("modalMessage").innerHTML = message;
     document.getElementById("responseModal").style.display = "flex";
 }
-
 function hideModal() {
     document.getElementById("responseModal").style.display = "none";
 }
