@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Chats</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+        }
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 18px;
+        }
+        .user-accno {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .chat-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .chat-btn:hover {
+            background: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heading">
+            <h1>User Chats</h1>
+        </div>
+        <div class="users-list" id="usersList">
+            <!-- Users will appear here -->
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/customerqueries_users.js"></script>
+</body>
+</html>
