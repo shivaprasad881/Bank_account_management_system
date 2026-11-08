@@ -11,7 +11,6 @@ console.log(emp_token)
 let source = sessionStorage.getItem("source_page");
 let user_accno = sessionStorage.getItem("chat_accno");
 
-
 function fetch_chat(){
 
     //now check who is requesting - either customer or employee
