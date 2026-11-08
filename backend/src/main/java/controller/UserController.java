@@ -17,11 +17,13 @@ import service.QRCodeService;
 import java.time.LocalTime;
 import java.util.Map;
 
+import model.CustomerQuery;
 import model.Email;
 import model.User;
 import model.Employee;
 import model.Transaction;
 import model.Notification;
+import model.CustomerQuery;
 
 
 import repository.UserRepository;
@@ -29,6 +31,7 @@ import repository.EmailRepository;
 import repository.EmployeeRepository;
 import repository.TransactionRepository;
 import repository.NotificationRepository;
+import repository.CustomerQueryRepository;
 
 import org.springframework.http.HttpHeaders;
 
@@ -63,8 +66,12 @@ public class UserController {
 
 	@Autowired
     private TransactionRepository transactionRepository;
+
 	@Autowired
     private NotificationRepository notificationRepository;
+
+	@Autowired
+    private CustomerQueryRepository customerQueryRepository;
 
     @Autowired
     private UserService userService;
@@ -79,7 +86,42 @@ public class UserController {
     private QRCodeService qrCodeService;
 
 
+	@PostMapping("/send_message")
+	public ResponseEntity<?> sendMessage(@RequestBody Map<String, Object> jsonBody) {
+		try {
+			String token = (String) jsonBody.get("token");
+			String message = (String) jsonBody.get("message");
 
+			String accno = JwtUtil.validateToken(token);
+
+			CustomerQuery query = new CustomerQuery(accno, "sender", message);
+			customerQueryRepository.save(query);
+
+			return ResponseEntity.ok("Message sent");
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+	@PostMapping("/send_message2")
+	public ResponseEntity<?> sendMessage2(@RequestBody Map<String, Object> jsonBody) {
+		try {
+			String emp_token = (String) jsonBody.get("emp_token");
+			String user_accno = (String) jsonBody.get("user_accno");
+			String message = (String) jsonBody.get("message");
+
+			JwtUtil.validateToken(emp_token);
+
+			CustomerQuery query = new CustomerQuery(user_accno, "receiver", message);
+			customerQueryRepository.save(query);
+
+			return ResponseEntity.ok("Message sent");
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
 
 	@PostMapping("/generate")
 	public ResponseEntity<byte[]> generateQR(@RequestBody Map<String, String> requestBody) {
@@ -170,6 +212,49 @@ public class UserController {
 		}
 
 	}
+
+	@GetMapping("/get_all_users")
+	public ResponseEntity<?> getAllUsers(@RequestParam String emp_token) {
+		try {
+			JwtUtil.validateToken(emp_token);
+
+			List<User> users = userRepository.findAll();
+
+			return ResponseEntity.ok(users);
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+	@GetMapping("/fetch_chat_history")
+	public ResponseEntity<?> fetchChatHistory(@RequestParam String token) {
+		try {
+			String accno = JwtUtil.validateToken(token);
+
+			List<CustomerQuery> queries = customerQueryRepository.findByAccno(accno);
+
+			return ResponseEntity.ok(queries);
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+	}
+
+	@GetMapping("/fetch_chat_history2")
+	public ResponseEntity<?> fetchChatHistory2(@RequestParam String emp_token, @RequestParam String user_accno) {
+		try {
+			JwtUtil.validateToken(emp_token);
+
+			List<CustomerQuery> queries = customerQueryRepository.findByAccno(user_accno);
+
+			return ResponseEntity.ok(queries);
+
+		} catch (Exception e) {
+			return ResponseEntity.status(401).body("Invalid token");
+		}
+}
+
 
 	@GetMapping("/fetch_the_target_account_user_name")
 	public ResponseEntity<?> fetch_the_target_account_user_name(@RequestParam String token, @RequestParam String target, @RequestParam String target_type) {
