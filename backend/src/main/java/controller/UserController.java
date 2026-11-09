@@ -810,6 +810,24 @@ public class UserController {
 	}
 
 
+	@PatchMapping("/send_email")
+	public ResponseEntity<?> sendEmail(@RequestBody Map<String, Object> jsonBody) {
+		try {
+			String email = (String) jsonBody.get("email");
+			String subject = (String) jsonBody.get("subject");
+			String message = (String) jsonBody.get("message");
+
+		
+			emailUtil.sendEmail(email, subject, message);
+
+			return ResponseEntity.ok("Email sent successfully");
+
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("Failed to send email");
+		}
+	}
+
+
 	@PatchMapping("/failure_authentication")
 	public void failureauthentication(@RequestBody Map<String, Object> jsonBody) {
 	    String identity = (String) jsonBody.get("identity");
@@ -924,7 +942,7 @@ public class UserController {
 	public String verifyEmailAndSendOtp(@RequestBody Map<String, Object> jsonBody) {
 		String useremail = (String) jsonBody.get("email");
 
-		User user = userRepository.findByEmail(useremail);
+		User user = userRepository.findByEmail(useremail); 
 
 		if (user == null) {
 			return "false";

@@ -59,7 +59,7 @@ public class EmailUtil {
             System.out.println("Email error: " + e.getMessage());
             return false;
         }
-    }
+    } 
 
     public boolean sendotpp(String email) {
 

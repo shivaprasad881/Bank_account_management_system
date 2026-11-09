@@ -428,6 +428,6 @@ function stopScanner() {
 }
 
 function fetch_customer_queries(){
-    sessionStorage.setItem("source_page", "customer_dashboard");
+    sessionStorage.setItem("source_page", "customer_dashboard"); 
     window.location.href = "chat.html";
 }

@@ -80,3 +80,22 @@ function toggleInput() {
     }
 }
 toggleInput() 
+
+function saveDraft(text) {
+
+    sessionStorage.setItem('draft', text);
+    console.log(sessionStorage.getItem('draft'))
+}
+
+function runs_on_reload(){
+    //now the page is reloaded , the dtata in the text got loassed ,but we had the lates dat ain the session , so get the infor form it ,  now we hav ethe sesion as the backup with the latest dta , get the data from it
+
+    let saved = sessionStorage.getItem('draft');
+    if (saved !== null) {
+        document.getElementById('message').value = saved;
+    }
+
+    //now we successsfully brought the data from our backup session , now we are at athecurrent atate , then again teh changes and updates are pushed to the session for furthe rrecoverly
+}
+
+runs_on_reload();

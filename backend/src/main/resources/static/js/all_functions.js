@@ -272,13 +272,12 @@ function register(){
 
 
 
-             url = `${API_BASE_URL}/send_email`;
+            url = `${API_BASE_URL}/send_email`;
                         
             let sendingdata = {
                 email : email,
                 subject : "Your Registration successfull !!",
-                message: message,
-                verifyemail: "false"
+                message: message
             };
                         
             fetch(url, {
